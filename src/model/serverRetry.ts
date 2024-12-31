@@ -1,8 +1,8 @@
 import axios from "axios";
 import { NavigateFunction } from "react-router-dom";
 
-// export const url = "https://port-0-my-spring-app-m09c1v2t70d7f20e.sel4.cloudtype.app/api/";
-export const url = "http://localhost:8080/api/";
+export const url = "https://port-0-my-spring-app-m09c1v2t70d7f20e.sel4.cloudtype.app/api/";
+// export const url = "http://localhost:8080/api/";
 
 export async function severComposeArrayRetry<T,D>(api: string, setData1: (data: T[]) => void, setData2: (data: D[]) => void, maxRetries: number = 5, delay: number = 1000): Promise<void> {
     let attempts = 0;
