@@ -40,7 +40,7 @@ const EditProblem: React.FC<EditProblemProps> = ({ problems }) => {
 
   useEffect(() => {
     if (examples.length > 0) {
-      const newRefs = examples.map((example, index) => ({
+      const newRefs = examples.map(({}, index) => ({
         id: Date.now() + index,
         inputRef: React.createRef<HTMLTextAreaElement>(),
         outputRef: React.createRef<HTMLTextAreaElement>(),

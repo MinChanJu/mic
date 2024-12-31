@@ -147,7 +147,7 @@ const ChagePw: React.FC<UserProps> = ({ user }) => {
 
 const Solved: React.FC<UserProps> = ({ user }) => {
   return (
-    <div>내가 푼 문제</div>
+    <div>{user.name}</div>
   )
 }
 
