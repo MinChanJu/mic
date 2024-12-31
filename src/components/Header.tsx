@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from 'react-router-dom';
 import { Contest, CurrentContest, Problem, User } from "../model/talbe";
-import logo from "../image/MiC_logo.png"
+import logo from "../assets/MiC_logo.png"
 import './css/Header.css';
 
 interface HeaderProps {

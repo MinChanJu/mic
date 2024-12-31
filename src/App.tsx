@@ -3,7 +3,6 @@ import { Route, Routes } from 'react-router-dom';
 import { Contest, CurrentContest, Problem, User } from './model/talbe';
 import { severComposeArrayRetry } from './model/serverRetry';
 import Header from './components/Header';
-import './App.css'
 import Home from './components/Home';
 import Login from './components/Login';
 import ContestList from './components/ContestList';
@@ -16,6 +15,7 @@ import ProblemMake from './components/ProblemMake';
 import ProblemView from './components/ProblemView';
 import UserView from './components/UserView';
 import SettingView from './components/SettingView';
+import './App.css'
 
 function App() {
   const [user, setUser] = useState<User>(() => {
