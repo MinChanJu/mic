@@ -1,0 +1,130 @@
+.loginContainer {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 100px;
+}
+
+.loginBox {
+    position: relative;
+    width: 850px;
+    height: 600px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border-radius: 30px;
+}
+
+.signUp,
+.signIn,
+.changeBox,
+.signInDes,
+.signUpDes {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    padding: 20px;
+    text-align: center;
+    align-content: center;
+    transition: transform 1s;
+    box-sizing: border-box;
+}
+
+.signUpDes {
+    z-index: 4;
+}
+
+.signUpDes.move-left {
+    transform: translateX(-100%);
+}
+
+.signInDes {
+    transform: translateX(100%);
+    z-index: 4;
+}
+
+.signInDes.move-right {
+    transform: translateX(200%);
+}
+
+.signIn {
+    transform: translateX(0);
+    z-index: 2;
+    position: relative;
+    background-color: white;
+}
+
+.signUp {
+    transform: translateX(0);
+    z-index: 1;
+    background-color: white;
+}
+
+.changeBox {
+    transform: translateX(100%);
+    z-index: 3;
+    background-color: #355bc3;
+}
+
+.changeBox.move-left {
+    transform: translateX(0);
+}
+
+.changeBtn {
+    background-color: rgba(255, 0, 0, 0);
+    font-size: 20px;
+    border: none;
+    border-radius: 25px;
+    border: 1px solid white;
+    padding: 6px 12px;
+    color: white;
+}
+
+.changeBtn:hover {
+    cursor: pointer;
+}
+
+.changeBtn:active {
+    transform: scale(0.9);
+}
+
+.loginField {
+    width: 100%;
+    font-size: 14px;
+    padding: 8px;
+    border: 1px solid #1976d2;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.loginField:focus {
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.8);
+    border-color: #007BFF;
+    outline: none;
+}
+
+.loginButton {
+    background-color: #1976d2;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.input-group {
+    margin-top: 20px;
+}
+
+.regisTitle {
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+h1 {
+    margin: 0px;
+}

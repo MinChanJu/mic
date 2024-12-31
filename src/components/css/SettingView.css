@@ -1,0 +1,103 @@
+.setting-container {
+    display: flex;
+    margin: 0px auto;
+    width: 80%;
+    margin-top: 50px;
+}
+
+.setting-menu {
+    flex: 1;
+}
+
+.setting-menu-select {
+    height: 40px;
+    width: 100%;
+    text-align: center;
+    align-content: center;
+    border: 1px solid gray;
+    border-bottom: 0px;
+    box-sizing: border-box;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.last {
+    border-bottom: 1px solid gray;
+}
+
+.now {
+    background-color: rgb(218, 218, 218);
+}
+
+.admin-menu {
+    width: 100%;
+    text-align: center;
+    margin-top: 50px;
+    font-size: 25px;
+}
+
+.setting-view {
+    flex: 2.5;
+    padding-left: 20px;
+    box-sizing: border-box;
+}
+
+.view-title {
+    border-bottom: 1px solid gray;
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+.total-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.view-container {
+    display: flex;
+}
+
+.view-name {
+    flex: 1;
+    align-content: center;
+}
+
+.view-content {
+    flex: 4;
+    border: 1px solid gray;
+    padding: 2px 12px;
+    font-size: 15px;
+    border-radius: 12px;
+    align-content: center;
+    height: 30px;
+    width: 100%;
+}
+
+input.view-content {
+    border: 1px solid red;
+}
+
+.view-submit {
+    text-align: center;
+    width: 50px;
+    height: auto;
+    padding: 6px 12px;
+    border-radius: 10px;
+    background-color: rgb(102, 150, 252);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #898888;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: rgb(218, 216, 216);
+}

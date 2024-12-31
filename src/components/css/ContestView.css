@@ -1,0 +1,54 @@
+.ContestName {
+    font-size: 40px;
+    font-weight: 600;
+    max-width: 600px;
+    margin: 50px auto;
+    margin-bottom: 10px;
+    padding: 30px;
+    text-align: center;
+}
+
+.ContestDescription {
+    margin: 0px auto;
+    font-size: 20px;
+    max-width: 600px;
+    word-break: break-all;
+    text-align: center;
+    padding-left: 30px;
+    padding-right: 30px;
+    box-sizing: border-box;
+}
+
+.ContestUserId {
+    margin: 20px auto;
+    text-align: center;
+    max-width: 600px;
+    word-break: break-all;
+    font-size: 20px;
+    padding-left: 30px;
+    padding-right: 30px;
+    color: red;
+    box-sizing: border-box;
+    margin-bottom: 0px;
+}
+
+.ContestUserId > span {
+    cursor: pointer;
+}
+
+.owner {
+    display: flex;
+    gap: 100px;
+    justify-content: center;
+}
+
+.addProblem,
+.editButton,
+.deleteButton {
+    padding: 6px 12px;
+    border-radius: 10px;
+    background-color: rgb(129, 210, 250);
+    color: rgb(107, 77, 68);
+    cursor: pointer;
+    font-size: 20px;
+}

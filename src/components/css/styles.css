@@ -1,0 +1,26 @@
+.message {
+    color: red;
+    margin-top: 20px;
+}
+
+.loading {
+    height: 21px;
+    width: 21px;
+    margin: 0px auto;
+    box-sizing: border-box;
+    border: 2px solid rgb(143, 143, 143);
+    border-top: 2px solid black;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* 회전 애니메이션 정의 */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

@@ -1,0 +1,44 @@
+.list-container {
+    margin: 0px auto;
+    padding: 20px;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    margin: 50px auto;
+    max-width: 600px;
+    padding: 20px;
+    gap: 20px;
+    border: 2px solid gray;
+    border-radius: 30px;
+    box-sizing: border-box;
+}
+
+.element {
+    padding: 20px;
+    font-size: 20px;
+    text-align: left;
+    width: 100%;
+    word-wrap: break-word;
+    word-break: break-all;
+    background-color: aquamarine;
+    border-radius: 15px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+h3, h4 {
+    margin: 0px;
+    cursor: pointer;
+}
+
+p {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+a {
+    color: black;
+    text-decoration: none;
+}
