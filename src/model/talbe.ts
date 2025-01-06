@@ -6,6 +6,7 @@ export type User = {
   phone: string,
   email: string,
   authority: number,
+  contest: number,
   createdAt: string,
 }
 
@@ -15,6 +16,7 @@ export type Contest = {
   contestName: string,
   contestDescription: string,
   contestPw: string,
+  eventTime: string,
   createdAt: string,
 }
 

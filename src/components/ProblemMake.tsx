@@ -5,7 +5,7 @@ import { autoResize } from "../model/commonFunction";
 import axios from "axios";
 import "./css/ProblemMake.css"
 import "./css/styles.css"
-import { url } from "../model/serverRetry";
+import { url } from "../model/server";
 
 interface ProblemMakeProps {
   currentContest: CurrentContest

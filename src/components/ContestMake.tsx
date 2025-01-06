@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Contest, CurrentContest, User } from "../model/talbe";
-import { url } from "../model/serverRetry";
+import { url } from "../model/server";
 import axios from "axios";
 import "./css/ContestMake.css"
 import "./css/styles.css"
@@ -20,6 +20,7 @@ const ContestMake: React.FC<ContestMakeProps> = ({ user, setCurrentContest }) =>
   const contestPasswordRef = useRef<HTMLInputElement | null>(null);
   const contestCheckPasswordRef = useRef<HTMLInputElement | null>(null);
   const contestDescriptionRef = useRef<HTMLTextAreaElement | null>(null);
+  const eventTimeRef = useRef<HTMLInputElement | null>(null);
 
   const handleSubmit = async () => {
     setIsLoading(true)
@@ -27,11 +28,14 @@ const ContestMake: React.FC<ContestMakeProps> = ({ user, setCurrentContest }) =>
       contestNameRef.current &&
       contestPasswordRef.current &&
       contestCheckPasswordRef.current &&
-      contestDescriptionRef.current) {
+      contestDescriptionRef.current &&
+      eventTimeRef.current) {
       if (userIdRef.current.value === user.userId && user.userId !== "") {
         if (contestPasswordRef.current.value === contestCheckPasswordRef.current.value) {
           if (contestNameRef.current.value !== '') {
             let attempts = 0;
+            const localDateTime = eventTimeRef.current.value;
+            const isoDateTime = new Date(localDateTime).toISOString();
 
             while (attempts < 5) {
               try {
@@ -39,7 +43,8 @@ const ContestMake: React.FC<ContestMakeProps> = ({ user, setCurrentContest }) =>
                   userId: userIdRef.current.value,
                   contestName: contestNameRef.current.value,
                   contestDescription: contestDescriptionRef.current.value,
-                  contestPw: contestPasswordRef.current.value
+                  contestPw: contestPasswordRef.current.value,
+                  eventTime: isoDateTime,
                 }, { timeout: 10000 });
 
                 if (response.data === "") {
@@ -105,6 +110,10 @@ const ContestMake: React.FC<ContestMakeProps> = ({ user, setCurrentContest }) =>
             </div>
           </div>
           <div style={{ marginTop: '10px', color: 'red' }}>누구나 접근할 수 있는 대회를 개최하려면 빈칸으로 해주세요.</div>
+          <div className="make-group">
+            <div className="makeTitle">대회 개최 시간</div>
+            <input className="makeField" ref={eventTimeRef} type="datetime-local" id="contestName"></input>
+          </div>
           <div className="make-group">
             <div className="makeTitle">대회 설명</div>
             <textarea className="makeField" ref={contestDescriptionRef} style={{ height: '100px' }} id="contestDescription" />

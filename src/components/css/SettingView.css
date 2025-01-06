@@ -96,6 +96,7 @@ th, td {
     border: 1px solid #898888;
     padding: 8px;
     text-align: left;
+    word-break: break-all;
 }
 
 th {

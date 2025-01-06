@@ -3,9 +3,10 @@ import { Code, Problem, User } from "../model/talbe";
 import { useNavigate, useParams } from "react-router-dom";
 import { autoResize } from "../model/commonFunction";
 import { MathJax, MathJaxContext } from 'better-react-mathjax';
-import { serverMessageWithObjectRetry, serverNoReturnRetry } from "../model/serverRetry";
+import { url } from "../model/server";
 import "./css/ProblemView.css";
 import "./css/styles.css";
+import axios from "axios";
 
 interface ProblemViewProps {
   user: User
@@ -97,15 +98,26 @@ const ProblemView: React.FC<ProblemViewProps> = ({ user, problems }) => {
   const submitCode = async () => {
     setMessage("")
     if (code !== "") {
-      let codeDTO: Code = {code: code, lang: lang, problemId: problem[0].id}
-      serverMessageWithObjectRetry<string, Code>('code', codeDTO, setMessage, setIsLoading)
+      let codeDTO: Code = { code: code, lang: lang, problemId: problem[0].id }
+      async function serverMessage() {
+        setIsLoading(true)
+        const response = await axios.post<string>(url + 'code', codeDTO, { timeout: 10000 });
+        setMessage(response.data);
+        setIsLoading(false)
+      }
+      serverMessage();
     } else {
       setMessage("코드를 작성해주세요")
     }
   }
 
   const deleteProblem = () => {
-    serverNoReturnRetry(`problems/${id}`, null, "delete", "/contest", navigate)
+    async function serverNoReturn() {
+      await axios.delete(url + `contests/${id}`, { timeout: 10000 });
+      navigate("/contest")
+      window.location.reload()
+    }
+    serverNoReturn();
   }
 
   const goToProblemEdit = () => {
@@ -116,13 +128,13 @@ const ProblemView: React.FC<ProblemViewProps> = ({ user, problems }) => {
     <div className="Problem">
       <div className="prblemName">{problem[0]?.problemName}</div>
       {(user.authority === 5 || user.userId === problem[0]?.userId) &&
-        <div className="owner" style={{marginTop: '30px'}}>
+        <div className="owner" style={{ marginTop: '30px' }}>
           <span className="editButton" onClick={goToProblemEdit}>편집</span>
           <span className="deleteButton" onClick={deleteProblem}>삭제</span>
         </div>
       }
       <MathJaxContext config={mathJaxConfig}>
-        <div  style={{ position: 'relative', zIndex: -1 }}>
+        <div style={{ position: 'relative', zIndex: -1 }}>
           <div className="titleDes">
             <div className="desName">문제 설명</div>
             <div className="problemDes"><MathJax>{problem[0]?.problemDescription}</MathJax></div>
@@ -149,22 +161,22 @@ const ProblemView: React.FC<ProblemViewProps> = ({ user, problems }) => {
       </div>
       {user.id === -1 && <div className="resultMessage">코드를 제출하려면 로그인을 해주세요.</div>}
       {user.id !== -1 && <><div className="resultMessage">{message}</div>
-      <div className="doubleDes">
-        <div className="titleDes">
-          <div className="desName">코드</div>
+        <div className="doubleDes">
+          <div className="titleDes">
+            <div className="desName">코드</div>
+          </div>
+          <div className="titleDes left">
+            <select className="desName" value={lang} onChange={handleLanguageChange}>
+              <option value="Python">Python</option>
+              <option value="C">C</option>
+              <option value="JAVA">JAVA</option>
+            </select>
+          </div>
         </div>
-        <div className="titleDes left">
-          <select className="desName" value={lang} onChange={handleLanguageChange}>
-            <option value="Python">Python</option>
-            <option value="C">C</option>
-            <option value="JAVA">JAVA</option>
-          </select>
-        </div>
-      </div>
-      <textarea className="codeForm" ref={textareaRef} onInput={handleInput} onKeyDown={insertKey} spellCheck={false} value={code} id="code"></textarea>
-      <div className="submitCode" onClick={submitCode}>
-        {isLoading ? <div className="loading"></div> : <div>제출</div>}
-      </div></>}
+        <textarea className="codeForm" ref={textareaRef} onInput={handleInput} onKeyDown={insertKey} spellCheck={false} value={code} id="code"></textarea>
+        <div className="submitCode" onClick={submitCode}>
+          {isLoading ? <div className="loading"></div> : <div>제출</div>}
+        </div></>}
     </div>
   )
 }

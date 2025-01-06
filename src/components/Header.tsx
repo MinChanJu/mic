@@ -58,7 +58,7 @@ const Header:React.FC<HeaderProps> = ({user,setUser,problems,contests,setCurrent
 
   const logout = () => {
     sessionStorage.removeItem('user');
-    setUser({id: -1, name: '', userId: '', userPw: '', phone: '', email: '', authority: 0, createdAt: ''});
+    setUser({id: -1, name: '', userId: '', userPw: '', phone: '', email: '', authority: 0, contest: -1, createdAt: ''});
     window.location.reload();
   }
 

@@ -2,8 +2,9 @@ import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Contest, Problem, User } from "../model/talbe";
 import './css/ContestView.css';
-import { serverNoReturnRetry } from "../model/serverRetry";
+import { url } from "../model/server";
 import { MathJaxContext } from "better-react-mathjax";
+import axios from "axios";
 
 interface ContestViewProps {
   user: User
@@ -36,7 +37,12 @@ const ContestView: React.FC<ContestViewProps> = ({ user, contests, problems }) =
   };
 
   const deleteContest = (contestId: number) => {
-    serverNoReturnRetry(`contests/${contestId}`, null, "delete", "/contest", navigate)
+    async function serverNoReturn() {
+      await axios.delete(url + `contests/${contestId}`, { timeout: 10000 });
+      navigate("/contest")
+      window.location.reload()
+    }
+    serverNoReturn();
   }
 
   const goToProblemMake = () => {

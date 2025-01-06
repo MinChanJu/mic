@@ -4,7 +4,7 @@ import { User } from "../model/talbe";
 import axios from "axios";
 import './css/Login.css'
 import './css/styles.css'
-import { url } from "../model/serverRetry";
+import { url } from "../model/server";
 
 interface LoginProps {
   setUser: React.Dispatch<React.SetStateAction<User>>;
@@ -115,36 +115,20 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
         const password = signUpPasswordRef.current!.value;
         const checkPassword = signUpCheckPasswordRef.current!.value;
         if (password === checkPassword) {
-          let attempts = 0;
-
-          while (attempts < 5) {
-            try {
-              const response = await axios.post(url + `users/create`,
-                {
-                  name: signUpNameRef.current.value,
-                  phone: signUpPhoneRef.current.value,
-                  userId: signUpIdRef.current.value,
-                  userPw: signUpPasswordRef.current.value,
-                  email: signUpEmailRef.current.value,
-                  authority: 0,
-                }, { timeout: 10000 });
-              if (response.data === "") {
-                setregisterMessage(isPasswordValid(password))
-              } else {
-                setregisterMessage("회원가입 성공!")
-              }
-              break;  // 성공 시 루프 탈출
-            } catch (error: any) {
-              attempts++;
-              console.error(`Attempt ${attempts} failed for register. Error: ${error.message}`);
-              if (attempts >= 5) {
-                console.error(`All ${5} attempts failed for register.`);
-                setregisterMessage("서버 에러 또는 이미 존재하는 아이디")
-                break;
-              }
-              console.log(`Retrying register in ${1000 / 1000}s...`);
-              await new Promise(resolve => setTimeout(resolve, 1000));
-            }
+          const response = await axios.post(url + `users/create`,
+            {
+              name: signUpNameRef.current.value,
+              phone: signUpPhoneRef.current.value,
+              userId: signUpIdRef.current.value,
+              userPw: signUpPasswordRef.current.value,
+              email: signUpEmailRef.current.value,
+              authority: 1,
+              contest: -1,
+            }, { timeout: 10000 });
+          if (response.data === "") {
+            setregisterMessage(isPasswordValid(password))
+          } else {
+            setregisterMessage("회원가입 성공!")
           }
         } else {
           setregisterMessage("비밀번호가 일치하지 않습니다.")
@@ -158,34 +142,16 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
 
   const loginUser = async () => {
     setIsLoading(true)
-    if (signInIdRef.current &&
-      signInPasswordRef.current) {
-      if (signInIdRef.current.value !== "" &&
-        signInPasswordRef.current.value !== "") {
-        let attempts = 0;
-
-        while (attempts < 5) {
-          try {
-            const response = await axios.post(url + `users/${signInIdRef.current.value}/${signInPasswordRef.current.value}`, { timeout: 10000 });
-            if (response.data === "") {
-              setloginMessage("잘못된 아이디 또는 비밀번호")
-            } else {
-              setUser(response.data as User)
-              sessionStorage.setItem('user', JSON.stringify(response.data));
-              navigate('/home');
-            }
-            break;  // 성공 시 루프 탈출
-          } catch (error: any) {
-            attempts++;
-            console.error(`Attempt ${attempts} failed for login. Error: ${error.message}`);
-            if (attempts >= 5) {
-              console.error(`All ${5} attempts failed for login.`);
-              setloginMessage("서버 에러")
-              break;
-            }
-            console.log(`Retrying login in ${1000 / 1000}s...`);
-            await new Promise(resolve => setTimeout(resolve, 1000));
-          }
+    if (signInIdRef.current && signInPasswordRef.current) {
+      if (signInIdRef.current.value !== "" && signInPasswordRef.current.value !== "") {
+        const response = await axios.post(url + `users/${signInIdRef.current.value}/${signInPasswordRef.current.value}`, { timeout: 10000 });
+        if (response.data === "") {
+          setloginMessage("잘못된 아이디 또는 비밀번호")
+        } else {
+          setUser(response.data as User)
+          sessionStorage.setItem('user', JSON.stringify(response.data));
+          navigate('/home');
+          window.location.reload()
         }
       } else {
         setloginMessage("빈칸을 채워 넣으세요")

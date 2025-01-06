@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Example, Problem } from "../model/talbe";
 import { useNavigate, useParams } from "react-router-dom";
-import { url, severArrayRetry } from "../model/serverRetry";
+import { url, severArray } from "../model/server";
 import { autoResize } from "../model/commonFunction";
 import axios from "axios";
 
@@ -32,10 +32,7 @@ const EditProblem: React.FC<EditProblemProps> = ({ problems }) => {
   const problemExampleOutputRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
-    severArrayRetry(
-      `api/problems/examples/${id}`,
-      setExamples
-    )
+    severArray( `problems/examples/${id}`, setExamples);
   }, []);
 
   useEffect(() => {

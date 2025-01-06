@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Contest, User } from "../model/talbe";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import { url } from "../model/serverRetry";
+import { url } from "../model/server";
 
 interface EditContestProps {
   user: User

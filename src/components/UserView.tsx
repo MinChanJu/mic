@@ -1,26 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { User } from "../model/talbe";
-import { severObjectRetry } from '../model/serverRetry';
+import { url } from '../model/server';
 import "./css/UserView.css"
+import axios from "axios";
 
-const UserView:React.FC = () => {
-  const { id } = useParams<{id: string}>();
+const UserView: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const [curUser, setCurUser] = useState<User>();
   const [year, setYear] = useState<string>();
   const [month, setMonth] = useState<string>();
   const [day, setDay] = useState<string>();
-  
+
   useEffect(() => {
     if (id) {
-      severObjectRetry(`users/${id}`, setCurUser);
+      async function serverObject() {
+        const response = await axios.post<User>(url + `users/${id}`, null, { timeout: 10000 });
+        setCurUser(response.data);
+      }
+      serverObject();
     }
   }, [id]);
 
   useEffect(() => {
-    setYear(curUser?.createdAt.substring(0,4))
-    setMonth(curUser?.createdAt.substring(5,7))
-    setDay(curUser?.createdAt.substring(8,10))
+    setYear(curUser?.createdAt.substring(0, 4))
+    setMonth(curUser?.createdAt.substring(5, 7))
+    setDay(curUser?.createdAt.substring(8, 10))
   }, [curUser])
 
   return (
