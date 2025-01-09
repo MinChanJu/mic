@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Contest, Problem, User } from "../model/talbe";
+import { Contest, Problem, Solved, User } from "../model/talbe";
 import { url } from "../model/server";
 import './css/SettingView.css'
 import { useNavigate } from "react-router-dom";
@@ -9,9 +9,10 @@ interface SettingViewProps {
   user: User
   contests: Contest[]
   problems: Problem[]
+  solveds: Solved[]
 }
 
-const SettingView: React.FC<SettingViewProps> = ({ user, contests, problems }) => {
+const SettingView: React.FC<SettingViewProps> = ({ user, contests, problems, solveds }) => {
   const [data, setData] = useState<string>("정보")
   return (
     <div className="setting-container">
@@ -31,7 +32,7 @@ const SettingView: React.FC<SettingViewProps> = ({ user, contests, problems }) =
         <div className="view-title">{data}</div>
         {data === "정보" && <Info user={user} />}
         {data === "비밀번호 변경" && <ChagePw user={user} />}
-        {data === "내가 푼 문제" && <Solved user={user} />}
+        {data === "내가 푼 문제" && <SolvedPage problems={problems} solveds={solveds} />}
         {data === "만든 문제" && <MakePro user={user} problems={problems} />}
         {data === "만든 대회" && <MakeCon user={user} contests={contests} />}
         {data === "회원 관리" && <UserManage user={user} contests={contests} />}
@@ -148,9 +149,37 @@ const ChagePw: React.FC<UserProps> = ({ user }) => {
   )
 }
 
-const Solved: React.FC<UserProps> = ({ user }) => {
+interface solvdeProps {
+  problems: Problem[]
+  solveds: Solved[]
+}
+
+const SolvedPage: React.FC<solvdeProps> = ({ problems, solveds }) => {
+  const solvedProblems = problems.filter((problem) => {
+    const solve = solveds.some((solved) => solved.problemId == problem.id);
+    return solve;
+  })
   return (
-    <div>{user.name}</div>
+    <div>
+      <table>
+        <thead>
+          <tr>
+            <th style={{width: "30px", textAlign: "center"}}>번호</th>
+            <th>문제 제목</th>
+            <th style={{width: "30px", textAlign: "center"}}>해결</th>
+          </tr>
+        </thead>
+        <tbody>
+          {solvedProblems.map((problem) => (
+            <tr key={problem.id}>
+              <td>{problem.id}</td>
+              <td>{problem.problemName}</td>
+              <td><div className="solved" style={{backgroundColor: "rgb(0, 255, 0)"}}>해결</div></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }
 
@@ -172,7 +201,7 @@ const MakePro: React.FC<ProblemProps> = ({ user, problems }) => {
       <table>
         <thead>
           <tr>
-            <th>번호</th>
+            <th style={{width: "30px", textAlign: "center"}}>번호</th>
             <th>문제 이름</th>
             <th>주최자</th>
           </tr>
@@ -209,7 +238,7 @@ const MakeCon: React.FC<ContestProps> = ({ user, contests }) => {
       <table>
         <thead>
           <tr>
-            <th>번호</th>
+            <th style={{width: "30px", textAlign: "center"}}>번호</th>
             <th>대회 이름</th>
             <th>주최자</th>
           </tr>
@@ -245,8 +274,11 @@ const UserManage: React.FC<ContestProps> = ({ user, contests }) => {
     setEnters(updatedEnters);
   };
 
-  const handleChange = (index: number) => {
-    console.log("authority : " + authoritys[index] + "  enters : " + enters[index]);
+  const handleChange = async (user: User, index: number) => {
+    let updateUser = user;
+    updateUser.authority = authoritys[index]
+    updateUser.contest = enters[index]
+    await axios.put(url + `users/${user.id}`, updateUser, {timeout: 10000});
   };
 
   useEffect(() => {
@@ -269,7 +301,7 @@ const UserManage: React.FC<ContestProps> = ({ user, contests }) => {
       <table>
         <thead>
           <tr>
-            <th>번호</th>
+            <th style={{width: "30px", textAlign: "center"}}>번호</th>
             <th>이름</th>
             <th>아이디</th>
             <th>이메일</th>
@@ -287,7 +319,7 @@ const UserManage: React.FC<ContestProps> = ({ user, contests }) => {
               <td>{user.email}</td>
               <td><input type="number" value={authoritys[index]} onChange={(event) => handleChangeAuthority(index, event)} min="0" max="5" step="1"></input></td>
               <td><input type="number" value={enters[index]} onChange={(event) => handleChangeEnter(index, event)} min="-1" max={contests.reduce((max, item) => (item.id > max ? item.id : max), 0).toString()} step="1"></input></td>
-              <td><button onClick={() => handleChange(index)}>수정</button></td>
+              <td><button onClick={() => handleChange(user, index)}>수정</button></td>
             </tr>
           ))}
         </tbody>

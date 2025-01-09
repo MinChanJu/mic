@@ -144,11 +144,11 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
     setIsLoading(true)
     if (signInIdRef.current && signInPasswordRef.current) {
       if (signInIdRef.current.value !== "" && signInPasswordRef.current.value !== "") {
-        const response = await axios.post(url + `users/${signInIdRef.current.value}/${signInPasswordRef.current.value}`, { timeout: 10000 });
-        if (response.data === "") {
+        const response = await axios.post<User>(url + `users/${signInIdRef.current.value}/${signInPasswordRef.current.value}`, { timeout: 10000 });
+        if (response.data.id == -1) {
           setloginMessage("잘못된 아이디 또는 비밀번호")
         } else {
-          setUser(response.data as User)
+          setUser(response.data)
           sessionStorage.setItem('user', JSON.stringify(response.data));
           navigate('/home');
           window.location.reload()

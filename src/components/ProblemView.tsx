@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Code, Problem, User } from "../model/talbe";
+import { Code, Problem, Solved, User } from "../model/talbe";
 import { useNavigate, useParams } from "react-router-dom";
 import { autoResize } from "../model/commonFunction";
 import { MathJax, MathJaxContext } from 'better-react-mathjax';
@@ -11,9 +11,11 @@ import axios from "axios";
 interface ProblemViewProps {
   user: User
   problems: Problem[]
+  solveds: Solved[]
+  setSolveds: React.Dispatch<React.SetStateAction<Solved[]>>;
 }
 
-const ProblemView: React.FC<ProblemViewProps> = ({ user, problems }) => {
+const ProblemView: React.FC<ProblemViewProps> = ({ user, problems, solveds, setSolveds }) => {
   const { id } = useParams();
   const problem = problems.filter(problem => problem.id === Number(id));
   const [lang, setLang] = useState<string>('Python');
@@ -103,6 +105,22 @@ const ProblemView: React.FC<ProblemViewProps> = ({ user, problems }) => {
         setIsLoading(true)
         const response = await axios.post<string>(url + 'code', codeDTO, { timeout: 10000 });
         setMessage(response.data);
+        let solvedDTO = { userId: user.userId, problemId: problem[0].id, score: "실패" };
+        if (response.data as unknown as number == 100) solvedDTO.score = "정답";
+        const response2 = await axios.post<Solved>(url + `users/solved`, solvedDTO, { timeout: 10000 });
+        setSolveds((prevSolveds) => {
+          const exists = prevSolveds.some((solved) => solved.userId === solvedDTO.userId && solved.problemId == solvedDTO.problemId);
+          console.log(exists)
+          if (exists) {
+            return prevSolveds.map((solved) =>
+              solved.userId === solvedDTO.userId && solved.problemId === solvedDTO.problemId
+                ? { ...solved, score: solvedDTO.score }
+                : solved
+            );
+          } else {
+            return [...prevSolveds, response2.data];
+          }
+        });
         setIsLoading(false)
       }
       serverMessage();
@@ -133,6 +151,16 @@ const ProblemView: React.FC<ProblemViewProps> = ({ user, problems }) => {
           <span className="deleteButton" onClick={deleteProblem}>삭제</span>
         </div>
       }
+      {(() => {
+        const filtered = solveds.filter((solved) => solved.userId === user.userId && solved.problemId === problem[0].id);
+
+        if (filtered.length === 0) return <></>;
+
+        const score = filtered[0].score;
+        const style = (score === "정답" ? { backgroundColor: "rgb(0, 255, 0)" } : { backgroundColor: "rgb(255, 0, 0)" });
+
+        return <div className="owner"><div className="solved" style={style}>{score}</div></div>;
+      })()}
       <MathJaxContext config={mathJaxConfig}>
         <div style={{ position: 'relative', zIndex: -1 }}>
           <div className="titleDes">

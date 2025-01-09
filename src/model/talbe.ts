@@ -42,6 +42,14 @@ export type Example = {
   createdAt: string
 }
 
+export type Solved = {
+  id: number,
+  userId: string,
+  problemId: number,
+  score: string,
+  createdAt: string
+}
+
 export type CurrentContest = {
   contestId: number,
   contestName: string

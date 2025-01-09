@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Contest, Problem, User } from "../model/talbe";
+import { Contest, Problem, Solved, User } from "../model/talbe";
 import './css/ContestView.css';
 import { url } from "../model/server";
 import { MathJaxContext } from "better-react-mathjax";
@@ -10,9 +10,10 @@ interface ContestViewProps {
   user: User
   contests: Contest[]
   problems: Problem[]
+  solveds: Solved[]
 }
 
-const ContestView: React.FC<ContestViewProps> = ({ user, contests, problems }) => {
+const ContestView: React.FC<ContestViewProps> = ({ user, contests, problems, solveds }) => {
   const { id } = useParams();
   const contest = contests.filter(contest => contest.id === Number(id));
   const contestProblems = problems
@@ -53,6 +54,8 @@ const ContestView: React.FC<ContestViewProps> = ({ user, contests, problems }) =
     navigate(`/contest/edit/${id}`)
   }
 
+  if (new Date(contest[0].eventTime) >= new Date() && user.authority != 5 && user.userId !== contest[0].userId) return (<div>아직 아님</div>)
+
   return (
     <div>
       <div className="ContestName">{contest[0]?.contestName}</div>
@@ -65,16 +68,38 @@ const ContestView: React.FC<ContestViewProps> = ({ user, contests, problems }) =
         </div>
       }
       <div className="list-container">
-        <div className='list'>
-          <MathJaxContext config={mathJaxConfig}>
-            {contestProblems.map((problem, index) => (
-              <div className='element' onClick={() => { goToProblemId(problem.id) }} key={problem.id}>
-                <h4>{index + 1}. {problem.problemName}</h4>
-                {problem.problemDescription.length > 50 && <p>{problem.problemDescription.slice(0, 50)} ...</p>}
-                {problem.problemDescription.length <= 50 && <p>{problem.problemDescription}</p>}
-              </div>
-            ))}
-          </MathJaxContext>
+        <div className='list' style={{ maxWidth: "600px" }}>
+          <table>
+            <thead>
+              <tr>
+                <th style={{ width: "30px", textAlign: "center" }}>번호</th>
+                <th>문제 제목</th>
+                <th style={{ width: "50px", textAlign: "center" }}>해결</th>
+              </tr>
+            </thead>
+            <tbody>
+              <MathJaxContext config={mathJaxConfig}>
+                {contestProblems.map((problem, index) => (
+                  <tr className='element' key={problem.id}>
+                    <td style={{ textAlign: "center" }}>{index + 1}</td>
+                    <td onClick={() => { goToProblemId(problem.id) }}>{problem.problemName}</td>
+                    <td>
+                      {(() => {
+                        const filtered = solveds.filter((solved) => solved.userId === user.userId && solved.problemId === problem.id);
+
+                        if (filtered.length === 0) return <></>;
+
+                        const score = filtered[0].score;
+                        const style = (score === "정답" ? { backgroundColor: "rgb(0, 255, 0)" } : { backgroundColor: "rgb(255, 0, 0)" });
+
+                        return <div className="solved" style={style}>{score}</div>;
+                      })()}
+                    </td>
+                  </tr>
+                ))}
+              </MathJaxContext>
+            </tbody>
+          </table>
           {(user.authority === 5 || user.userId === contest[0]?.userId) &&
             <div className="owner">
               <span className="addProblem" onClick={goToProblemMake}>문제 추가</span>

@@ -1,25 +1,23 @@
 import axios from "axios";
-// import { NavigateFunction } from "react-router-dom";
-import { Contest, Problem } from "./talbe";
+import { Contest, Problem, Solved, User } from "./talbe";
 
-// export const url = "https://port-0-my-spring-app-m09c1v2t70d7f20e.sel4.cloudtype.app/api/";
-export const url = "http://localhost:8080/api/";
+export const url = "https://port-0-my-spring-app-m09c1v2t70d7f20e.sel4.cloudtype.app/api/";
+// export const url = "http://localhost:8080/api/";
 
-export async function severComposeData(api: string, id: number, setProblems: (data: Problem[]) => void, setFinishProblems: (data: Problem[]) => void, setContests: (data: Contest[]) => void, setFinishContests: (data: Contest[]) => void) {
+export async function severComposeData(api: string, user: User, setProblems: (data: Problem[]) => void, setContests: (data: Contest[]) => void, setSolveds: (data: Solved[]) => void) {
     const response = await axios.post<{ problems: Problem[], contests: Contest[] }>(url + api, null, { timeout: 10000 });
     const data = response.data;
-    setProblems(data.problems);
-    setContests(data.contests);
-    if (id == -1) {
-        setFinishProblems(data.problems.filter((problem) => { 
-            const contest = data.contests.find((contest) => contest.id === problem.contestId);
-            if (contest) return new Date(contest.eventTime) < new Date();
-            else return false;
-        }));
-        setFinishContests(data.contests.filter((contest) => { return new Date(contest.eventTime) < new Date(); }));
+    if (user.contest == -1) {
+        setProblems(data.problems.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+        setContests(data.contests.sort((a, b) => new Date(b.eventTime).getTime() - new Date(a.eventTime).getTime()));
     } else {
-        setFinishProblems(data.problems.filter((problem) => { return problem.contestId == id; }));
-        setFinishContests(data.contests.filter((contest) => { return contest.id == id; }));
+        setProblems(data.problems.filter((problem) => { return problem.contestId == user.contest; }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+        setContests(data.contests.filter((contest) => { return contest.id == user.contest; }).sort((a, b) => new Date(b.eventTime).getTime() - new Date(a.eventTime).getTime()));
+    }
+
+    if (user.id != -1) {
+        const response = await axios.post<Solved[]>(url + `users/solved/${user.userId}`, { timeout: 10000 });
+        setSolveds(response.data);
     }
 }
 
