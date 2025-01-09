@@ -26,3 +26,6 @@ dist-ssr
 # MacOs
 .DS_Store
 ._*
+
+# sub
+sub.md
