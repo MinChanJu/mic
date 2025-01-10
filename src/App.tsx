@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Route, Routes } from 'react-router-dom';
-import { Contest, CurrentContest, Problem, Solved, User } from './model/talbe';
+import { Contest, CurrentContest, Problem, Solved, User, InitUser, InitCurrentContest } from './model/talbe';
 import { severComposeData } from './model/server';
 import Header from './components/Header';
 import Home from './components/Home';
@@ -16,13 +16,14 @@ import ProblemView from './components/ProblemView';
 import UserView from './components/UserView';
 import SettingView from './components/SettingView';
 import './App.css'
+import ScoreBoard from './components/ScoreBoad';
 
 function App() {
   const [user, setUser] = useState<User>(() => {
     const savedUser = sessionStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : { id: -1, name: '', userId: '', userPw: '', phone: '', email: '', authority: -1, contest: -1, createdAt: '' };
+    return savedUser ? JSON.parse(savedUser) : InitUser;
   });
-  const [currentContest,setCurrentContest] = useState<CurrentContest>({contestId:-1, contestName: ''})
+  const [currentContest,setCurrentContest] = useState<CurrentContest>(InitCurrentContest)
   const [problems, setProblems] = useState<Problem[]>([]);
   const [contests, setContests] = useState<Contest[]>([]);
   const [solveds, setSolveds] = useState<Solved[]>([]);
@@ -41,7 +42,8 @@ function App() {
         <Route path="/contest" element={<ContestList user={user} contests={contests} setCurrentContest={setCurrentContest} />} />
         <Route path="/contest/edit/:id" element={<EditContest user={user} contests={contests} />} />
         <Route path="/contest/make" element={<ContestMake user={user} setCurrentContest={setCurrentContest} />} />
-        <Route path="/contest/:id" element={<ContestView user={user} contests={contests} problems={problems} solveds={solveds} />} />
+        <Route path="/contest/:id" element={<ContestView user={user} contests={contests} problems={problems} solveds={solveds} setCurrentContest={setCurrentContest} />} />
+        <Route path="/score/:id" element={<ScoreBoard contests={contests} problems={problems} />} />
         <Route path="/problem" element={<ProblemList user={user} contests={contests} problems={problems} solveds={solveds} />} />
         <Route path="/problem/edit/:id" element={<EditProblem problems={problems} />} />
         <Route path="/problem/make" element={<ProblemMake currentContest={currentContest} user={user} />} />
@@ -50,7 +52,6 @@ function App() {
         <Route path="/setting" element={<SettingView user={user} contests={contests} problems={problems} solveds={solveds} />} />
       </Routes>
     </div>
-
   )
 }
 

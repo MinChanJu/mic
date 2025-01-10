@@ -21,6 +21,7 @@ const ContestMake: React.FC<ContestMakeProps> = ({ user, setCurrentContest }) =>
   const contestCheckPasswordRef = useRef<HTMLInputElement | null>(null);
   const contestDescriptionRef = useRef<HTMLTextAreaElement | null>(null);
   const eventTimeRef = useRef<HTMLInputElement | null>(null);
+  const timeRef = useRef<HTMLInputElement | null>(null);
 
   const handleSubmit = async () => {
     setIsLoading(true)
@@ -29,44 +30,30 @@ const ContestMake: React.FC<ContestMakeProps> = ({ user, setCurrentContest }) =>
       contestPasswordRef.current &&
       contestCheckPasswordRef.current &&
       contestDescriptionRef.current &&
-      eventTimeRef.current) {
+      eventTimeRef.current &&
+      timeRef.current) {
       if (userIdRef.current.value === user.userId && user.userId !== "") {
         if (contestPasswordRef.current.value === contestCheckPasswordRef.current.value) {
           if (contestNameRef.current.value !== '') {
-            let attempts = 0;
             const localDateTime = eventTimeRef.current.value;
             const isoDateTime = new Date(localDateTime).toISOString();
 
-            while (attempts < 5) {
-              try {
-                let response = await axios.post(url + `contests/create`, {
-                  userId: userIdRef.current.value,
-                  contestName: contestNameRef.current.value,
-                  contestDescription: contestDescriptionRef.current.value,
-                  contestPw: contestPasswordRef.current.value,
-                  eventTime: isoDateTime,
-                }, { timeout: 10000 });
+            let response = await axios.post(url + `contests/create`, {
+              userId: userIdRef.current.value,
+              contestName: contestNameRef.current.value,
+              contestDescription: contestDescriptionRef.current.value,
+              contestPw: contestPasswordRef.current.value,
+              eventTime: isoDateTime,
+              time: timeRef.current.value
+            }, { timeout: 10000 });
 
-                if (response.data === "") {
-                  setMakeMessage("서버 오류")
-                } else {
-                  const contest = response.data as Contest
-                  setCurrentContest({ contestId: contest.id, contestName: contest.contestName })
-                  navigate('/problem/make')
-                  setMakeMessage("대회 개최 성공!")
-                }
-                break;  // 성공 시 루프 탈출
-              } catch (error: any) {
-                attempts++;
-                console.error(`Attempt ${attempts} failed for contests/create. Error: ${error.message}`);
-                if (attempts >= 5) {
-                  console.error(`All ${5} attempts failed for contests/create.`);
-                  setMakeMessage("이미 존재하는 대회 이름 또는 서버 에러")
-                  break;
-                }
-                console.log(`Retrying $contests/create in 1s...`);
-                await new Promise(resolve => setTimeout(resolve, 1000));
-              }
+            if (response.data === "") {
+              setMakeMessage("서버 오류")
+            } else {
+              const contest = response.data as Contest
+              setCurrentContest({ contestId: contest.id, contestName: contest.contestName })
+              navigate('/problem/make')
+              setMakeMessage("대회 개최 성공!")
             }
           } else {
             setMakeMessage("이름 작성 필요")
@@ -110,9 +97,15 @@ const ContestMake: React.FC<ContestMakeProps> = ({ user, setCurrentContest }) =>
             </div>
           </div>
           <div style={{ marginTop: '10px', color: 'red' }}>누구나 접근할 수 있는 대회를 개최하려면 빈칸으로 해주세요.</div>
-          <div className="make-group">
-            <div className="makeTitle">대회 개최 시간</div>
-            <input className="makeField" ref={eventTimeRef} type="datetime-local" id="contestName"></input>
+          <div className="double-make-group">
+            <div className="make-group">
+              <div className="makeTitle">대회 개최 시간</div>
+              <input className="makeField" ref={eventTimeRef} type="datetime-local" id="contestName"></input>
+            </div>
+            <div className="make-group">
+              <div className="makeTitle">대회 진행 시간 (분 단위)</div>
+              <input className="makeField" ref={timeRef} type="number" min={0} max={3000} step={5} id="contestName"></input>
+            </div>
           </div>
           <div className="make-group">
             <div className="makeTitle">대회 설명</div>

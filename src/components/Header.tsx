@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from 'react-router-dom';
-import { Contest, CurrentContest, Problem, Solved, User } from "../model/talbe";
+import { Contest, CurrentContest, Problem, Solved, User, InitUser, InitCurrentContest } from "../model/talbe";
 import logo from "../assets/MiC_logo.png"
 import './css/Header.css';
 
@@ -18,38 +18,38 @@ const Header: React.FC<HeaderProps> = ({ user, setUser, setSolveds, problems, co
   const navigate = useNavigate();
 
   const goToLogin = () => {
-    setCurrentContest({ contestId: -1, contestName: '' })
+    setCurrentContest(InitCurrentContest)
     navigate('/login');
   };
 
   const goToProblem = () => {
-    setCurrentContest({ contestId: -1, contestName: '' })
+    setCurrentContest(InitCurrentContest)
     navigate('/problem');
   };
 
   const goToContest = () => {
-    setCurrentContest({ contestId: -1, contestName: '' })
+    setCurrentContest(InitCurrentContest)
     navigate('/contest');
   };
 
   const goToUserId = () => {
-    setCurrentContest({ contestId: -1, contestName: '' })
+    setCurrentContest(InitCurrentContest)
     navigate(`/user/${user.userId}`);
   };
 
   const goToHome = () => {
-    setCurrentContest({ contestId: -1, contestName: '' })
+    setCurrentContest(InitCurrentContest)
     navigate('/home');
     window.location.reload();
   };
 
   const goToSetting = () => {
-    setCurrentContest({ contestId: -1, contestName: '' })
+    setCurrentContest(InitCurrentContest)
     navigate('/setting');
   };
 
   const goToProblemId = (problemId: number) => {
-    setCurrentContest({ contestId: -1, contestName: '' })
+    setCurrentContest(InitCurrentContest)
     navigate(`/problem/${problemId}`);
   };
 
@@ -60,8 +60,9 @@ const Header: React.FC<HeaderProps> = ({ user, setUser, setSolveds, problems, co
 
   const logout = () => {
     sessionStorage.removeItem('user');
-    setUser({ id: -1, name: '', userId: '', userPw: '', phone: '', email: '', authority: 0, contest: -1, createdAt: '' });
+    setUser(InitUser);
     setSolveds([]);
+    navigate('/home');
     window.location.reload();
   }
 

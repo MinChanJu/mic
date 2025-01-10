@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CurrentContest, ProblemDTO, User } from "../model/talbe";
+import { CurrentContest, User } from "../model/talbe";
 import { autoResize } from "../model/commonFunction";
 import axios from "axios";
 import "./css/ProblemMake.css"
@@ -77,7 +77,7 @@ const ProblemMake: React.FC<ProblemMakeProps> = ({ currentContest, user }) => {
           exampleOutput: example.outputRef.current?.value,
         }));
 
-        const requestData: ProblemDTO = {
+        const requestData = {
           contestId: currentContest.contestId,
           contestName: currentContest.contestName,
           userId: user.userId,
@@ -90,37 +90,21 @@ const ProblemMake: React.FC<ProblemMakeProps> = ({ currentContest, user }) => {
           examples: exampleData
         };
 
-        let attempts = 0;
+        const response = await axios.post(url + `problems/create`, requestData, { timeout: 10000 });
 
-        while (attempts < 5) {
-          try {
-            const response = await axios.post(url + `problems/create`, requestData, { timeout: 10000 });
-            if (response.data === "") {
-              setMakeMessage("서버 오류")
-            } else {
-              if (cont === 1) {
-                setExamples([])
-                refs.forEach(ref => {
-                  if (ref.current) {
-                    ref.current.value = "";
-                  }
-                });
-              } else {
-                navigate(`/contest/${currentContest.contestId}`)
-                window.location.reload()
+        if (response.data === "") {
+          setMakeMessage("서버 오류")
+        } else {
+          if (cont === 1) {
+            setExamples([])
+            refs.forEach(ref => {
+              if (ref.current) {
+                ref.current.value = "";
               }
-            }
-            break;  // 성공 시 루프 탈출
-          } catch (error: any) {
-            attempts++;
-            console.error(`Attempt ${attempts} failed for contest edit. Error: ${error.message}`);
-            if (attempts >= 5) {
-              console.error(`All ${5} attempts failed for contest edit.`);
-              setMakeMessage("이미 존재하는 문제 이름 또는 서버 에러")
-              break;
-            }
-            console.log(`Retrying contest edit in ${1000 / 1000}s...`);
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            });
+          } else {
+            navigate(`/home`)
+            window.location.reload()
           }
         }
       } else {

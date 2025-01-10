@@ -19,19 +19,29 @@ const EditContest: React.FC<EditContestProps> = ({ user, contests }) => {
   const contestPasswordRef = useRef<HTMLInputElement | null>(null);
   const contestCheckPasswordRef = useRef<HTMLInputElement | null>(null);
   const contestDescriptionRef = useRef<HTMLTextAreaElement | null>(null);
+  const eventTimeRef = useRef<HTMLInputElement | null>(null);
+  const timeRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (userIdRef.current &&
       contestNameRef.current &&
       contestPasswordRef.current &&
       contestCheckPasswordRef.current &&
-      contestDescriptionRef.current) {
-        userIdRef.current.value = contest[0].userId
-        contestNameRef.current.value = contest[0].contestName
-        contestPasswordRef.current.value = contest[0].contestPw
-        contestCheckPasswordRef.current.value = contest[0].contestPw
-        contestDescriptionRef.current.value = contest[0].contestDescription
-      }
+      contestDescriptionRef.current &&
+      eventTimeRef.current &&
+      timeRef.current) {
+      userIdRef.current.value = contest[0].userId
+      contestNameRef.current.value = contest[0].contestName
+      contestPasswordRef.current.value = contest[0].contestPw
+      contestCheckPasswordRef.current.value = contest[0].contestPw
+      contestDescriptionRef.current.value = contest[0].contestDescription
+      const date = new Date(contest[0].eventTime);
+      const timezoneOffset = date.getTimezoneOffset() * 60000;  // 분 단위 오프셋 → ms로 변환
+      const localDate = new Date(date.getTime() - timezoneOffset);
+      const formattedDateTime = localDate.toISOString().slice(0, 16);
+      eventTimeRef.current.value = formattedDateTime;
+      timeRef.current.value = contest[0].time.toString()
+    }
   }, [contest]);
 
   const handleSubmit = async () => {
@@ -39,40 +49,31 @@ const EditContest: React.FC<EditContestProps> = ({ user, contests }) => {
       contestNameRef.current &&
       contestPasswordRef.current &&
       contestCheckPasswordRef.current &&
-      contestDescriptionRef.current) {
+      contestDescriptionRef.current &&
+      eventTimeRef.current &&
+      timeRef.current) {
       setEditMessage("")
       if (userIdRef.current.value === user.userId && user.userId !== "") {
         if (contestPasswordRef.current.value === contestCheckPasswordRef.current.value) {
           if (contestNameRef.current.value !== '') {
-            let attempts = 0;
+            const localDateTime = eventTimeRef.current.value;
+            const isoDateTime = new Date(localDateTime).toISOString();
 
-            while (attempts < 5) {
-              try {
-                const response = await axios.put(url + `contests/${id}`,
-                  { userId: userIdRef.current.value,
-                    contestName: contestNameRef.current.value,
-                    contestDescription: contestDescriptionRef.current.value,
-                    contestPw: contestPasswordRef.current.value
-                  }, { timeout: 10000 });
-                if (response.data === "") {
-                  setEditMessage("서버 에러")
-                } else {
-                  console.log(`contest edit load complete`);
-                  navigate(`/contest/${id}`)
-                  window.location.reload()
-                }
-                break;  // 성공 시 루프 탈출
-              } catch (error: any) {
-                attempts++;
-                console.error(`Attempt ${attempts} failed for contest edit. Error: ${error.message}`);
-                if (attempts >= 5) {
-                  console.error(`All ${5} attempts failed for contest edit.`);
-                  setEditMessage("이미 존재하는 대회 이름 또는 서버 에러")
-                  break;
-                }
-                console.log(`Retrying contest edit in ${1000 / 1000}s...`);
-                await new Promise(resolve => setTimeout(resolve, 1000));
-              }
+            const response = await axios.put(url + `contests/${id}`, {
+              userId: userIdRef.current.value,
+              contestName: contestNameRef.current.value,
+              contestDescription: contestDescriptionRef.current.value,
+              contestPw: contestPasswordRef.current.value,
+              eventTime: isoDateTime,
+              time: timeRef.current.value
+            }, { timeout: 10000 });
+
+            if (response.data === "") {
+              setEditMessage("서버 에러")
+            } else {
+              console.log(`contest edit load complete`);
+              navigate(`/contest/${id}`)
+              window.location.reload()
             }
           } else {
             setEditMessage("이름 작성 필요")
@@ -116,6 +117,16 @@ const EditContest: React.FC<EditContestProps> = ({ user, contests }) => {
             </div>
           </div>
           <div style={{ marginTop: '10px', color: 'red' }}>누구나 접근할 수 있는 대회를 개최하려면 빈칸으로 해주세요.</div>
+          <div className="double-make-group">
+            <div className="make-group">
+              <div className="makeTitle">대회 개최 시간</div>
+              <input className="makeField" ref={eventTimeRef} type="datetime-local" id="contestName"></input>
+            </div>
+            <div className="make-group">
+              <div className="makeTitle">대회 진행 시간 (분 단위)</div>
+              <input className="makeField" ref={timeRef} type="number" min={0} max={3000} step={5} id="contestName"></input>
+            </div>
+          </div>
           <div className="make-group">
             <div className="makeTitle">대회 설명</div>
             <textarea className="makeField" ref={contestDescriptionRef} style={{ height: '100px' }} id="contestDescription" />

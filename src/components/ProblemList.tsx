@@ -11,7 +11,7 @@ interface ProblemListProps {
 }
 
 const ProblemList: React.FC<ProblemListProps> = ({ user, contests, problems, solveds }) => {
-  const finishProblems = problems.filter((problem) => new Date(contests.filter((contest) => contest.id == problem.contestId)[0].eventTime) < new Date())
+  const finishProblems = problems.filter((problem) => new Date(contests.filter((contest) => contest.id == problem.contestId)[0]?.eventTime) < new Date())
   const navigate = useNavigate();
 
   const goToProblemId = (problemId: number) => {

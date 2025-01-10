@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Contest, Problem, Solved, User } from "../model/talbe";
+import { Contest, CurrentContest, Problem, Solved, User } from "../model/talbe";
 import './css/ContestView.css';
 import { url } from "../model/server";
 import { MathJaxContext } from "better-react-mathjax";
@@ -11,9 +11,10 @@ interface ContestViewProps {
   contests: Contest[]
   problems: Problem[]
   solveds: Solved[]
+  setCurrentContest: React.Dispatch<React.SetStateAction<CurrentContest>>;
 }
 
-const ContestView: React.FC<ContestViewProps> = ({ user, contests, problems, solveds }) => {
+const ContestView: React.FC<ContestViewProps> = ({ user, contests, problems, solveds, setCurrentContest }) => {
   const { id } = useParams();
   const contest = contests.filter(contest => contest.id === Number(id));
   const contestProblems = problems
@@ -47,6 +48,7 @@ const ContestView: React.FC<ContestViewProps> = ({ user, contests, problems, sol
   }
 
   const goToProblemMake = () => {
+    setCurrentContest({contestId: contest[0].id, contestName: contest[0].contestName})
     navigate('/problem/make')
   }
 
@@ -54,7 +56,11 @@ const ContestView: React.FC<ContestViewProps> = ({ user, contests, problems, sol
     navigate(`/contest/edit/${id}`)
   }
 
-  if (new Date(contest[0].eventTime) >= new Date() && user.authority != 5 && user.userId !== contest[0].userId) return (<div>아직 아님</div>)
+  const goToScoreBoard = () => {
+    navigate(`/score/${id}`)
+  }
+
+  if (new Date(contest[0]?.eventTime) >= new Date() && user.authority != 5 && user.userId !== contest[0].userId) return (<div>아직 아님</div>)
 
   return (
     <div>
@@ -67,6 +73,21 @@ const ContestView: React.FC<ContestViewProps> = ({ user, contests, problems, sol
           <span className="deleteButton" onClick={() => { deleteContest(contest[0].id) }}>삭제</span>
         </div>
       }
+      {(() => {
+        const now = new Date();
+
+        const event = new Date(contest[0]?.eventTime);
+        const finish = new Date(contest[0]?.eventTime);
+        finish.setMinutes(finish.getMinutes() + contest[0]?.time);
+
+        if (now < event && finish <= now) return <></>
+        
+        return (
+          <div className="owner">
+            <span onClick={goToScoreBoard} className="editButton" style={{marginTop: "30px"}}>스코어보드</span>
+          </div>
+        )
+        })()}
       <div className="list-container">
         <div className='list' style={{ maxWidth: "600px" }}>
           <table>

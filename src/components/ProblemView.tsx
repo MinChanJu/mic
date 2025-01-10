@@ -131,7 +131,7 @@ const ProblemView: React.FC<ProblemViewProps> = ({ user, problems, solveds, setS
 
   const deleteProblem = () => {
     async function serverNoReturn() {
-      await axios.delete(url + `contests/${id}`, { timeout: 10000 });
+      await axios.delete(url + `problems/${id}`, { timeout: 10000 });
       navigate("/contest")
       window.location.reload()
     }
