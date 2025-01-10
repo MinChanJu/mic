@@ -1,8 +1,8 @@
 import axios from "axios";
 import { Contest, Problem, Solved, User } from "./talbe";
 
-// export const url = "https://port-0-my-spring-app-m09c1v2t70d7f20e.sel4.cloudtype.app/api/";
-export const url = "http://localhost:8080/api/";
+export const url = "https://port-0-my-spring-app-m09c1v2t70d7f20e.sel4.cloudtype.app/api/";
+// export const url = "http://localhost:8080/api/";
 
 export async function severComposeData(api: string, user: User, setProblems: (data: Problem[]) => void, setContests: (data: Contest[]) => void, setSolveds: (data: Solved[]) => void) {
     const response = await axios.post<{ problems: Problem[], contests: Contest[] }>(url + api, null, { timeout: 10000 });
