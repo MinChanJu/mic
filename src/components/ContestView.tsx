@@ -80,7 +80,7 @@ const ContestView: React.FC<ContestViewProps> = ({ user, contests, problems, sol
         const finish = new Date(contest[0]?.eventTime);
         finish.setMinutes(finish.getMinutes() + contest[0]?.time);
 
-        if (now < event && finish <= now) return <></>
+        if (now < event || finish <= now) return <></>
         
         return (
           <div className="owner">
