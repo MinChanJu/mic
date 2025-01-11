@@ -1,17 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { User } from "../model/talbe";
-import axios from "axios";
+import React, { useEffect, useRef, useState } from "react"
+import { URL, User } from "../model/talbe"
+import axios from "axios"
 import './css/Login.css'
 import './css/styles.css'
-import { url } from "../model/server";
+import CommonFunction from "../model/CommonFunction"
 
 interface LoginProps {
   setUser: React.Dispatch<React.SetStateAction<User>>;
 }
 
 const Login: React.FC<LoginProps> = ({ setUser }) => {
-  const navigate = useNavigate();
+  const { goToHome } = CommonFunction()
   const [isMovedLeft, setIsMovedLeft] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -68,7 +67,7 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
   }, [isMovedLeft]);
 
   const handleButtonClick = () => {
-    setIsMovedLeft(prevState => !prevState);
+    setIsMovedLeft(prev => !prev);
     if (signInIdRef.current &&
       signInPasswordRef.current &&
       signUpNameRef.current &&
@@ -115,21 +114,26 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
         const password = signUpPasswordRef.current!.value;
         const checkPassword = signUpCheckPasswordRef.current!.value;
         if (password === checkPassword) {
-          const response = await axios.post(url + `users/create`,
-            {
-              name: signUpNameRef.current.value,
-              phone: signUpPhoneRef.current.value,
-              userId: signUpIdRef.current.value,
-              userPw: signUpPasswordRef.current.value,
-              email: signUpEmailRef.current.value,
-              authority: 1,
-              contest: -1,
-            }, { timeout: 10000 });
-          if (response.data === "") {
-            setregisterMessage(isPasswordValid(password))
-          } else {
-            setregisterMessage("회원가입 성공!")
-          }
+          const requestData: User = {
+            id: -1,
+            name: signUpNameRef.current.value,
+            userId: signUpIdRef.current.value,
+            userPw: signUpPasswordRef.current.value,
+            phone: signUpPhoneRef.current.value,
+            email: signUpEmailRef.current.value,
+            authority: 1,
+            contest: -1,
+            createdAt: new Date().toISOString()
+          };
+
+          try {
+            const response = await axios.post(URL + `users/create`, requestData, { timeout: 10000 });
+            if (response.data === "") {
+              setregisterMessage(isPasswordValid(password))
+            } else {
+              setregisterMessage("회원가입 성공!")
+            }
+          } catch (error) { console.log("서버 오류 " + error) }
         } else {
           setregisterMessage("비밀번호가 일치하지 않습니다.")
         }
@@ -144,15 +148,17 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
     setIsLoading(true)
     if (signInIdRef.current && signInPasswordRef.current) {
       if (signInIdRef.current.value !== "" && signInPasswordRef.current.value !== "") {
-        const response = await axios.post<User>(url + `users/${signInIdRef.current.value}/${signInPasswordRef.current.value}`, { timeout: 10000 });
-        if (response.data.id == -1) {
-          setloginMessage("잘못된 아이디 또는 비밀번호")
-        } else {
-          setUser(response.data)
-          sessionStorage.setItem('user', JSON.stringify(response.data));
-          navigate('/home');
-          window.location.reload()
-        }
+        try {
+          const response = await axios.post<User>(URL + `users/${signInIdRef.current.value}/${signInPasswordRef.current.value}`, { timeout: 10000 });
+          const user: User = response.data
+          if (user.id == -1) {
+            setloginMessage("잘못된 아이디 또는 비밀번호")
+          } else {
+            setUser(user)
+            sessionStorage.setItem('user', JSON.stringify(user));
+            goToHome();
+          }
+        } catch (error) { console.log("서버 오류 " + error) }
       } else {
         setloginMessage("빈칸을 채워 넣으세요")
       }

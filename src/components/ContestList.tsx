@@ -1,49 +1,20 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Contest, CurrentContest, User } from '../model/talbe';
-import './css/List.css';
+import React from 'react'
+import { Contest, User } from '../model/talbe'
+import './css/List.css'
+import CommonFunction from '../model/CommonFunction'
 
 interface ContestListProps {
   user: User
   contests: Contest[]
-  setCurrentContest: React.Dispatch<React.SetStateAction<CurrentContest>>
 }
 
-const ContestList: React.FC<ContestListProps> = ({ user, contests, setCurrentContest }) => {
-  const navigate = useNavigate();
-
-  const showPopUp = () => {
-    alert("아직 대회 시작 시간이 안되었습니다.");
-  }
-
-  const goToContestId = (contest: Contest, pop: boolean) => {
-    if (pop) showPopUp();
-    else {
-      setCurrentContest({ contestId: contest.id, contestName: contest.contestName })
-      navigate(`/contest/${contest.id}`);
-    }
-  };
-
-  const goToMakeContest = () => {
-    navigate(`/contest/make`);
-  };
-
-  const TimeFormat = (eventTime: string, time: number) => {
-    const event = new Date(eventTime);
-    event.setMinutes(event.getMinutes() + time);
-    const year = event.getFullYear();
-    const month = String(event.getMonth() + 1).padStart(2, "0");
-    const day = String(event.getDate()).padStart(2, "0");
-    const hours = String(event.getHours()).padStart(2, "0");
-    const minutes = String(event.getMinutes()).padStart(2, "0");
-    return `${year}년 ${month}월 ${day}일 ${hours}:${minutes}`;
-  };
-
+const ContestList: React.FC<ContestListProps> = ({ user, contests }) => {
+  const { goToContestId, goToMakeContest, TimeFormat } = CommonFunction()
   const cont = (index: number, contest: Contest, color: string, pop: boolean) => {
     return (
-      <tr className='element' style={{ backgroundColor: color }} key={contest.id}>
+      <tr className='element' style={{ backgroundColor: color }} onClick={() => { goToContestId(user, contest, pop) }} key={contest.id}>
         <td>{index + 1}</td>
-        <td onClick={() => { goToContestId(contest, pop) }}>{contest.contestName}</td>
+        <td>{contest.contestName}</td>
         <td>{contest.userId}</td>
         <td>{TimeFormat(contest.eventTime, 0)}</td>
         <td>{TimeFormat(contest.eventTime, contest.time)}</td>

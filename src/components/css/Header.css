@@ -37,7 +37,7 @@ header {
     text-align: end;
     padding-right: 20px;
     box-sizing: border-box;
-    z-index: 2;
+    z-index: 4;
     background-color: white;
 }
 
@@ -60,7 +60,7 @@ header {
     font-size: 20px;
     cursor: pointer;
     box-sizing: border-box;
-    z-index: 2;
+    z-index: 4;
     background-color: white;
 }
 
@@ -81,6 +81,7 @@ header {
     border: 1px solid gray;
     display: flex;
     box-sizing: border-box;
+    z-index: 3;
 }
 
 .menu:hover .description {

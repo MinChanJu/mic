@@ -1,3 +1,15 @@
+export const URL = "http://localhost:8080/api/";
+// export const URL = "https://port-0-my-spring-app-m09c1v2t70d7f20e.sel4.cloudtype.app/api/";
+
+export const mathJaxConfig = {
+  tex: {
+    inlineMath: [["$", "$"], ["\\(", "\\)"]],
+    displayMath: [["$$", "$$"], ["\\[", "\\]"]],
+    packages: { "[+]": ["ams"] }  // ✅ AMS 패키지 활성화
+  },
+  loader: { load: [] }  // ✅ AMS는 기본 내장되어 있으므로 추가 로드 불필요
+};
+
 export type User = {
   id: number
   name: string
@@ -24,7 +36,6 @@ export type Contest = {
 export type Problem = {
   id: number
   contestId: number
-  contestName: string
   userId: string
   problemName: string
   problemDescription: string
@@ -51,12 +62,12 @@ export type Solved = {
   createdAt: string
 }
 
-export type CurrentContest = {
-  contestId: number
-  contestName: string
+export type ProblemDTO = {
+  problem: Problem
+  examples: Example[]
 }
 
-export type Code = {
+export type CodeDTO = {
   code: string
   lang: string
   problemId: number
@@ -69,8 +80,28 @@ export type ContestScore = {
 
 export type Submit = {
   problemId: number
-  score: number
+  score: string
+}
+
+export type UserDTO = {
+  id: number
+  name: string
+  userId: string
+  email: string
+  authority: number
+  createdAt: string
+}
+
+export type ProblemsAndContestsDTO = {
+  problems: Problem[]
+  contests: Contest[]
+}
+
+export type CurrentContest = {
+  contestId: number
+  contestName: string
 }
 
 export const InitUser: User = { id: -1, name: '', userId: '', userPw: '', phone: '', email: '', authority: -1, contest: -1, createdAt: '' };
 export const InitCurrentContest: CurrentContest = { contestId: -1, contestName: '' };
+export const InitExample: Example = { id: -1, problemId: -1, exampleInput: "", exampleOutput: "", createdAt: new Date().toISOString() };

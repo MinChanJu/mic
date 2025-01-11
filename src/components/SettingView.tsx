@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Contest, Problem, Solved, User } from "../model/talbe";
-import { url } from "../model/server";
+import React, { useEffect, useRef, useState } from "react"
+import { URL, Contest, Problem, Solved, User, mathJaxConfig } from "../model/talbe"
+import axios from "axios"
 import './css/SettingView.css'
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import CommonFunction from "../model/CommonFunction"
+import { MathJax, MathJaxContext } from "better-react-mathjax"
 
 interface SettingViewProps {
   user: User
@@ -13,6 +13,7 @@ interface SettingViewProps {
 }
 
 const SettingView: React.FC<SettingViewProps> = ({ user, contests, problems, solveds }) => {
+
   const [data, setData] = useState<string>("정보")
   return (
     <div className="setting-container">
@@ -58,7 +59,7 @@ const Info: React.FC<UserProps> = ({ user }) => {
       phoneRef.current.value = user.phone
       emailRef.current.value = user.email
     }
-  })
+  }, [])
 
   const handleSubmit = () => {
     if (phoneRef.current &&
@@ -155,26 +156,38 @@ interface solvdeProps {
 }
 
 const SolvedPage: React.FC<solvdeProps> = ({ problems, solveds }) => {
-  const solvedProblems = problems.filter((problem) => {
-    const solve = solveds.some((solved) => solved.problemId == problem.id);
-    return solve;
-  })
+  const { goToProblemId } = CommonFunction()
   return (
     <div>
       <table>
         <thead>
           <tr>
-            <th style={{width: "30px", textAlign: "center"}}>번호</th>
+            <th style={{ width: "30px", textAlign: "center" }}>번호</th>
             <th>문제 제목</th>
-            <th style={{width: "30px", textAlign: "center"}}>해결</th>
+            <th style={{ width: "30px", textAlign: "center" }}>해결</th>
           </tr>
         </thead>
         <tbody>
-          {solvedProblems.map((problem) => (
-            <tr key={problem.id}>
-              <td>{problem.id}</td>
-              <td>{problem.problemName}</td>
-              <td><div className="solved" style={{backgroundColor: "rgb(0, 255, 0)"}}>해결</div></td>
+          {solveds.map((solved) => (
+            <tr key={solved.id} onClick={() => { goToProblemId(solved.problemId) }}>
+              <td>{solved.problemId}</td>
+              <td>
+                {(() => {
+                  const problem = problems.find((problem) => problem.id == solved.problemId)
+                  if (!problem) return <></>
+                  return <>{problem.problemName}</>
+                })()}
+              </td>
+              <td>
+                {(() => {
+                  const score = solved.score;
+                  let style = { backgroundColor: "rgb(238, 255, 0)" };
+                  if (score === "100") style.backgroundColor = "rgb(43, 255, 0)";
+                  if (score === "0") style.backgroundColor = "rgb(255, 0, 0)";
+
+                  return <div className="solved" style={style}>{score}</div>;
+                })()}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -189,31 +202,31 @@ interface ProblemProps {
 }
 
 const MakePro: React.FC<ProblemProps> = ({ user, problems }) => {
+  const { goToProblemId } = CommonFunction()
   const myProblems = problems.filter(problem => problem.userId === user.userId);
-  const navigate = useNavigate();
-
-  const goToProblem = (id: number) => {
-    navigate(`/problem/${id}`)
-  }
 
   return (
     <div className="total-container">
       <table>
         <thead>
           <tr>
-            <th style={{width: "30px", textAlign: "center"}}>번호</th>
+            <th style={{ width: "30px", textAlign: "center" }}>번호</th>
             <th>문제 이름</th>
             <th>주최자</th>
           </tr>
         </thead>
         <tbody>
-          {myProblems.map((problem, index) => (
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td style={{ cursor: "pointer" }} onClick={() => { goToProblem(problem.id) }}>{problem.problemName}</td>
-              <td>{problem.userId}</td>
-            </tr>
-          ))}
+          <MathJaxContext config={mathJaxConfig}>
+            {myProblems.map((problem, index) => (
+              <tr key={index}>
+                <td>{index + 1}</td>
+                <td style={{ cursor: "pointer" }} onClick={() => { goToProblemId(problem.id) }}>
+                  <MathJax>{problem.problemName}</MathJax>
+                </td>
+                <td>{problem.userId}</td>
+              </tr>
+            ))}
+          </MathJaxContext>
         </tbody>
       </table>
     </div>
@@ -226,19 +239,15 @@ interface ContestProps {
 }
 
 const MakeCon: React.FC<ContestProps> = ({ user, contests }) => {
+  const { goToContestId } = CommonFunction()
   const myContests = contests.filter(contest => contest.userId === user.userId);
-  const navigate = useNavigate();
-
-  const goToContest = (id: number) => {
-    navigate(`/contest/${id}`)
-  }
 
   return (
     <div className="total-container">
       <table>
         <thead>
           <tr>
-            <th style={{width: "30px", textAlign: "center"}}>번호</th>
+            <th style={{ width: "30px", textAlign: "center" }}>번호</th>
             <th>대회 이름</th>
             <th>주최자</th>
           </tr>
@@ -247,7 +256,7 @@ const MakeCon: React.FC<ContestProps> = ({ user, contests }) => {
           {myContests.map((contest, index) => (
             <tr key={index}>
               <td>{index + 1}</td>
-              <td style={{ cursor: "pointer" }} onClick={() => { goToContest(contest.id) }}>{contest.contestName}</td>
+              <td style={{ cursor: "pointer" }} onClick={() => { goToContestId(user, contest, false) }}>{contest.contestName}</td>
               <td>{contest.userId}</td>
             </tr>
           ))}
@@ -278,18 +287,22 @@ const UserManage: React.FC<ContestProps> = ({ user, contests }) => {
     let updateUser = user;
     updateUser.authority = authoritys[index]
     updateUser.contest = enters[index]
-    await axios.put(url + `users/${user.id}`, updateUser, {timeout: 10000});
+    try {
+      await axios.put(URL + `users/${user.id}`, updateUser, { timeout: 10000 });
+    } catch (error) { console.log("서버 오류 " + error) }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       if (user.authority === 5) {
-        const response = await axios.post<User[]>(url + 'users', null, { timeout: 10000 });
-        const fetchedUsers = response.data;
+        try {
+          const response = await axios.post<User[]>(URL + 'users', null, { timeout: 10000 });
+          const UsersR: User[] = response.data;
 
-        setUsers(fetchedUsers);
-        setAuthoritys(fetchedUsers.map((user) => user.authority));
-        setEnters(fetchedUsers.map((user) => user.contest));
+          setUsers(UsersR);
+          setAuthoritys(UsersR.map((user) => user.authority));
+          setEnters(UsersR.map((user) => user.contest));
+        } catch (error) { console.log("서버 오류 " + error) }
       }
     }
     fetchData()
@@ -301,7 +314,7 @@ const UserManage: React.FC<ContestProps> = ({ user, contests }) => {
       <table>
         <thead>
           <tr>
-            <th style={{width: "30px", textAlign: "center"}}>번호</th>
+            <th style={{ width: "30px", textAlign: "center" }}>번호</th>
             <th>이름</th>
             <th>아이디</th>
             <th>이메일</th>

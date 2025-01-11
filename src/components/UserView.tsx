@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { User } from "../model/talbe";
-import { url } from '../model/server';
+import React, { useEffect, useState } from "react"
+import { useParams } from "react-router-dom"
+import { URL, User } from "../model/talbe"
+import axios from "axios"
 import "./css/UserView.css"
-import axios from "axios";
 
 const UserView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,14 +12,14 @@ const UserView: React.FC = () => {
   const [day, setDay] = useState<string>();
 
   useEffect(() => {
-    if (id) {
-      async function serverObject() {
-        const response = await axios.post<User>(url + `users/${id}`, null, { timeout: 10000 });
+    async function serverObject() {
+      try {
+        const response = await axios.post<User>(URL + `users/${id}`, null, { timeout: 10000 });
         setCurUser(response.data);
-      }
-      serverObject();
+      } catch (error) { console.log("서버 오류 " + error) }
     }
-  }, [id]);
+    serverObject();
+  }, []);
 
   useEffect(() => {
     setYear(curUser?.createdAt.substring(0, 4))
