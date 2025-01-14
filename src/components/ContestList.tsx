@@ -46,7 +46,7 @@ const ContestList: React.FC<ContestListProps> = ({ user, contests }) => {
 
 
               if (now < event) return cont(index, contest, "rgb(142, 142, 142)", true)
-              if (user.contest == contest.id) return cont(index, contest, "rgb(255, 255, 255)", false)
+              if (user.contestId == contest.id) return cont(index, contest, "rgb(255, 255, 255)", false)
               if (contest.contestPw != '' && now <= finish) return cont(index, contest, "rgb(255, 100, 100)", true)
               else if (now <= finish) return cont(index, contest, "rgb(216, 216, 216)", false)
               return cont(index, contest, "rgb(255, 255, 255)", false)

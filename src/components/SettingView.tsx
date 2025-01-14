@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
-import { URL, Contest, Problem, Solved, User, mathJaxConfig } from "../model/talbe"
-import axios from "axios"
+import { URL, Contest, Problem, Solve, User, mathJaxConfig, ApiResponse } from "../model/talbe"
+import axios, { AxiosError } from "axios"
 import './css/SettingView.css'
 import CommonFunction from "../model/CommonFunction"
 import { MathJax, MathJaxContext } from "better-react-mathjax"
@@ -9,10 +9,10 @@ interface SettingViewProps {
   user: User
   contests: Contest[]
   problems: Problem[]
-  solveds: Solved[]
+  solves: Solve[]
 }
 
-const SettingView: React.FC<SettingViewProps> = ({ user, contests, problems, solveds }) => {
+const SettingView: React.FC<SettingViewProps> = ({ user, contests, problems, solves }) => {
 
   const [data, setData] = useState<string>("정보")
   return (
@@ -33,7 +33,7 @@ const SettingView: React.FC<SettingViewProps> = ({ user, contests, problems, sol
         <div className="view-title">{data}</div>
         {data === "정보" && <Info user={user} />}
         {data === "비밀번호 변경" && <ChagePw user={user} />}
-        {data === "내가 푼 문제" && <SolvedPage problems={problems} solveds={solveds} />}
+        {data === "내가 푼 문제" && <SolvePage problems={problems} solves={solves} />}
         {data === "만든 문제" && <MakePro user={user} problems={problems} />}
         {data === "만든 대회" && <MakeCon user={user} contests={contests} />}
         {data === "회원 관리" && <UserManage user={user} contests={contests} />}
@@ -152,10 +152,10 @@ const ChagePw: React.FC<UserProps> = ({ user }) => {
 
 interface solvdeProps {
   problems: Problem[]
-  solveds: Solved[]
+  solves: Solve[]
 }
 
-const SolvedPage: React.FC<solvdeProps> = ({ problems, solveds }) => {
+const SolvePage: React.FC<solvdeProps> = ({ problems, solves }) => {
   const { goToProblemId } = CommonFunction()
   return (
     <div>
@@ -168,24 +168,24 @@ const SolvedPage: React.FC<solvdeProps> = ({ problems, solveds }) => {
           </tr>
         </thead>
         <tbody>
-          {solveds.map((solved) => (
-            <tr key={solved.id} onClick={() => { goToProblemId(solved.problemId) }}>
-              <td>{solved.problemId}</td>
+          {solves.map((solve) => (
+            <tr key={solve.id} onClick={() => { goToProblemId(solve.problemId) }}>
+              <td>{solve.problemId}</td>
               <td>
                 {(() => {
-                  const problem = problems.find((problem) => problem.id == solved.problemId)
+                  const problem = problems.find((problem) => problem.id == solve.problemId)
                   if (!problem) return <></>
                   return <>{problem.problemName}</>
                 })()}
               </td>
               <td>
                 {(() => {
-                  const score = solved.score;
+                  const score = solve.score;
                   let style = { backgroundColor: "rgb(238, 255, 0)" };
-                  if (score === "100") style.backgroundColor = "rgb(43, 255, 0)";
-                  if (score === "0") style.backgroundColor = "rgb(255, 0, 0)";
+                  if (score === 1000) style.backgroundColor = "rgb(43, 255, 0)";
+                  if (score === 0) style.backgroundColor = "rgb(255, 0, 0)";
 
-                  return <div className="solved" style={style}>{score}</div>;
+                  return <div className="solve" style={style}>{score/10}</div>;
                 })()}
               </td>
             </tr>
@@ -286,23 +286,35 @@ const UserManage: React.FC<ContestProps> = ({ user, contests }) => {
   const handleChange = async (user: User, index: number) => {
     let updateUser = user;
     updateUser.authority = authoritys[index]
-    updateUser.contest = enters[index]
+    updateUser.contestId = enters[index]
     try {
-      await axios.put(URL + `users/${user.id}`, updateUser, { timeout: 10000 });
-    } catch (error) { console.log("서버 오류 " + error) }
+      await axios.put(URL + `users/update`, updateUser, { timeout: 10000 });
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.error(error.response?.data.message);
+      } else {
+        console.error("알 수 없는 에러:", error);
+      }
+    }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       if (user.authority === 5) {
         try {
-          const response = await axios.post<User[]>(URL + 'users', null, { timeout: 10000 });
-          const UsersR: User[] = response.data;
+          const response = await axios.post<ApiResponse<User[]>>(URL + 'users', null, { timeout: 10000 });
+          const UsersR: User[] = response.data.data;
 
           setUsers(UsersR);
           setAuthoritys(UsersR.map((user) => user.authority));
-          setEnters(UsersR.map((user) => user.contest));
-        } catch (error) { console.log("서버 오류 " + error) }
+          setEnters(UsersR.map((user) => user.contestId));
+        } catch (error) {
+          if (error instanceof AxiosError) {
+            console.error(error.response?.data.message);
+          } else {
+            console.error("알 수 없는 에러:", error);
+          }
+        }
       }
     }
     fetchData()

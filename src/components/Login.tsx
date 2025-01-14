@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
-import { URL, User } from "../model/talbe"
-import axios from "axios"
+import { ApiResponse, URL, User } from "../model/talbe"
+import axios, { AxiosError } from "axios"
 import './css/Login.css'
 import './css/styles.css'
 import CommonFunction from "../model/CommonFunction"
@@ -87,16 +87,6 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
     }
   };
 
-  const isPasswordValid = (password: string): string => {
-    let message = "\n비밀번호는 8자 이상이어야 하며 영문자, 숫자를 포함해야 합니다."
-    if (/\s|'|"|;/.test(password)) { return "비밀번호에 포함되면 안되는 문자가 있습니다." + message }
-    if (password.length < 8) { return "비밀번호가 8자 미만입니다." + message }
-    if (!/[a-zA-Z]/.test(password)) { return "비밀번호에 영문자가 포함되어 있지 않습니다." + message }
-    if (!/[0-9]/.test(password)) { return "비밀번호에 숫자가 포함되어 있지 않습니다." + message }
-
-    return "이미 존재하는 아이디";
-  };
-
   const registerUser = async () => {
     setIsLoading(true)
     if (signUpNameRef.current &&
@@ -122,18 +112,21 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
             phone: signUpPhoneRef.current.value,
             email: signUpEmailRef.current.value,
             authority: 1,
-            contest: -1,
+            contestId: -1,
             createdAt: new Date().toISOString()
           };
 
           try {
-            const response = await axios.post(URL + `users/create`, requestData, { timeout: 10000 });
-            if (response.data === "") {
-              setregisterMessage(isPasswordValid(password))
+            await axios.post<ApiResponse<User>>(URL + `users/create`, requestData, { timeout: 10000 });
+            setregisterMessage("회원가입 성공!")
+            handleButtonClick()
+          } catch (error) {
+            if (error instanceof AxiosError) {
+              setregisterMessage(error.response?.data.message + "\n비밀번호는 영문자, 숫자를 포함해야하며 8자 이상이어야 합니다.");
             } else {
-              setregisterMessage("회원가입 성공!")
+              console.error("알 수 없는 에러:", error);
             }
-          } catch (error) { console.log("서버 오류 " + error) }
+          }
         } else {
           setregisterMessage("비밀번호가 일치하지 않습니다.")
         }
@@ -149,16 +142,18 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
     if (signInIdRef.current && signInPasswordRef.current) {
       if (signInIdRef.current.value !== "" && signInPasswordRef.current.value !== "") {
         try {
-          const response = await axios.post<User>(URL + `users/${signInIdRef.current.value}/${signInPasswordRef.current.value}`, { timeout: 10000 });
-          const user: User = response.data
-          if (user.id == -1) {
-            setloginMessage("잘못된 아이디 또는 비밀번호")
+          const response = await axios.post<ApiResponse<User>>(URL + `users/${signInIdRef.current.value}/${signInPasswordRef.current.value}`, null, { timeout: 10000 });
+          const user: User = response.data.data
+          setUser(user)
+          sessionStorage.setItem('user', JSON.stringify(user));
+          goToHome();
+        } catch (error) {
+          if (error instanceof AxiosError) {
+            setloginMessage("아이디 또는 비밀번호가 틀렸습니다.");
           } else {
-            setUser(user)
-            sessionStorage.setItem('user', JSON.stringify(user));
-            goToHome();
+            setloginMessage("알 수 없는 에러: " + error);
           }
-        } catch (error) { console.log("서버 오류 " + error) }
+        }
       } else {
         setloginMessage("빈칸을 채워 넣으세요")
       }

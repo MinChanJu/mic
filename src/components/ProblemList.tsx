@@ -1,5 +1,5 @@
 import React from 'react'
-import { Contest, mathJaxConfig, Problem, Solved, User } from '../model/talbe'
+import { Contest, mathJaxConfig, Problem, Solve, User } from '../model/talbe'
 import './css/List.css'
 import CommonFunction from '../model/CommonFunction'
 import { MathJax, MathJaxContext } from 'better-react-mathjax'
@@ -8,10 +8,10 @@ interface ProblemListProps {
   user: User
   contests: Contest[]
   problems: Problem[]
-  solveds: Solved[]
+  solves: Solve[]
 }
 
-const ProblemList: React.FC<ProblemListProps> = ({ user, contests, problems, solveds }) => {
+const ProblemList: React.FC<ProblemListProps> = ({ user, contests, problems, solves }) => {
   const { goToMakeProblem, goToProblemId } = CommonFunction()
   const finishProblems = problems.filter((problem) => {
     const contest = contests.find((contest) => contest.id === problem.contestId);
@@ -53,16 +53,16 @@ const ProblemList: React.FC<ProblemListProps> = ({ user, contests, problems, sol
                 </td>
                 <td>
                   {(() => {
-                    const filtered = solveds.filter((solved) => solved.userId === user.userId && solved.problemId === problem.id);
+                    const filtered = solves.filter((solve) => solve.userId === user.userId && solve.problemId === problem.id);
 
                     if (filtered.length === 0) return <></>;
 
                     const score = filtered[0].score;
                     let style = { backgroundColor: "rgb(238, 255, 0)" };
-                    if (score === "100") style.backgroundColor = "rgb(43, 255, 0)";
-                    if (score === "0") style.backgroundColor = "rgb(255, 0, 0)";
+                    if (score === 1000) style.backgroundColor = "rgb(43, 255, 0)";
+                    if (score === 0) style.backgroundColor = "rgb(255, 0, 0)";
 
-                    return <div className="solved" style={style}>{score}</div>;
+                    return <div className="solve" style={style}>{score/10}</div>;
                   })()}
                 </td>
               </tr>

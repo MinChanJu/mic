@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
-import { URL, User } from "../model/talbe"
-import axios from "axios"
+import { ApiResponse, InitUser, URL, User } from "../model/talbe"
+import axios, { AxiosError } from "axios"
 import "./css/UserView.css"
 
 const UserView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [curUser, setCurUser] = useState<User>();
+  const [curUser, setCurUser] = useState<User>(InitUser);
   const [year, setYear] = useState<string>();
   const [month, setMonth] = useState<string>();
   const [day, setDay] = useState<string>();
@@ -14,9 +14,15 @@ const UserView: React.FC = () => {
   useEffect(() => {
     async function serverObject() {
       try {
-        const response = await axios.post<User>(URL + `users/${id}`, null, { timeout: 10000 });
-        setCurUser(response.data);
-      } catch (error) { console.log("서버 오류 " + error) }
+        const response = await axios.post<ApiResponse<User>>(URL + `users/${id}`, null, { timeout: 10000 });
+        setCurUser(response.data.data);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          console.error(error.response?.data.message);
+        } else {
+          console.error("알 수 없는 에러:", error);
+        }
+      }
     }
     serverObject();
   }, []);

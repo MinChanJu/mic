@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { Contest, InitUser, Solved, URL, User } from "./talbe";
+import axios, { AxiosError } from "axios";
+import { ApiResponse, Contest, InitUser, Solve, URL, User } from "./talbe";
 
 const CommonFunction = () => {
     const navigate = useNavigate();
@@ -37,32 +37,40 @@ const CommonFunction = () => {
     // 삭제
     const deleteContest = async (contestId: number) => {
         try {
-            await axios.delete<void>(URL + `contests/${contestId}`, { timeout: 10000 });
+            await axios.delete<ApiResponse<void>>(URL + `contests/${contestId}`, { timeout: 10000 });
             goToContest();
             window.location.reload();
         } catch (error) {
-            console.error("서버 오류", error);
+            if (error instanceof AxiosError) {
+                console.error(error.response?.data.message);
+              } else {
+                console.error("알 수 없는 에러:", error);
+              }
         }
     };
 
     const deleteProblem = async (id: number) => {
         try {
-            await axios.delete<void>(URL + `problems/${id}`, { timeout: 10000 });
+            await axios.delete<ApiResponse<void>>(URL + `problems/${id}`, { timeout: 10000 });
             goToHome();
             window.location.reload();
         } catch (error) {
-            console.error("서버 오류", error);
+            if (error instanceof AxiosError) {
+                console.error(error.response?.data.message);
+              } else {
+                console.error("알 수 없는 에러:", error);
+              }
         }
     };
 
     // 로그아웃
     const logout = (
         setUser: React.Dispatch<React.SetStateAction<User>>,
-        setSolveds: React.Dispatch<React.SetStateAction<Solved[]>>
+        setSolves: React.Dispatch<React.SetStateAction<Solve[]>>
     ) => {
         sessionStorage.removeItem('user');
         setUser(InitUser);
-        setSolveds([]);
+        setSolves([]);
         goToHome();
         window.location.reload();
     };

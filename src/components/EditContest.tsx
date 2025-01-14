@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react"
 import { useParams } from "react-router-dom"
-import { URL, Contest, User } from "../model/talbe"
-import axios from "axios"
+import { URL, Contest, User, ApiResponse } from "../model/talbe"
+import axios, { AxiosError } from "axios"
 import CommonFunction from "../model/CommonFunction"
 
 interface EditContestProps {
@@ -53,15 +53,18 @@ const EditContest: React.FC<EditContestProps> = ({ user, contests }) => {
             };
 
             try {
-              const response = await axios.put<Contest>(URL + 'contests/update', requestData, { timeout: 10000 });
-              const contestR: Contest = response.data
+              const response = await axios.put<ApiResponse<Contest>>(URL + 'contests/update', requestData, { timeout: 10000 });
+              const contestR: Contest = response.data.data
 
-              if (contestR.id == -1) setEditMessage("존재하지 않는 대회")
-              else {
-                goToContestId(user, contestR, false);
-                window.location.reload()
+              goToContestId(user, contestR, false);
+              window.location.reload()
+            } catch (error) {
+              if (error instanceof AxiosError) {
+                setEditMessage(error.response?.data.message);
+              } else {
+                console.error("알 수 없는 에러:", error);
               }
-            } catch (error) { setEditMessage("서버 오류") }
+            }
           } else {
             setEditMessage("이름 작성 필요")
           }

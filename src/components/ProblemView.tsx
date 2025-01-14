@@ -1,8 +1,8 @@
 import React, { useRef, useState } from "react"
 import { useParams } from "react-router-dom"
-import { URL, CodeDTO, Problem, Solved, User, mathJaxConfig } from "../model/talbe"
+import { URL, CodeDTO, Problem, Solve, User, mathJaxConfig, ApiResponse } from "../model/talbe"
 import { MathJax, MathJaxContext } from 'better-react-mathjax'
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 import "./css/ProblemView.css"
 import "./css/styles.css"
 import CommonFunction from "../model/CommonFunction"
@@ -10,11 +10,11 @@ import CommonFunction from "../model/CommonFunction"
 interface ProblemViewProps {
   user: User
   problems: Problem[]
-  solveds: Solved[]
-  setSolveds: React.Dispatch<React.SetStateAction<Solved[]>>;
+  solves: Solve[]
+  setSolves: React.Dispatch<React.SetStateAction<Solve[]>>;
 }
 
-const ProblemView: React.FC<ProblemViewProps> = ({ user, problems, solveds, setSolveds }) => {
+const ProblemView: React.FC<ProblemViewProps> = ({ user, problems, solves, setSolves }) => {
   const { deleteProblem, autoResize, goToProblemEdit } = CommonFunction()
   const { id } = useParams();
   const problem = problems.find(problem => problem.id === Number(id));
@@ -45,25 +45,31 @@ const ProblemView: React.FC<ProblemViewProps> = ({ user, problems, solveds, setS
           };
 
           try {
-            const response = await axios.post<string>(URL + 'code', requestData, { timeout: 10000 });
-            setMessage(response.data);
+            const response = await axios.post<ApiResponse<string>>(URL + 'code', requestData, { timeout: 10000 });
+            setMessage(response.data.data);
 
-            let solvedDTO: Solved = {
+            let solve: Solve = {
               id: -1,
               userId: user.userId,
               problemId: problem!.id,
-              score: "0",
+              score: 0,
               createdAt: new Date().toISOString()
             };
 
-            const num = Number(response.data);
-            if (!isNaN(num)) solvedDTO.score = num.toString();
+            const num = Number(response.data.data);
+            if (!isNaN(num)) solve.score = Math.floor(num*10);
 
-            await axios.post<Solved>(URL + `solveds`, solvedDTO, { timeout: 10000 });
+            await axios.post<ApiResponse<Solve>>(URL + `solves`, solve, { timeout: 10000 });
 
-            const response2 = await axios.post<Solved[]>(URL + `solveds/${user.userId}`, null, { timeout: 10000 });
-            setSolveds(response2.data);
-          } catch (error) { setMessage("서버 오류") }
+            const response2 = await axios.post<ApiResponse<Solve[]>>(URL + `solves/${user.userId}`, null, { timeout: 10000 });
+            setSolves(response2.data.data);
+          } catch (error) {
+            if (error instanceof AxiosError) {
+              console.error(error.response?.data.message);
+            } else {
+              console.error("알 수 없는 에러:", error);
+            }
+          }
 
           setIsLoading(false);
         }
@@ -88,16 +94,16 @@ const ProblemView: React.FC<ProblemViewProps> = ({ user, problems, solveds, setS
         </div>
       }
       {(() => {
-        const filtered = solveds.filter((solved) => solved.userId === user.userId && solved.problemId === problem.id);
+        const filtered = solves.filter((solve) => solve.userId === user.userId && solve.problemId === problem.id);
 
         if (filtered.length === 0) return <></>;
 
         const score = filtered[0].score;
         let style = { backgroundColor: "rgb(238, 255, 0)" };
-        if (score === "100") style.backgroundColor = "rgb(43, 255, 0)";
-        if (score === "0") style.backgroundColor = "rgb(255, 0, 0)";
+        if (score === 1000) style.backgroundColor = "rgb(43, 255, 0)";
+        if (score === 0) style.backgroundColor = "rgb(255, 0, 0)";
 
-        return <div className="owner"><div className="solved" style={style}>{score}</div></div>;
+        return <div className="owner"><div className="solve" style={style}>{score/10}</div></div>;
       })()}
       <MathJaxContext config={mathJaxConfig}>
         <div style={{ position: 'relative', zIndex: -1 }}>

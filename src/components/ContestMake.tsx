@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react"
-import { URL, Contest, User } from "../model/talbe"
-import axios from "axios"
+import { URL, Contest, User, ApiResponse } from "../model/talbe"
+import axios, { AxiosError } from "axios"
 import "./css/ContestMake.css"
 import "./css/styles.css"
 import CommonFunction from "../model/CommonFunction"
@@ -49,13 +49,16 @@ const ContestMake: React.FC<ContestMakeProps> = ({ user }) => {
             };
 
             try {
-              const response = await axios.post<Contest>(URL + `contests/create`, requestData, { timeout: 10000 });
-              const contestR: Contest = response.data
-
-              if (contestR.id == -1) setMakeMessage("대회 이름 중복")
-              else goToMakeProblem(contestR.id)
-            } catch (error) {setMakeMessage("서버 오류")}
-            
+              const response = await axios.post<ApiResponse<Contest>>(URL + `contests/create`, requestData, { timeout: 10000 });
+              const contestR: Contest = response.data.data
+              goToMakeProblem(contestR.id)
+            } catch (error) {
+              if (error instanceof AxiosError) {
+                setMakeMessage(error.response?.data.message);
+              } else {
+                console.error("알 수 없는 에러:", error);
+              }
+            }
           } else {
             setMakeMessage("이름 작성 필요")
           }

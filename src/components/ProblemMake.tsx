@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react"
 import { useParams } from "react-router-dom"
-import { URL, Example, Problem, ProblemDTO, User } from "../model/talbe"
-import axios from "axios"
+import { URL, Example, Problem, ProblemDTO, User, ApiResponse } from "../model/talbe"
+import axios, { AxiosError } from "axios"
 import "./css/ProblemMake.css"
 import "./css/styles.css"
 import CommonFunction from "../model/CommonFunction"
@@ -83,21 +83,22 @@ const ProblemMake: React.FC<ProblemMakeProps> = ({ user }) => {
         };
 
         try {
-          const response = await axios.post<Problem>(URL + `problems/create`, requestData, { timeout: 10000 });
-          const problemR: Problem = response.data;
-
-          if (problemR.id == -1) setMakeMessage("서버 오류")
-          else {
-            if (cont === 1) {
-              setExampleInputRefs([])
-              setExampleOutputRefs([])
-              refs.forEach(ref => {if (ref.current) ref.current.value = "";});
-            } else {
-              goToHome()
-              window.location.reload()
-            }
+          await axios.post<ApiResponse<Problem>>(URL + `problems/create`, requestData, { timeout: 10000 });
+          if (cont === 1) {
+            setExampleInputRefs([])
+            setExampleOutputRefs([])
+            refs.forEach(ref => {if (ref.current) ref.current.value = "";});
+          } else {
+            goToHome()
+            window.location.reload()
           }
-        } catch (error) { setMakeMessage("서버 오류") }
+        } catch (error) {
+          if (error instanceof AxiosError) {
+            setMakeMessage(error.response?.data.message);
+          } else {
+            console.error("알 수 없는 에러:", error);
+          }
+        }
       } else {
         setMakeMessage("설명을 채워 넣어주세요")
       }

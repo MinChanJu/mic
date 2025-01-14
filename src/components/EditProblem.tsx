@@ -1,9 +1,9 @@
 /* eslint-disable */
 import React, { useEffect, useRef, useState } from "react"
 import { useParams } from "react-router-dom"
-import { URL, Example, InitExample, Problem, ProblemDTO } from "../model/talbe"
+import { URL, Example, InitExample, Problem, ProblemDTO, ApiResponse } from "../model/talbe"
 import CommonFunction from "../model/CommonFunction"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 
 interface EditProblemProps {
   problems: Problem[]
@@ -30,11 +30,17 @@ const EditProblem: React.FC<EditProblemProps> = ({ problems }) => {
   useEffect(() => {
     async function severArray() {
       try {
-        const response = await axios.post<Example[]>(URL + `examples/${id}`, null, { timeout: 10000 });
-        setExamples(response.data);
-        setExampleInputRefs(response.data.map(() => React.createRef<HTMLTextAreaElement>()));
-        setExampleOutputRefs(response.data.map(() => React.createRef<HTMLTextAreaElement>()));
-      } catch (error) { console.log("서버 오류 " + error) }
+        const response = await axios.post<ApiResponse<Example[]>>(URL + `examples/${id}`, null, { timeout: 10000 });
+        setExamples(response.data.data);
+        setExampleInputRefs(response.data.data.map(() => React.createRef<HTMLTextAreaElement>()));
+        setExampleOutputRefs(response.data.data.map(() => React.createRef<HTMLTextAreaElement>()));
+      } catch (error) { 
+        if (error instanceof AxiosError) {
+          console.error(error.response?.data.message);
+        } else {
+          console.error("알 수 없는 에러:", error);
+        }
+      }
     }
     severArray();
   }, []);
@@ -49,8 +55,14 @@ const EditProblem: React.FC<EditProblemProps> = ({ problems }) => {
     async function deleteExample() {
       if (examples[index].id != -1) {
         try {
-          await axios.delete(URL + `examples/${examples[index].id}`, { timeout: 10000 });
-        } catch (error) { console.log("서버 오류 " + error) }
+          await axios.delete<ApiResponse<void>>(URL + `examples/${examples[index].id}`, { timeout: 10000 });
+        } catch (error) {
+          if (error instanceof AxiosError) {
+            console.error(error.response?.data.message);
+          } else {
+            console.error("알 수 없는 에러:", error);
+          }
+        }
       }
     }
     deleteExample();
@@ -101,15 +113,18 @@ const EditProblem: React.FC<EditProblemProps> = ({ problems }) => {
         };
 
         try {
-          const response = await axios.put<Problem>(URL + 'problems/update', requestData, { timeout: 10000 });
-          const problemR: Problem = response.data
+          const response = await axios.put<ApiResponse<Problem>>(URL + 'problems/update', requestData, { timeout: 10000 });
+          const problemR: Problem = response.data.data
 
-          if (problemR.id == -1) setEditMessage("존재하지 않는 문제")
-          else {
-            goToProblemId(problemR.id)
-            window.location.reload()
+          goToProblemId(problemR.id)
+          window.location.reload()
+        } catch (error) {
+          if (error instanceof AxiosError) {
+            setEditMessage(error.response?.data.message);
+          } else {
+            console.error("알 수 없는 에러:", error);
           }
-        } catch (error) { setEditMessage("서버 오류") }
+        }
       } else {
         setEditMessage("설명을 채워 넣어주세요")
       }

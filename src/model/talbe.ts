@@ -1,5 +1,5 @@
-// export const URL = "http://localhost:8080/api/";
-export const URL = "https://port-0-my-spring-app-m09c1v2t70d7f20e.sel4.cloudtype.app/api/";
+export const URL = "http://localhost:8080/api/";
+// export const URL = "https://port-0-my-spring-app-m09c1v2t70d7f20e.sel4.cloudtype.app/api/";
 
 export const mathJaxConfig = {
   tex: {
@@ -18,7 +18,7 @@ export type User = {
   phone: string
   email: string
   authority: number
-  contest: number
+  contestId: number
   createdAt: string
 }
 
@@ -28,8 +28,8 @@ export type Contest = {
   contestName: string
   contestDescription: string
   contestPw: string
-  eventTime: string
   time: number
+  eventTime: string
   createdAt: string
 }
 
@@ -54,11 +54,11 @@ export type Example = {
   createdAt: string
 }
 
-export type Solved = {
+export type Solve = {
   id: number
   userId: string
   problemId: number
-  score: string
+  score: number
   createdAt: string
 }
 
@@ -73,14 +73,14 @@ export type CodeDTO = {
   problemId: number
 }
 
-export type ContestScore = {
+export type ContestScoreDTO = {
   name: string
-  solvedProblems: Submit[]
+  solveProblems: SubmitDTO[]
 }
 
-export type Submit = {
+export type SubmitDTO = {
   problemId: number
-  score: string
+  score: number
 }
 
 export type UserDTO = {
@@ -97,11 +97,12 @@ export type ProblemsAndContestsDTO = {
   contests: Contest[]
 }
 
-export type CurrentContest = {
-  contestId: number
-  contestName: string
+export interface ApiResponse<T> {
+  status: number;    // HTTP 상태 코드 (200, 400, 500 등)
+  success: boolean;  // 성공 여부
+  message: string;   // 응답 메시지
+  data: T;           // 제네릭 타입의 데이터
 }
 
-export const InitUser: User = { id: -1, name: '', userId: '', userPw: '', phone: '', email: '', authority: -1, contest: -1, createdAt: '' };
-export const InitCurrentContest: CurrentContest = { contestId: -1, contestName: '' };
+export const InitUser: User = { id: -1, name: '', userId: '', userPw: '', phone: '', email: '', authority: -1, contestId: -1, createdAt: '' };
 export const InitExample: Example = { id: -1, problemId: -1, exampleInput: "", exampleOutput: "", createdAt: new Date().toISOString() };
