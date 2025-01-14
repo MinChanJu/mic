@@ -1,5 +1,5 @@
-export const URL = "http://localhost:8080/api/";
-// export const URL = "https://port-0-my-spring-app-m09c1v2t70d7f20e.sel4.cloudtype.app/api/";
+// export const URL = "http://localhost:8080/api/";
+export const URL = "https://port-0-my-spring-app-m09c1v2t70d7f20e.sel4.cloudtype.app/api/";
 
 export const mathJaxConfig = {
   tex: {
