@@ -18,7 +18,8 @@ const UserView: React.FC = () => {
         setCurUser(response.data.data);
       } catch (error) {
         if (error instanceof AxiosError) {
-          console.error(error.response?.data.message);
+          if (error.response) console.error(error.response.data.message);
+          else console.error("서버 에러: ", error)
         } else {
           console.error("알 수 없는 에러:", error);
         }

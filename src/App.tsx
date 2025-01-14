@@ -30,19 +30,20 @@ function App() {
   useEffect(() => {
     async function fetchData() {
       try {
+        console.log(URL);
         const response = await axios.post<ApiResponse<ContestsAndProblemsDTO>>(URL + 'data', null, { timeout: 10000 });
         const data = response.data;
         
         if (user.contestId == -1) {
-          setProblems(data.data.problems.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
           setContests(data.data.contests.sort((a, b) => new Date(b.eventTime).getTime() - new Date(a.eventTime).getTime()));
+          setProblems(data.data.problems.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
         } else {
-          setProblems(data.data.problems.filter((problem) => { return problem.contestId == user.contestId; }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
           setContests(data.data.contests.filter((contest) => { return contest.id == user.contestId; }).sort((a, b) => new Date(b.eventTime).getTime() - new Date(a.eventTime).getTime()));
+          setProblems(data.data.problems.filter((problem) => { return problem.contestId == user.contestId; }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
         }
       } catch (error) { 
         if (error instanceof AxiosError) {
-          if (error.response) console.error(error.response?.data.message);
+          if (error.response) console.error(error.response.data.message);
           else console.error("서버 에러: ", error)
         } else {
           console.error("알 수 없는 에러:", error);
@@ -55,7 +56,8 @@ function App() {
           setSolves(response.data.data);
         } catch (error) {
           if (error instanceof AxiosError) {
-            console.error(error.response?.data.message);
+            if (error.response) console.error(error.response.data.message);
+            else console.error("서버 에러: ", error)
           } else {
             console.error("알 수 없는 에러:", error);
           }

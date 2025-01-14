@@ -60,7 +60,8 @@ const EditContest: React.FC<EditContestProps> = ({ user, contests }) => {
               window.location.reload()
             } catch (error) {
               if (error instanceof AxiosError) {
-                setEditMessage(error.response?.data.message);
+                if (error.response) setEditMessage(error.response.data.message);
+                else console.error("서버 에러: ", error)
               } else {
                 console.error("알 수 없는 에러:", error);
               }

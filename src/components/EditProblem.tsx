@@ -36,7 +36,8 @@ const EditProblem: React.FC<EditProblemProps> = ({ problems }) => {
         setExampleOutputRefs(response.data.data.map(() => React.createRef<HTMLTextAreaElement>()));
       } catch (error) { 
         if (error instanceof AxiosError) {
-          console.error(error.response?.data.message);
+          if (error.response) console.error(error.response.data.message);
+          else console.error("서버 에러: ", error)
         } else {
           console.error("알 수 없는 에러:", error);
         }
@@ -58,7 +59,8 @@ const EditProblem: React.FC<EditProblemProps> = ({ problems }) => {
           await axios.delete<ApiResponse<void>>(URL + `examples/${examples[index].id}`, { timeout: 10000 });
         } catch (error) {
           if (error instanceof AxiosError) {
-            console.error(error.response?.data.message);
+            if (error.response) console.error(error.response.data.message);
+            else console.error("서버 에러: ", error)
           } else {
             console.error("알 수 없는 에러:", error);
           }
@@ -120,7 +122,8 @@ const EditProblem: React.FC<EditProblemProps> = ({ problems }) => {
           window.location.reload()
         } catch (error) {
           if (error instanceof AxiosError) {
-            setEditMessage(error.response?.data.message);
+            if (error.response) setEditMessage(error.response.data.message);
+            else console.error("서버 에러: ", error)
           } else {
             console.error("알 수 없는 에러:", error);
           }

@@ -153,7 +153,8 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
           goToHome();
         } catch (error) {
           if (error instanceof AxiosError) {
-            setloginMessage("아이디 또는 비밀번호가 틀렸습니다.");
+            if (error.response) setloginMessage("아이디 또는 비밀번호가 틀렸습니다.");
+            else console.error("서버 에러: ", error)
           } else {
             setloginMessage("알 수 없는 에러: " + error);
           }

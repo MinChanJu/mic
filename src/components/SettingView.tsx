@@ -291,7 +291,8 @@ const UserManage: React.FC<ContestProps> = ({ user, contests }) => {
       await axios.put(URL + `users/update`, updateUser, { timeout: 10000 });
     } catch (error) {
       if (error instanceof AxiosError) {
-        console.error(error.response?.data.message);
+        if (error.response) console.error(error.response.data.message);
+        else console.error("서버 에러: ", error)
       } else {
         console.error("알 수 없는 에러:", error);
       }
@@ -310,7 +311,8 @@ const UserManage: React.FC<ContestProps> = ({ user, contests }) => {
           setEnters(UsersR.map((user) => user.contestId));
         } catch (error) {
           if (error instanceof AxiosError) {
-            console.error(error.response?.data.message);
+            if (error.response) console.error(error.response.data.message);
+            else console.error("서버 에러: ", error)
           } else {
             console.error("알 수 없는 에러:", error);
           }

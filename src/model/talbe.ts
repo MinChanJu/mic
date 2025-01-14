@@ -1,5 +1,12 @@
-// export const URL = "http://localhost:8080/api/";
-export const URL = "https://port-0-my-spring-app-m09c1v2t70d7f20e.sel4.cloudtype.app/api/";
+declare const process: {
+  env: {
+    NODE_ENV: string;
+  };
+};
+
+export const URL = process.env.NODE_ENV === 'production'
+  ? "https://port-0-my-spring-app-m09c1v2t70d7f20e.sel4.cloudtype.app/api/"  // 배포 서버 주소
+  : "http://localhost:8080/api/"; 
 
 export const mathJaxConfig = {
   tex: {
