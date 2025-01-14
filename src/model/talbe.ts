@@ -6,7 +6,7 @@ declare const process: {
 
 export const URL = process.env.NODE_ENV === 'production'
   ? "https://port-0-my-spring-app-m09c1v2t70d7f20e.sel4.cloudtype.app/api/"  // 배포 서버 주소
-  : "http://localhost:8080/api/"; 
+  : "http://localhost:8080/api/";  // 로컬 주소
 
 export const mathJaxConfig = {
   tex: {

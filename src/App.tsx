@@ -30,7 +30,6 @@ function App() {
   useEffect(() => {
     async function fetchData() {
       try {
-        console.log(URL);
         const response = await axios.post<ApiResponse<ContestsAndProblemsDTO>>(URL + 'data', null, { timeout: 10000 });
         const data = response.data;
         
