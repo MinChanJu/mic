@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { URL, Contest, Problem, Solve, User, InitUser, ProblemsAndContestsDTO, ApiResponse } from './model/talbe'
+import { URL, Contest, Problem, Solve, User, InitUser, ApiResponse, ContestsAndProblemsDTO } from './model/talbe'
 import axios, { AxiosError } from 'axios';
 import Header from './components/Header';
 import Home from './components/Home';
@@ -30,7 +30,7 @@ function App() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.post<ApiResponse<ProblemsAndContestsDTO>>(URL + 'data', null, { timeout: 10000 });
+        const response = await axios.post<ApiResponse<ContestsAndProblemsDTO>>(URL + 'data', null, { timeout: 10000 });
         const data = response.data;
         
         if (user.contestId == -1) {

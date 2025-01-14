@@ -92,9 +92,9 @@ export type UserDTO = {
   createdAt: string
 }
 
-export type ProblemsAndContestsDTO = {
-  problems: Problem[]
+export type ContestsAndProblemsDTO = {
   contests: Contest[]
+  problems: Problem[]
 }
 
 export interface ApiResponse<T> {
