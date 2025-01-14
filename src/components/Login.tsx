@@ -122,7 +122,11 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
             handleButtonClick()
           } catch (error) {
             if (error instanceof AxiosError) {
-              setregisterMessage(error.response?.data.message + "\n비밀번호는 영문자, 숫자를 포함해야하며 8자 이상이어야 합니다.");
+              if (error.response) setregisterMessage(error.response.data.message + "\n비밀번호는 영문자, 숫자를 포함해야하며 8자 이상이어야 합니다.");
+              else {
+                setregisterMessage("서버 에러")
+                console.error("서버 에러:", error);
+              }
             } else {
               console.error("알 수 없는 에러:", error);
             }
