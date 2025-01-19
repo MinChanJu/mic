@@ -2,15 +2,15 @@ import Header from './components/Header';
 import './App.css'
 import AppRoutes from './routes';
 import { UserProvider } from './context/UserContext';
-import {  BrowserRouter as Router } from 'react-router-dom';
+import {  BrowserRouter } from 'react-router-dom';
 
 function App() {
   return (
     <UserProvider>
-      <Router basename='/mic-react/'>
+      <BrowserRouter>
         <Header />
         <AppRoutes />
-      </Router>
+      </BrowserRouter>
     </UserProvider>
   )
 }

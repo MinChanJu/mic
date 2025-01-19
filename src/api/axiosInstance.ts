@@ -1,14 +1,16 @@
 import axios from 'axios';
 
 declare const process: {
-    env: {
-      NODE_ENV: string;
-    };
+  env: {
+    NODE_ENV: string;
   };
-  
-const URL = process.env.NODE_ENV === 'production'
-  ? "https://port-0-my-spring-app-m09c1v2t70d7f20e.sel4.cloudtype.app/api"  // 배포 서버 주소
-  : "http://localhost:8080/api";  // 로컬 주소
+};
+
+// const URL = process.env.NODE_ENV === 'production'
+//   ? "https://port-0-my-spring-app-m09c1v2t70d7f20e.sel4.cloudtype.app/api"  // 배포 서버 주소
+//   : "http://localhost:8080/api";  // 로컬 주소
+
+const URL = "https://port-0-my-spring-app-m09c1v2t70d7f20e.sel4.cloudtype.app/api"  // 배포 서버 주소
 
 // Axios 인스턴스 생성
 const axiosInstance = axios.create({

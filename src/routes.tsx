@@ -16,7 +16,6 @@ import ScoreBoard from './pages/ScoreBoad';
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Home />} />
-    <Route path="/home" element={<Home />} />
     <Route path="/login" element={<Login />} />
     <Route path="/contest" element={<ContestList />} />
     <Route path="/contest/edit/:contestId" element={<EditContest />} />
