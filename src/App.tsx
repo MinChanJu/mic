@@ -2,15 +2,15 @@ import Header from './components/Header';
 import './App.css'
 import AppRoutes from './routes';
 import { UserProvider } from './context/UserContext';
-import {  BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 
 function App() {
   return (
     <UserProvider>
-      <BrowserRouter>
+      <HashRouter>
         <Header />
         <AppRoutes />
-      </BrowserRouter>
+      </HashRouter>
     </UserProvider>
   )
 }
