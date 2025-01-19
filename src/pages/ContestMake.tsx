@@ -1,16 +1,15 @@
 import React, { useRef, useState } from "react"
-import { URL, Contest, User, ApiResponse } from "../model/talbe"
-import axios, { AxiosError } from "axios"
-import "./css/ContestMake.css"
-import "./css/styles.css"
-import CommonFunction from "../model/CommonFunction"
+import { AxiosError } from "axios"
+import { createContest } from "../api/contest"
+import { useUser } from "../context/UserContext"
+import { Contest } from "../types/Contest"
+import useNavigation from "../hooks/useNavigation"
+import "../styles/ContestMake.css"
+import "../styles/styles.css"
 
-interface ContestMakeProps {
-  user: User
-}
-
-const ContestMake: React.FC<ContestMakeProps> = ({ user }) => {
-  const { goToMakeProblem } = CommonFunction()
+const ContestMake: React.FC = () => {
+  const { user } = useUser()
+  const { goToProblemMake } = useNavigation()
   const [makeMessage, setMakeMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const userIdRef = useRef<HTMLInputElement>(null);
@@ -18,8 +17,8 @@ const ContestMake: React.FC<ContestMakeProps> = ({ user }) => {
   const contestPasswordRef = useRef<HTMLInputElement>(null);
   const contestCheckPasswordRef = useRef<HTMLInputElement>(null);
   const contestDescriptionRef = useRef<HTMLTextAreaElement>(null);
-  const eventTimeRef = useRef<HTMLInputElement>(null);
-  const timeRef = useRef<HTMLInputElement>(null);
+  const startTimeRef = useRef<HTMLInputElement>(null);
+  const endTimeRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async () => {
     setIsLoading(true)
@@ -29,36 +28,38 @@ const ContestMake: React.FC<ContestMakeProps> = ({ user }) => {
       contestPasswordRef.current &&
       contestCheckPasswordRef.current &&
       contestDescriptionRef.current &&
-      eventTimeRef.current &&
-      timeRef.current) {
+      startTimeRef.current &&
+      endTimeRef.current) {
       if (userIdRef.current.value === user.userId && user.userId !== "") {
         if (contestPasswordRef.current.value === contestCheckPasswordRef.current.value) {
           if (contestNameRef.current.value !== '') {
-            const localDateTime = eventTimeRef.current.value;
-            const isoDateTime = new Date(localDateTime).toISOString();
+            if (startTimeRef.current.value !== "" || endTimeRef.current.value === "") {
+              const requestData: Contest = {
+                id: null,
+                userId: userIdRef.current.value,
+                contestName: contestNameRef.current.value,
+                contestDescription: contestDescriptionRef.current.value,
+                contestPw: contestPasswordRef.current.value === "" ? null : contestPasswordRef.current.value,
+                startTime: startTimeRef.current.value === "" ? null : new Date(startTimeRef.current.value).toISOString(),
+                endTime: endTimeRef.current.value === "" ? null : new Date(endTimeRef.current.value).toISOString(),
+                createdAt: new Date().toISOString()
+              };
 
-            const requestData: Contest = {
-              id: -1,
-              userId: userIdRef.current.value,
-              contestName: contestNameRef.current.value,
-              contestDescription: contestDescriptionRef.current.value,
-              contestPw: contestPasswordRef.current.value,
-              eventTime: isoDateTime,
-              time: Number(timeRef.current.value),
-              createdAt: new Date().toISOString()
-            };
+              console.log(requestData)
 
-            try {
-              const response = await axios.post<ApiResponse<Contest>>(URL + `contests/create`, requestData, { timeout: 10000 });
-              const contestR: Contest = response.data.data
-              goToMakeProblem(contestR.id)
-            } catch (error) {
-              if (error instanceof AxiosError) {
-                if (error.response) setMakeMessage(error.response.data.message);
-                else console.error("서버 에러: ", error)
-              } else {
-                console.error("알 수 없는 에러:", error);
+              try {
+                const response = await createContest(requestData);
+                goToProblemMake(response.data.id!)
+              } catch (error) {
+                if (error instanceof AxiosError) {
+                  if (error.response) setMakeMessage("응답 에러: " + error.response.data.message);
+                  else console.error("서버 에러: ", error)
+                } else {
+                  console.error("알 수 없는 에러:", error);
+                }
               }
+            } else {
+              setMakeMessage("죵료 시간을 입력하려면 시작 시간을 입력해야합니다.")
             }
           } else {
             setMakeMessage("이름 작성 필요")
@@ -105,11 +106,11 @@ const ContestMake: React.FC<ContestMakeProps> = ({ user }) => {
           <div className="double-make-group">
             <div className="make-group">
               <div className="makeTitle">대회 개최 시간</div>
-              <input className="makeField" ref={eventTimeRef} type="datetime-local" />
+              <input className="makeField" ref={startTimeRef} type="datetime-local" />
             </div>
             <div className="make-group">
-              <div className="makeTitle">대회 진행 시간 (분 단위)</div>
-              <input className="makeField" ref={timeRef} type="number" min={0} max={3000} step={5} />
+              <div className="makeTitle">대회 종료 시간</div>
+              <input className="makeField" ref={endTimeRef} type="datetime-local" />
             </div>
           </div>
           <div className="make-group">

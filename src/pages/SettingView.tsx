@@ -1,18 +1,21 @@
 import React, { useEffect, useRef, useState } from "react"
-import { URL, Contest, Problem, Solve, User, mathJaxConfig, ApiResponse } from "../model/talbe"
-import axios, { AxiosError } from "axios"
-import './css/SettingView.css'
-import CommonFunction from "../model/CommonFunction"
 import { MathJax, MathJaxContext } from "better-react-mathjax"
+import { AxiosError } from "axios"
+import { getAllProblemsByUserId, getAllSolveProblemsByUserId } from "../api/problem"
+import { getAllContestsByUserId } from "../api/contest"
+import { getAllUsers, updateUser } from "../api/user"
+import { mathJaxConfig } from "../constants/mathJaxConfig"
+import { useUser } from "../context/UserContext"
+import { ProblemScoreDTO } from "../types/ProblemScoreDTO"
+import { Contest } from "../types/Contest"
+import { Problem } from "../types/Problem"
+import { User } from "../types/User"
+import useNavigation from "../hooks/useNavigation"
+import '../styles/SettingView.css'
 
-interface SettingViewProps {
-  user: User
-  contests: Contest[]
-  problems: Problem[]
-  solves: Solve[]
-}
 
-const SettingView: React.FC<SettingViewProps> = ({ user, contests, problems, solves }) => {
+const SettingView: React.FC = () => {
+  const { user } = useUser()
 
   const [data, setData] = useState<string>("정보")
   return (
@@ -31,12 +34,12 @@ const SettingView: React.FC<SettingViewProps> = ({ user, contests, problems, sol
       </div>
       <div className="setting-view">
         <div className="view-title">{data}</div>
-        {data === "정보" && <Info user={user} />}
-        {data === "비밀번호 변경" && <ChagePw user={user} />}
-        {data === "내가 푼 문제" && <SolvePage problems={problems} solves={solves} />}
-        {data === "만든 문제" && <MakePro user={user} problems={problems} />}
-        {data === "만든 대회" && <MakeCon user={user} contests={contests} />}
-        {data === "회원 관리" && <UserManage user={user} contests={contests} />}
+        {data === "정보" && <Info />}
+        {data === "비밀번호 변경" && <ChagePw />}
+        {data === "내가 푼 문제" && <SolvePage />}
+        {data === "만든 문제" && <MakePro />}
+        {data === "만든 대회" && <MakeCon />}
+        {data === "회원 관리" && <UserManage />}
       </div>
     </div>
   )
@@ -44,11 +47,8 @@ const SettingView: React.FC<SettingViewProps> = ({ user, contests, problems, sol
 
 export default SettingView
 
-interface UserProps {
-  user: User
-}
-
-const Info: React.FC<UserProps> = ({ user }) => {
+const Info: React.FC = () => {
+  const { user } = useUser()
   const passwordRef = useRef<HTMLInputElement | null>(null)
   const phoneRef = useRef<HTMLInputElement | null>(null)
   const emailRef = useRef<HTMLInputElement | null>(null)
@@ -105,7 +105,8 @@ const Info: React.FC<UserProps> = ({ user }) => {
   )
 }
 
-const ChagePw: React.FC<UserProps> = ({ user }) => {
+const ChagePw: React.FC = () => {
+  const { user } = useUser()
   const passwordRef = useRef<HTMLInputElement | null>(null)
   const newPasswordRef = useRef<HTMLInputElement | null>(null)
   const newcheckPasswordRef = useRef<HTMLInputElement | null>(null)
@@ -150,13 +151,27 @@ const ChagePw: React.FC<UserProps> = ({ user }) => {
   )
 }
 
-interface solvdeProps {
-  problems: Problem[]
-  solves: Solve[]
-}
+const SolvePage: React.FC = () => {
+  const { user } = useUser()
+  const [problemScores, setProblemScores] = useState<ProblemScoreDTO[]>([])
+  const { goToProblemId } = useNavigation()
 
-const SolvePage: React.FC<solvdeProps> = ({ problems, solves }) => {
-  const { goToProblemId } = CommonFunction()
+  useEffect(() => {
+      async function loadProblemScores() {
+        try {
+          const response = await getAllSolveProblemsByUserId(user.userId);
+          setProblemScores(response.data);
+        } catch (error) {
+          if (error instanceof AxiosError) {
+            if (error.response) console.error("응답 에러: ", error.response.data.message);
+            else console.error("서버 에러: ", error)
+          } else {
+            console.error("알 수 없는 에러:", error);
+          }
+        }
+      }
+      loadProblemScores();
+    }, []);
   return (
     <div>
       <table>
@@ -168,24 +183,18 @@ const SolvePage: React.FC<solvdeProps> = ({ problems, solves }) => {
           </tr>
         </thead>
         <tbody>
-          {solves.map((solve) => (
-            <tr key={solve.id} onClick={() => { goToProblemId(solve.problemId) }}>
-              <td>{solve.problemId}</td>
+          {problemScores.map((problemSocre) => (
+            <tr key={problemSocre.problem.id} onClick={() => { goToProblemId(problemSocre.problem.id!) }}>
+              <td>{problemSocre.problem.id}</td>
+              <td>{problemSocre.problem.problemName}</td>
               <td>
                 {(() => {
-                  const problem = problems.find((problem) => problem.id == solve.problemId)
-                  if (!problem) return <></>
-                  return <>{problem.problemName}</>
-                })()}
-              </td>
-              <td>
-                {(() => {
-                  const score = solve.score;
+                  const score = problemSocre.score;
                   let style = { backgroundColor: "rgb(238, 255, 0)" };
                   if (score === 1000) style.backgroundColor = "rgb(43, 255, 0)";
                   if (score === 0) style.backgroundColor = "rgb(255, 0, 0)";
 
-                  return <div className="solve" style={style}>{score/10}</div>;
+                  return <div className="solve" style={style}>{score / 10}</div>;
                 })()}
               </td>
             </tr>
@@ -196,14 +205,28 @@ const SolvePage: React.FC<solvdeProps> = ({ problems, solves }) => {
   )
 }
 
-interface ProblemProps {
-  user: User,
-  problems: Problem[]
-}
-
-const MakePro: React.FC<ProblemProps> = ({ user, problems }) => {
-  const { goToProblemId } = CommonFunction()
+const MakePro: React.FC = () => {
+  const { user } = useUser()
+  const { goToProblemId } = useNavigation()
+  const [problems, setProblems] = useState<Problem[]>([])
   const myProblems = problems.filter(problem => problem.userId === user.userId);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await getAllProblemsByUserId(user.userId);
+        setProblems(response.data);
+      } catch(error) {
+        if (error instanceof AxiosError) {
+          if (error.response) console.error("응답 에러: ", error.response.data.message);
+          else console.error("서버 에러: ", error)
+        } else {
+          console.error("알 수 없는 에러:", error);
+        }
+      }
+    }
+    fetchData()
+  }, [])
 
   return (
     <div className="total-container">
@@ -220,7 +243,7 @@ const MakePro: React.FC<ProblemProps> = ({ user, problems }) => {
             {myProblems.map((problem, index) => (
               <tr key={index}>
                 <td>{index + 1}</td>
-                <td style={{ cursor: "pointer" }} onClick={() => { goToProblemId(problem.id) }}>
+                <td style={{ cursor: "pointer" }} onClick={() => { goToProblemId(problem.id!) }}>
                   <MathJax>{problem.problemName}</MathJax>
                 </td>
                 <td>{problem.userId}</td>
@@ -233,14 +256,28 @@ const MakePro: React.FC<ProblemProps> = ({ user, problems }) => {
   )
 }
 
-interface ContestProps {
-  user: User,
-  contests: Contest[]
-}
-
-const MakeCon: React.FC<ContestProps> = ({ user, contests }) => {
-  const { goToContestId } = CommonFunction()
+const MakeCon: React.FC = () => {
+  const { user } = useUser()
+  const { goToContestId } = useNavigation()
+  const [contests, setContests] = useState<Contest[]>([])
   const myContests = contests.filter(contest => contest.userId === user.userId);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await getAllContestsByUserId(user.userId);
+        setContests(response.data);
+      } catch(error) {
+        if (error instanceof AxiosError) {
+          if (error.response) console.error("응답 에러: ", error.response.data.message);
+          else console.error("서버 에러: ", error)
+        } else {
+          console.error("알 수 없는 에러:", error);
+        }
+      }
+    }
+    fetchData()
+  }, [])
 
   return (
     <div className="total-container">
@@ -256,7 +293,7 @@ const MakeCon: React.FC<ContestProps> = ({ user, contests }) => {
           {myContests.map((contest, index) => (
             <tr key={index}>
               <td>{index + 1}</td>
-              <td style={{ cursor: "pointer" }} onClick={() => { goToContestId(user, contest, false) }}>{contest.contestName}</td>
+              <td style={{ cursor: "pointer" }} onClick={() => { goToContestId(contest.id!) }}>{contest.contestName}</td>
               <td>{contest.userId}</td>
             </tr>
           ))}
@@ -266,7 +303,8 @@ const MakeCon: React.FC<ContestProps> = ({ user, contests }) => {
   )
 }
 
-const UserManage: React.FC<ContestProps> = ({ user, contests }) => {
+const UserManage: React.FC = () => {
+  const { user } = useUser()
   const [users, setUsers] = useState<User[]>([]);
   const [authoritys, setAuthoritys] = useState<number[]>([]);
   const [enters, setEnters] = useState<number[]>([]);
@@ -284,14 +322,14 @@ const UserManage: React.FC<ContestProps> = ({ user, contests }) => {
   };
 
   const handleChange = async (user: User, index: number) => {
-    let updateUser = user;
-    updateUser.authority = authoritys[index]
-    updateUser.contestId = enters[index]
+    let userDetail = user;
+    userDetail.authority = authoritys[index]
+    userDetail.contestId = enters[index] === -1 ? null : enters[index]
     try {
-      await axios.put(URL + `users/update`, updateUser, { timeout: 10000 });
+      await updateUser(userDetail);
     } catch (error) {
       if (error instanceof AxiosError) {
-        if (error.response) console.error(error.response.data.message);
+        if (error.response) console.error("응답 에러: ", error.response.data.message);
         else console.error("서버 에러: ", error)
       } else {
         console.error("알 수 없는 에러:", error);
@@ -303,15 +341,17 @@ const UserManage: React.FC<ContestProps> = ({ user, contests }) => {
     const fetchData = async () => {
       if (user.authority === 5) {
         try {
-          const response = await axios.post<ApiResponse<User[]>>(URL + 'users', null, { timeout: 10000 });
-          const UsersR: User[] = response.data.data;
+          const response = await getAllUsers();
 
-          setUsers(UsersR);
-          setAuthoritys(UsersR.map((user) => user.authority));
-          setEnters(UsersR.map((user) => user.contestId));
+          setUsers(response.data);
+          setAuthoritys(response.data.map((user) => user.authority));
+          setEnters(response.data.map((user) => {
+            if (user.contestId) return user.contestId
+            return -1;
+        }));
         } catch (error) {
           if (error instanceof AxiosError) {
-            if (error.response) console.error(error.response.data.message);
+            if (error.response) console.error("응답 에러: ", error.response.data.message);
             else console.error("서버 에러: ", error)
           } else {
             console.error("알 수 없는 에러:", error);
@@ -345,7 +385,7 @@ const UserManage: React.FC<ContestProps> = ({ user, contests }) => {
               <td>{user.userId}</td>
               <td>{user.email}</td>
               <td><input type="number" value={authoritys[index]} onChange={(event) => handleChangeAuthority(index, event)} min="0" max="5" step="1"></input></td>
-              <td><input type="number" value={enters[index]} onChange={(event) => handleChangeEnter(index, event)} min="-1" max={contests.reduce((max, item) => (item.id > max ? item.id : max), 0).toString()} step="1"></input></td>
+              <td><input type="number" value={enters[index]} onChange={(event) => handleChangeEnter(index, event)} min="-1" max="100" step="1"></input></td>
               <td><button onClick={() => handleChange(user, index)}>수정</button></td>
             </tr>
           ))}

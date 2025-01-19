@@ -1,27 +1,44 @@
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useParams } from "react-router-dom"
-import { URL, Contest, User, ApiResponse } from "../model/talbe"
-import axios, { AxiosError } from "axios"
-import CommonFunction from "../model/CommonFunction"
+import { AxiosError } from "axios"
+import { getContestById, updateContest } from "../api/contest"
+import { useUser } from "../context/UserContext"
+import { Contest } from "../types/Contest"
+import { StringToTime } from "../utils/formatter"
+import useNavigation from "../hooks/useNavigation"
 
-interface EditContestProps {
-  user: User
-  contests: Contest[]
-}
 
-const EditContest: React.FC<EditContestProps> = ({ user, contests }) => {
-  const { goToContestId } = CommonFunction()
-  const { id } = useParams();
+const EditContest: React.FC = () => {
+  const { user } = useUser();
+  const { goToContestId } = useNavigation()
+  const { contestId } = useParams();
   const [editMessage, setEditMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const contest = contests.find(contest => contest.id === Number(id));
+  const [contest, setContest] = useState<Contest>();
   const userIdRef = useRef<HTMLInputElement>(null);
   const contestNameRef = useRef<HTMLInputElement>(null);
   const contestPasswordRef = useRef<HTMLInputElement>(null);
   const contestCheckPasswordRef = useRef<HTMLInputElement>(null);
   const contestDescriptionRef = useRef<HTMLTextAreaElement>(null);
-  const eventTimeRef = useRef<HTMLInputElement>(null);
-  const timeRef = useRef<HTMLInputElement>(null);
+  const startTimeRef = useRef<HTMLInputElement>(null);
+  const endTimeRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    async function loadContest() {
+      try {
+        const response = await getContestById(Number(contestId));
+        setContest(response.data);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          if (error.response) console.error("응답 에러: ", error.response.data.message);
+          else console.error("서버 에러: ", error)
+        } else {
+          console.error("알 수 없는 에러:", error);
+        }
+      }
+    }
+    loadContest();
+  }, []);
 
   if (!contest) return <></>
 
@@ -33,13 +50,13 @@ const EditContest: React.FC<EditContestProps> = ({ user, contests }) => {
       contestPasswordRef.current &&
       contestCheckPasswordRef.current &&
       contestDescriptionRef.current &&
-      eventTimeRef.current &&
-      timeRef.current) {
+      startTimeRef.current &&
+      endTimeRef.current) {
       if (userIdRef.current.value === user.userId && user.userId !== "") {
         if (contestPasswordRef.current.value === contestCheckPasswordRef.current.value) {
           if (contestNameRef.current.value !== '') {
-            const localDateTime = eventTimeRef.current.value;
-            const isoDateTime = new Date(localDateTime).toISOString();
+            const startTime = new Date(startTimeRef.current.value).toISOString();
+            const endTime = new Date(endTimeRef.current.value).toISOString();
 
             const requestData: Contest = {
               id: contest.id,
@@ -47,20 +64,18 @@ const EditContest: React.FC<EditContestProps> = ({ user, contests }) => {
               contestName: contestNameRef.current.value,
               contestDescription: contestDescriptionRef.current.value,
               contestPw: contestPasswordRef.current.value,
-              eventTime: isoDateTime,
-              time: Number(timeRef.current.value),
+              startTime: startTime,
+              endTime: endTime,
               createdAt: contest.createdAt,
             };
 
             try {
-              const response = await axios.put<ApiResponse<Contest>>(URL + 'contests/update', requestData, { timeout: 10000 });
-              const contestR: Contest = response.data.data
-
-              goToContestId(user, contestR, false);
+              const response = await updateContest(requestData);
+              goToContestId(response.data.id!);
               window.location.reload()
             } catch (error) {
               if (error instanceof AxiosError) {
-                if (error.response) setEditMessage(error.response.data.message);
+                if (error.response) setEditMessage("응답 에러: " + error.response.data.message);
                 else console.error("서버 에러: ", error)
               } else {
                 console.error("알 수 없는 에러:", error);
@@ -101,27 +116,22 @@ const EditContest: React.FC<EditContestProps> = ({ user, contests }) => {
           <div className="double-make-group">
             <div className="make-group">
               <div className="makeTitle">대회 비밀번호</div>
-              <input className="makeField" ref={contestPasswordRef} defaultValue={contest.contestPw} type="password" />
+              <input className="makeField" ref={contestPasswordRef} defaultValue={contest.contestPw == null ? "" : contest.contestPw} type="password" />
             </div>
             <div className="make-group">
               <div className="makeTitle">비밀번호 확인</div>
-              <input className="makeField" ref={contestCheckPasswordRef} defaultValue={contest.contestPw} type="password" />
+              <input className="makeField" ref={contestCheckPasswordRef} defaultValue={contest.contestPw == null ? "" : contest.contestPw} type="password" />
             </div>
           </div>
           <div style={{ marginTop: '10px', color: 'red' }}>누구나 접근할 수 있는 대회를 개최하려면 빈칸으로 해주세요.</div>
           <div className="double-make-group">
             <div className="make-group">
               <div className="makeTitle">대회 개최 시간</div>
-              <input className="makeField" ref={eventTimeRef} defaultValue={(() => {
-                const date = new Date(contest.eventTime);
-                const timezoneOffset = date.getTimezoneOffset() * 60000;  // 분 단위 오프셋 → ms로 변환
-                const localDate = new Date(date.getTime() - timezoneOffset);
-                return localDate.toISOString().slice(0, 16);
-              })()} type="datetime-local" />
+              <input className="makeField" ref={startTimeRef} defaultValue={contest.startTime == null ? "" : StringToTime(contest.startTime)} type="datetime-local" />
             </div>
             <div className="make-group">
               <div className="makeTitle">대회 진행 시간 (분 단위)</div>
-              <input className="makeField" ref={timeRef} defaultValue={contest.time} type="number" min={0} max={3000} step={5} />
+              <input className="makeField" ref={endTimeRef} defaultValue={contest.endTime == null ? "" : StringToTime(contest.endTime)} type="datetime-local" />
             </div>
           </div>
           <div className="make-group">

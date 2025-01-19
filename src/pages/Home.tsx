@@ -1,6 +1,6 @@
 import React from "react"
 import banner from "../assets/banner.png"
-import "./css/Home.css"
+import "../styles/Home.css"
 
 const Home:React.FC = () => {
   return (

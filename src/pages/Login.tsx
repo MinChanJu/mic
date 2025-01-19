@@ -1,16 +1,15 @@
 import React, { useEffect, useRef, useState } from "react"
-import { ApiResponse, URL, User } from "../model/talbe"
-import axios, { AxiosError } from "axios"
-import './css/Login.css'
-import './css/styles.css'
-import CommonFunction from "../model/CommonFunction"
+import { AxiosError } from "axios"
+import { login, register } from "../api/user"
+import { useUser } from "../context/UserContext"
+import { User } from "../types/User"
+import useNavigation from "../hooks/useNavigation"
+import '../styles/Login.css'
+import '../styles/styles.css'
 
-interface LoginProps {
-  setUser: React.Dispatch<React.SetStateAction<User>>;
-}
-
-const Login: React.FC<LoginProps> = ({ setUser }) => {
-  const { goToHome } = CommonFunction()
+const Login: React.FC = () => {
+  const {setUser} = useUser();
+  const { goToHome } = useNavigation()
   const [isMovedLeft, setIsMovedLeft] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -105,24 +104,27 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
         const checkPassword = signUpCheckPasswordRef.current!.value;
         if (password === checkPassword) {
           const requestData: User = {
-            id: -1,
+            id: null,
             name: signUpNameRef.current.value,
             userId: signUpIdRef.current.value,
             userPw: signUpPasswordRef.current.value,
             phone: signUpPhoneRef.current.value,
             email: signUpEmailRef.current.value,
             authority: 1,
-            contestId: -1,
+            contestId: null,
             createdAt: new Date().toISOString()
           };
 
           try {
-            await axios.post<ApiResponse<User>>(URL + `users/create`, requestData, { timeout: 10000 });
+            await register(requestData);
             setregisterMessage("회원가입 성공!")
             handleButtonClick()
           } catch (error) {
             if (error instanceof AxiosError) {
-              if (error.response) setregisterMessage(error.response.data.message + "\n비밀번호는 영문자, 숫자를 포함해야하며 8자 이상이어야 합니다.");
+              if (error.response) {
+                setregisterMessage(error.response.data.message + "\n비밀번호는 영문자, 숫자를 포함해야하며 8자 이상이어야 합니다.");
+                console.error("응답 에러: ", error.response.data.message)
+              }
               else {
                 setregisterMessage("서버 에러")
                 console.error("서버 에러:", error);
@@ -143,18 +145,22 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
 
   const loginUser = async () => {
     setIsLoading(true)
+    setloginMessage("")
     if (signInIdRef.current && signInPasswordRef.current) {
       if (signInIdRef.current.value !== "" && signInPasswordRef.current.value !== "") {
         try {
-          const response = await axios.post<ApiResponse<User>>(URL + `users/${signInIdRef.current.value}/${signInPasswordRef.current.value}`, null, { timeout: 10000 });
-          const user: User = response.data.data
-          setUser(user)
-          sessionStorage.setItem('user', JSON.stringify(user));
+          const requestData = {
+            userId: signInIdRef.current.value,
+            userPw: signInPasswordRef.current.value
+          }
+          const response = await login(requestData);
+          setUser(response.data)
           goToHome();
+          window.location.reload()
         } catch (error) {
           if (error instanceof AxiosError) {
-            if (error.response) setloginMessage("아이디 또는 비밀번호가 틀렸습니다.");
-            else console.error("서버 에러: ", error)
+            if (error.response) setloginMessage("응답 에러: " + error.response.data.message);
+            else setloginMessage("서버 에러: " + error)
           } else {
             setloginMessage("알 수 없는 에러: " + error);
           }

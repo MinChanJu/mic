@@ -1,23 +1,22 @@
 /* eslint-disable */
 import React, { useEffect, useRef, useState } from "react"
 import { useParams } from "react-router-dom"
-import { URL, Example, InitExample, Problem, ProblemDTO, ApiResponse } from "../model/talbe"
-import CommonFunction from "../model/CommonFunction"
-import axios, { AxiosError } from "axios"
+import { AxiosError } from "axios"
+import { getProblemById, updateProblem } from "../api/problem"
+import { deleteExampleById, getAllExamplesByProblemId } from "../api/example"
+import { Problem } from "../types/Problem"
+import { Example, InitExample } from "../types/Example"
+import { ProblemDTO } from "../types/ProblemDTO"
+import { autoResize } from "../utils/resize"
+import useNavigation from "../hooks/useNavigation"
 
-interface EditProblemProps {
-  problems: Problem[]
-}
-
-const EditProblem: React.FC<EditProblemProps> = ({ problems }) => {
-  const { goToProblemId, autoResize } = CommonFunction();
-  const { id } = useParams();
-  const problem = problems.find(problem => problem.id === Number(id));
+const EditProblem: React.FC = () => {
+  const { problemId } = useParams();
+  const { goToProblemId } = useNavigation();
+  const [problem, setProblem] = useState<Problem>()
   const [editMessage, setEditMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [examples, setExamples] = useState<Example[]>([]);
-  const [exampleInputRefs, setExampleInputRefs] = useState<React.RefObject<HTMLTextAreaElement>[]>([]);
-  const [exampleOutputRefs, setExampleOutputRefs] = useState<React.RefObject<HTMLTextAreaElement>[]>([]);
   const problemNameRef = useRef<HTMLInputElement>(null);
   const problemDescriptionRef = useRef<HTMLTextAreaElement>(null);
   const problemInputDescriptionRef = useRef<HTMLTextAreaElement>(null);
@@ -25,53 +24,65 @@ const EditProblem: React.FC<EditProblemProps> = ({ problems }) => {
   const problemExampleInputRef = useRef<HTMLTextAreaElement>(null);
   const problemExampleOutputRef = useRef<HTMLTextAreaElement>(null);
 
-  if (!problem) return <></>
-
   useEffect(() => {
-    async function severArray() {
+    async function loadProblem() {
       try {
-        const response = await axios.post<ApiResponse<Example[]>>(URL + `examples/${id}`, null, { timeout: 10000 });
-        setExamples(response.data.data);
-        setExampleInputRefs(response.data.data.map(() => React.createRef<HTMLTextAreaElement>()));
-        setExampleOutputRefs(response.data.data.map(() => React.createRef<HTMLTextAreaElement>()));
-      } catch (error) { 
+        const response = await getProblemById(Number(problemId));
+        setProblem(response.data);
+      } catch (error) {
         if (error instanceof AxiosError) {
-          if (error.response) console.error(error.response.data.message);
+          if (error.response) console.error("응답 에러: ", error.response.data.message);
           else console.error("서버 에러: ", error)
         } else {
           console.error("알 수 없는 에러:", error);
         }
       }
     }
-    severArray();
-  }, []);
-
-  const addExample = () => {
-    setExamples((prev) => [...prev, InitExample]);
-    setExampleInputRefs((prev) => [...prev, React.createRef<HTMLTextAreaElement>()]);
-    setExampleOutputRefs((prev) => [...prev, React.createRef<HTMLTextAreaElement>()]);
-  };
-
-  const deleteExample = (index: number) => {
-    async function deleteExample() {
-      if (examples[index].id != -1) {
-        try {
-          await axios.delete<ApiResponse<void>>(URL + `examples/${examples[index].id}`, { timeout: 10000 });
-        } catch (error) {
-          if (error instanceof AxiosError) {
-            if (error.response) console.error(error.response.data.message);
-            else console.error("서버 에러: ", error)
-          } else {
-            console.error("알 수 없는 에러:", error);
-          }
+    async function loadExamples() {
+      try {
+        const response = await getAllExamplesByProblemId(Number(problemId));
+        setExamples(response.data);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          if (error.response) console.error("응답 에러: ", error.response.data.message);
+          else console.error("서버 에러: ", error)
+        } else {
+          console.error("알 수 없는 에러:", error);
         }
       }
     }
-    deleteExample();
+    loadProblem();
+    loadExamples();
+  }, []);
 
-    setExamples((prev) => prev.filter((_, idx) => idx != index));
-    setExampleInputRefs((prev) => prev.filter((_, idx) => idx != index));
-    setExampleOutputRefs((prev) => prev.filter((_, idx) => idx != index));
+  if (!problem) return <></>
+
+  const addExample = () => {
+    setExamples((prev) => [...prev, InitExample]);
+  };
+
+  const deleteExample = async (index: number) => {
+    if (examples[index].id != null) {
+      try {
+        await deleteExampleById(examples[index].id);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          if (error.response) console.error("응답 에러: ", error.response.data.message);
+          else console.error("서버 에러: ", error)
+        } else {
+          console.error("알 수 없는 에러:", error);
+        }
+      }
+    }
+    setExamples((prev) => [...prev.slice(0, index), ...prev.slice(index + 1)]);
+  };
+
+  const handleExampleChange = (index: number, field: "exampleInput" | "exampleOutput", value: string) => {
+    setExamples((prev) =>
+      prev.map((example, idx) =>
+        idx === index ? { ...example, [field]: value } : example
+      )
+    );
   };
 
   const handleSubmit = async () => {
@@ -88,11 +99,11 @@ const EditProblem: React.FC<EditProblemProps> = ({ problems }) => {
         problemInputDescriptionRef.current.value !== "" &&
         problemOutputDescriptionRef.current.value !== "") {
 
-        const exampleData: Example[] = examples.map((example, index) => ({
+        const exampleData: Example[] = examples.map((example) => ({
           id: example.id,
-          problemId: problem.id,
-          exampleInput: exampleInputRefs[index].current!.value,
-          exampleOutput: exampleOutputRefs[index].current!.value,
+          problemId: problem.id!,
+          exampleInput: example.exampleInput,
+          exampleOutput: example.exampleOutput,
           createdAt: example.createdAt
         }));
 
@@ -115,14 +126,13 @@ const EditProblem: React.FC<EditProblemProps> = ({ problems }) => {
         };
 
         try {
-          const response = await axios.put<ApiResponse<Problem>>(URL + 'problems/update', requestData, { timeout: 10000 });
-          const problemR: Problem = response.data.data
+          const response = await updateProblem(requestData);
 
-          goToProblemId(problemR.id)
+          goToProblemId(response.data.id!)
           window.location.reload()
         } catch (error) {
           if (error instanceof AxiosError) {
-            if (error.response) setEditMessage(error.response.data.message);
+            if (error.response) setEditMessage("응답 에러: " + error.response.data.message);
             else console.error("서버 에러: ", error)
           } else {
             console.error("알 수 없는 에러:", error);
@@ -172,14 +182,18 @@ const EditProblem: React.FC<EditProblemProps> = ({ problems }) => {
           <div key={index} className="double-make-group">
             <div className="make-group">
               <div className="makeTitle">입력 예제 {index + 1}</div>
-              <textarea className="makeField" ref={exampleInputRefs[index]} defaultValue={example.exampleInput} style={{ minHeight: '100px' }} onInput={autoResize} />
+              <textarea className="makeField" value={example.exampleInput}
+              onChange={(e) => handleExampleChange(index, "exampleInput", e.target.value)}
+              style={{ minHeight: '100px' }} onInput={autoResize} />
             </div>
             <div className="make-group">
               <div className="makeTitle" style={{ display: "flex", justifyContent: "space-between" }}>
                 <span>출력 예제 {index + 1}</span>
                 <span style={{ cursor: "pointer" }} onClick={() => { deleteExample(index) }}>예제 삭제</span>
               </div>
-              <textarea className="makeField" ref={exampleOutputRefs[index]} defaultValue={example.exampleOutput} style={{ minHeight: '100px' }} onInput={autoResize} />
+              <textarea className="makeField" value={example.exampleOutput}
+              onChange={(e) => handleExampleChange(index, "exampleOutput", e.target.value)}
+              style={{ minHeight: '100px' }} onInput={autoResize} />
             </div>
           </div>
         ))}

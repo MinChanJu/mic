@@ -1,37 +1,62 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { URL, Contest, ContestScoreDTO, Problem, mathJaxConfig, ApiResponse } from '../model/talbe'
-import axios, { AxiosError } from 'axios'
 import { MathJax, MathJaxContext } from 'better-react-mathjax'
+import { AxiosError } from 'axios'
+import { getContestById } from '../api/contest'
+import { getAllProblemsByContestId } from '../api/problem'
+import { getScoreBoardByContestId } from '../api/myData'
+import { mathJaxConfig } from '../constants/mathJaxConfig'
+import { ContestScoreDTO } from '../types/ContestScoreDTO'
+import { Contest } from '../types/Contest'
+import { Problem } from '../types/Problem'
 
-interface ScoreBoardProps {
-  contests: Contest[]
-  problems: Problem[]
-}
 
-const ScoreBoard: React.FC<ScoreBoardProps> = ({ contests, problems }) => {
-  const { id } = useParams();
+const ScoreBoard: React.FC = () => {
+  const { contestId } = useParams();
   const [contestScores, setContestScores] = useState<ContestScoreDTO[]>([]);
 
-  const nowContest = contests.filter((contest) => contest.id == Number(id));
-  const nowProblmes = problems.filter((problem) => problem.contestId == Number(id)).sort((a, b) => a.id - b.id);
+  const [contest, setContest] = useState<Contest>();
+  const [problems, setProblems] = useState<Problem[]>([]);
+
+  useEffect(() => {
+    async function loadContest() {
+      try {
+        const response = await getContestById(Number(contestId));
+        setContest(response.data);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          if (error.response) console.error("응답 에러: ", error.response.data.message);
+          else console.error("서버 에러: ", error)
+        } else {
+          console.error("알 수 없는 에러:", error);
+        }
+      }
+    }
+    async function loadProblems() {
+      try {
+        const response = await getAllProblemsByContestId(Number(contestId));
+        setProblems(response.data);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          if (error.response) console.error("응답 에러: ", error.response.data.message);
+          else console.error("서버 에러: ", error)
+        } else {
+          console.error("알 수 없는 에러:", error);
+        }
+      }
+    }
+    loadContest();
+    loadProblems();
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.post<ApiResponse<ContestScoreDTO[]>>(URL + `data/${id}`, null, { timeout: 10_000 });
-        setContestScores(response.data.data.sort((a, b) => {
-          let sumA = 0;
-          let sumB = 0;
-          for (let i = 0; i < a.solveProblems.length; i++) {
-            sumA += Number(a.solveProblems[i].score);
-            sumB += Number(b.solveProblems[i].score);
-          }
-          return sumB - sumA;
-        }));
+        const response = await getScoreBoardByContestId(Number(contestId));
+        setContestScores(response.data);
       } catch (error) {
         if (error instanceof AxiosError) {
-          if (error.response) console.error(error.response.data.message);
+          if (error.response) console.error("응답 에러: ", error.response.data.message);
           else console.error("서버 에러: ", error)
         } else {
           console.error("알 수 없는 에러:", error);
@@ -45,18 +70,20 @@ const ScoreBoard: React.FC<ScoreBoardProps> = ({ contests, problems }) => {
     return () => clearInterval(interval);
   }, []);
 
+  if (!contest) return <></>
+
   return (
     <div>
       <div className="list">
-        <h2>대회명 : {nowContest[0]?.contestName}</h2>
+        <h2>대회명 : {contest.contestName}</h2>
         <table style={{ tableLayout: "fixed" }}>
           <thead>
             <tr>
               <th style={{ width: "30px", textAlign: "center" }}>등수</th>
-              <th style={{ width: `calc((100% - 85px) / ${nowProblmes.length + 1})`, textAlign: "center" }}>이름</th>
+              <th style={{ width: `calc((100% - 85px) / ${problems.length + 1})`, textAlign: "center" }}>이름</th>
               <MathJaxContext config={mathJaxConfig}>
-                {nowProblmes.map((problem, index) => (
-                  <th key={index} style={{ width: `calc((100% - 85px) / ${nowProblmes.length + 1})`, textAlign: "center" }}>
+                {problems.map((problem, index) => (
+                  <th key={index} style={{ width: `calc((100% - 85px) / ${problems.length + 1})`, textAlign: "center" }}>
                     <MathJax>{problem.problemName}</MathJax>
                   </th>
                 ))}

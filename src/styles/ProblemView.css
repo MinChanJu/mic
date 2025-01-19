@@ -67,6 +67,9 @@ select.desName {
     border-radius: 10px;
     box-sizing: border-box;
     margin-bottom: 20px;
+    overflow-x: auto;
+    white-space: pre;
+    word-wrap: normal;
     resize: none;
     font-size: 15px;
     background-color: rgb(65, 61, 61);

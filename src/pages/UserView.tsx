@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
-import { ApiResponse, InitUser, URL, User } from "../model/talbe"
-import axios, { AxiosError } from "axios"
-import "./css/UserView.css"
+import { AxiosError } from "axios"
+import { getUserByUserId } from "../api/user"
+import { UserDTO } from "../types/UserDTO"
+import "../styles/UserView.css"
 
 const UserView: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const [curUser, setCurUser] = useState<User>(InitUser);
+  const { userId } = useParams();
+  const [curUser, setCurUser] = useState<UserDTO>();
   const [year, setYear] = useState<string>();
   const [month, setMonth] = useState<string>();
   const [day, setDay] = useState<string>();
@@ -14,11 +15,11 @@ const UserView: React.FC = () => {
   useEffect(() => {
     async function serverObject() {
       try {
-        const response = await axios.post<ApiResponse<User>>(URL + `users/${id}`, null, { timeout: 10000 });
-        setCurUser(response.data.data);
+        const response = await getUserByUserId(userId!)
+        setCurUser(response.data);
       } catch (error) {
         if (error instanceof AxiosError) {
-          if (error.response) console.error(error.response.data.message);
+          if (error.response) console.error("응답 에러: ", error.response.data.message);
           else console.error("서버 에러: ", error)
         } else {
           console.error("알 수 없는 에러:", error);
@@ -33,6 +34,8 @@ const UserView: React.FC = () => {
     setMonth(curUser?.createdAt.substring(5, 7))
     setDay(curUser?.createdAt.substring(8, 10))
   }, [curUser])
+
+  if (!curUser) return <></>
 
   return (
     <div className="userView">
