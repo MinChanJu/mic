@@ -3,13 +3,11 @@ import { useParams } from "react-router-dom"
 import { MathJax, MathJaxContext } from 'better-react-mathjax'
 import { AxiosError } from "axios"
 import { deleteProblemById, getProblemById } from "../api/problem"
-import { getAllSolvesByUserId, solveProblem } from "../api/solve"
 import { runCode } from "../api/myData"
 import { mathJaxConfig } from "../constants/mathJaxConfig"
 import { useUser } from "../context/UserContext"
 import { Problem } from "../types/Problem"
 import { CodeDTO } from "../types/CodeDTO"
-import { Solve } from "../types/Solve"
 import { autoResize } from "../utils/resize"
 import useNavigation from "../hooks/useNavigation"
 import "../styles/ProblemView.css"
@@ -79,25 +77,8 @@ const ProblemView: React.FC = () => {
 
       try {
         const response = await runCode(requestData)
-        setMessage(response.data);
-
-        let solve: Solve = {
-          id: -1,
-          userId: user.userId,
-          problemId: problem!.id!,
-          score: 0,
-          lang: lang,
-          code: code,
-          createdAt: new Date().toISOString()
-        };
-
-        const num = Number(response.data);
-        if (!isNaN(num)) solve.score = Math.floor(num * 10);
-
-        await solveProblem(solve);
-
-        const response2 = await getAllSolvesByUserId(user.userId)
-        setSolves(response2.data);
+        setMessage(response.data.result);
+        setSolves(response.data.solves);
       } catch (error) {
         if (error instanceof AxiosError) {
           if (error.response) console.error("응답 예러: ", error.response.data.message);
