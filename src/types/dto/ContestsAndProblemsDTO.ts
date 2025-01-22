@@ -1,5 +1,5 @@
-import { Contest } from "./Contest"
-import { Problem } from "./Problem"
+import { Contest } from "../entity/Contest"
+import { Problem } from "../entity/Problem"
 
 export type ContestsAndProblemsDTO = {
     contests: Contest[]

@@ -1,6 +1,6 @@
 import axios from './axiosInstance';
-import { ApiResponse } from '../types/ApiResponse';
-import { Solve } from '../types/Solve';
+import { ApiResponse } from '../types/dto/ApiResponse';
+import { Solve } from '../types/entity/Solve';
 
 export const getAllSolvesByUserId = async (userId: string): Promise<ApiResponse<Solve[]>> => {
   const response = await axios.get(`/solves/users/${userId}`);

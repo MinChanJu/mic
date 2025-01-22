@@ -2,10 +2,9 @@ import React, { useEffect, useRef, useState } from "react"
 import { AxiosError } from "axios"
 import { login, register } from "../api/user"
 import { useUser } from "../context/UserContext"
-import { User } from "../types/User"
+import { User } from "../types/entity/User"
 import useNavigation from "../hooks/useNavigation"
-import '../styles/Login.css'
-import '../styles/styles.css'
+import styles from "../assets/css/Login.module.css"
 
 const Login: React.FC = () => {
   const {setUser} = useUser();
@@ -173,60 +172,60 @@ const Login: React.FC = () => {
   }
 
   return (
-    <div className="loginContainer">
-      <div className="loginBox" style={{ margin: "auto auto" }}>
-        <div ref={signUpRef} id="signUp" className={`signUp`} style={{ transform: isMovedLeft ? 'translateX(100%)' : 'translateX(0%)' }}>
+    <div className="flexRow" style={{ margin: "50px auto" }}>
+      <div className={styles.loginBox} style={{ margin: "auto auto" }}>
+        <div ref={signUpRef} className={styles.signUp} style={{ transform: isMovedLeft ? 'translateX(100%)' : 'translateX(0%)' }}>
           <h1>회원가입</h1>
-          <span className="message">{registerMessage}</span>
-          <div className="input-group">
-            <input className="loginField" ref={signUpNameRef} type="text" placeholder="닉네임"></input>
+          <span className="error">{registerMessage}</span>
+          <div className="makeGroup">
+            <input className="makeField" ref={signUpNameRef} type="text" placeholder="닉네임"></input>
           </div>
-          <div className="input-group">
-            <input className="loginField" ref={signUpIdRef} type="text" placeholder="아이디"></input>
+          <div className="makeGroup">
+            <input className="makeField" ref={signUpIdRef} type="text" placeholder="아이디"></input>
           </div>
-          <div className="input-group">
-            <input className="loginField" ref={signUpPasswordRef} type="password" placeholder="비밀번호"></input>
+          <div className="makeGroup">
+            <input className="makeField" ref={signUpPasswordRef} type="password" placeholder="비밀번호"></input>
           </div>
-          <div className="input-group">
-            <input className="loginField" ref={signUpCheckPasswordRef} type="password" placeholder="비밀번호 확인"></input>
+          <div className="makeGroup">
+            <input className="makeField" ref={signUpCheckPasswordRef} type="password" placeholder="비밀번호 확인"></input>
           </div>
-          <div className="input-group">
-            <input className="loginField" ref={signUpEmailRef} type="text" placeholder="이메일"></input>
+          <div className="makeGroup">
+            <input className="makeField" ref={signUpEmailRef} type="text" placeholder="이메일"></input>
           </div>
-          <div className="input-group">
-            <input className="loginField" ref={signUpPhoneRef} type="text" placeholder="전화번호"></input>
+          <div className="makeGroup">
+            <input className="makeField" ref={signUpPhoneRef} type="text" placeholder="전화번호"></input>
           </div>
-          <button className="loginButton" onClick={registerUser}>
+          <button className="makeButton" onClick={registerUser}>
             {isLoading ? <div className="loading"></div> : <div>회원가입</div>}
           </button>
         </div>
 
-        <div id="signInDes" className={`signInDes ${isMovedLeft ? 'move-right' : ''}`}>
+        <div className={`${styles.signInDes} ${isMovedLeft ? styles.moveRight : ''}`}>
           <h1 style={{ color: "white" }}> Hello MiC! </h1>
           <p style={{ color: "white" }}>아이디와 비밀번호를 입력해주세요</p>
-          <button className="changeBtn" onClick={handleButtonClick}>회원가입</button>
+          <button className={styles.changeBtn} onClick={handleButtonClick}>회원가입</button>
         </div>
 
-        <div className={`changeBox ${isMovedLeft ? 'move-left' : ''}`}></div>
+        <div className={`${styles.changeBox} ${isMovedLeft ? styles.moveLeft : ''}`}></div>
 
-        <div id="signUpDes" className={`signUpDes ${isMovedLeft ? '' : 'move-left'}`}>
+        <div className={`${styles.signUpDes} ${isMovedLeft ? '' : styles.moveLeft}`}>
           <h1 style={{ color: "white" }}> Wellcome MiC! </h1>
           <p style={{ color: "white" }}>사용자 정보들을 입력해주세요</p>
           <p style={{ color: "white" }}>비밀번호는 8자 이상이어야 하며</p>
           <p style={{ color: "white" }}>영문자, 숫자를 포함해야합니다.</p>
-          <button className="changeBtn" onClick={handleButtonClick}>로그인</button>
+          <button className={styles.changeBtn} onClick={handleButtonClick}>로그인</button>
         </div>
 
-        <div ref={signInRef} id="signIn" className={`signIn`} style={{ transform: isMovedLeft ? 'translateX(100%)' : 'translateX(0%)' }}>
+        <div ref={signInRef} className={styles.signIn} style={{ transform: isMovedLeft ? 'translateX(100%)' : 'translateX(0%)' }}>
           <h1>로그인</h1>
-          <span className="message">{loginMessage}</span>
-          <div className="input-group">
-            <input className="loginField" ref={signInIdRef} type="text" placeholder="아이디"></input>
+          <span className="error">{loginMessage}</span>
+          <div className="makeGroup">
+            <input className="makeField" ref={signInIdRef} type="text" placeholder="아이디"></input>
           </div>
-          <div className="input-group">
-            <input className="loginField" ref={signInPasswordRef} type="password" placeholder="비밀번호"></input>
+          <div className="makeGroup">
+            <input className="makeField" ref={signInPasswordRef} type="password" placeholder="비밀번호"></input>
           </div>
-          <button className="loginButton" onClick={loginUser}>
+          <button className="makeButton" onClick={loginUser}>
             {isLoading ? <div className="loading"></div> : <div>로그인</div>}
           </button>
         </div>

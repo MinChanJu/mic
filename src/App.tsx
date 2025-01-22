@@ -1,8 +1,11 @@
-import Header from './components/Header';
-import './App.css'
-import AppRoutes from './routes';
-import { UserProvider } from './context/UserContext';
 import { BrowserRouter } from 'react-router-dom';
+import { UserProvider } from './context/UserContext';
+import Header from './components/Header';
+import AppRoutes from './AppRoutes';
+import './styles/Global.css'
+import './styles/Text.css'
+import './styles/Flex.css'
+import './styles/Input.css'
 
 function App() {
   return (

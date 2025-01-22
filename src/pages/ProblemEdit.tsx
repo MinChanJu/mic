@@ -4,10 +4,10 @@ import { useParams } from "react-router-dom"
 import { AxiosError } from "axios"
 import { getProblemById, updateProblem } from "../api/problem"
 import { deleteExampleById, getAllExamplesByProblemId } from "../api/example"
-import { Problem } from "../types/Problem"
-import { Example, InitExample } from "../types/Example"
-import { ProblemDTO } from "../types/ProblemDTO"
 import { autoResize } from "../utils/resize"
+import { Problem } from "../types/entity/Problem"
+import { Example, InitExample } from "../types/entity/Example"
+import { ProblemDTO } from "../types/dto/ProblemDTO"
 import useNavigation from "../hooks/useNavigation"
 
 const EditProblem: React.FC = () => {

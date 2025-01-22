@@ -1,0 +1,79 @@
+.error {
+    color: red;
+    margin-top: 20px;
+}
+
+.loading {
+    height: 21px;
+    width: 21px;
+    margin: 0px auto;
+    box-sizing: border-box;
+    border: 2px solid rgb(143, 143, 143);
+    border-top: 2px solid black;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    margin: 0px auto;
+    max-width: 1200px;
+    padding: 20px;
+    gap: 20px;
+    box-sizing: border-box;
+}
+
+.description {
+    max-width: 600px;
+    padding: 15px 0px;
+    text-align: center;
+    margin: 0px auto;
+
+    font-size: 20px;
+    word-break: break-all;
+}
+
+.button {
+    padding: 6px 12px;
+    border-radius: 10px;
+    background-color: rgb(175, 175, 175);
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.banner {
+    max-width: 1000px;
+    height: 300px;
+    margin: 10px auto;
+    padding-left: 10px;
+    padding-right: 10px;
+    box-sizing: border-box;
+}
+
+.banner img {
+    width: 100%;
+    height: auto;
+}
+
+.solve {
+    text-align: center;
+    padding: 3px 0px;
+    border-radius: 7px;
+    width: 50px;
+}
+
+textarea {
+    resize: none;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

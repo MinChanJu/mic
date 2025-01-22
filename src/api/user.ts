@@ -1,7 +1,7 @@
 import axios from './axiosInstance';
-import { ApiResponse } from '../types/ApiResponse';
-import { User } from '../types/User';
-import { UserDTO } from '../types/UserDTO';
+import { ApiResponse } from '../types/dto/ApiResponse';
+import { User } from '../types/entity/User';
+import { UserDTO } from '../types/dto/UserDTO';
 
 interface UserLoginDTO {
   userId: string;

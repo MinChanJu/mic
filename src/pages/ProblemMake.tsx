@@ -3,13 +3,11 @@ import { useParams } from "react-router-dom"
 import { AxiosError } from "axios"
 import { createProblem } from "../api/problem"
 import { useUser } from "../context/UserContext"
-import { Problem } from "../types/Problem"
-import { ProblemDTO } from "../types/ProblemDTO"
-import { Example, InitExample } from "../types/Example"
 import { autoResize } from "../utils/resize"
+import { Problem } from "../types/entity/Problem"
+import { ProblemDTO } from "../types/dto/ProblemDTO"
+import { Example, InitExample } from "../types/entity/Example"
 import useNavigation from "../hooks/useNavigation"
-import "../styles/ProblemMake.css"
-import "../styles/styles.css"
 
 const ProblemMake: React.FC = () => {
   const {user} = useUser()
@@ -125,41 +123,41 @@ const ProblemMake: React.FC = () => {
           <h2>문제 정보 기입</h2>
           {Number(contestId) === -1 && <div>대회에 종속되지 않음</div>}
           {Number(contestId) !== -1 && <div>Contest Id: {Number(contestId)} Contest Name: {Number(contestId)}</div>}
-          <div className="make-group">
+          <div className="makeGroup">
             <div className="makeTitle">문제 제목</div>
             <input className="makeField" ref={problemNameRef} type="text" />
           </div>
-          <div className="make-group">
+          <div className="makeGroup">
             <div className="makeTitle">문제 설명</div>
             <textarea className="makeField" ref={problemDescriptionRef} style={{ minHeight: '100px' }} onInput={autoResize} />
           </div>
-          <div className="make-group">
+          <div className="makeGroup">
             <div className="makeTitle">입력에 대한 설명</div>
             <textarea className="makeField" ref={problemInputDescriptionRef} style={{ minHeight: '100px' }} onInput={autoResize} />
           </div>
-          <div className="make-group">
+          <div className="makeGroup">
             <div className="makeTitle">출력에 대한 설명</div>
             <textarea className="makeField" ref={problemOutputDescriptionRef} style={{ minHeight: '100px' }} onInput={autoResize} />
           </div>
-          <div className="double-make-group">
-            <div className="make-group">
+          <div className="doubleMakeGroup">
+            <div className="makeGroup">
               <div className="makeTitle">입력 예제</div>
               <textarea className="makeField" ref={problemExampleInputRef} style={{ minHeight: '100px' }} onInput={autoResize} />
             </div>
-            <div className="make-group">
+            <div className="makeGroup">
               <div className="makeTitle">출력 예제</div>
               <textarea className="makeField" ref={problemExampleOutputRef} style={{ minHeight: '100px' }} onInput={autoResize} />
             </div>
           </div>
           {examples.map((example, index) => (
-            <div key={index} className="double-make-group">
-              <div className="make-group">
+            <div key={index} className="doubleMakeGroup">
+              <div className="makeGroup">
                 <div className="makeTitle">입력 예제 {index + 1}</div>
                 <textarea className="makeField" value={example.exampleInput}
                 onChange={(e) => handleExampleChange(index, "exampleInput", e.target.value)}
                 style={{ minHeight: '100px' }} onInput={autoResize} />
               </div>
-              <div className="make-group">
+              <div className="makeGroup">
                 <div className="makeTitle" style={{ display: "flex", justifyContent: "space-between" }}>
                   <span>출력 예제 {index + 1}</span>
                   <span style={{ cursor: "pointer" }} onClick={() => { deleteExample(index) }}>예제 삭제</span>
@@ -171,8 +169,8 @@ const ProblemMake: React.FC = () => {
             </div>
           ))}
           <div className="addExample" onClick={addExample}>예제 추가</div>
-          <span className="message">{makeMessage}</span>
-          <div className="double-make-group">
+          <span className="error">{makeMessage}</span>
+          <div className="doubleMakeGroup">
             {Number(contestId) !== -1 &&
               <div className="makeButton" onClick={() => { handleSubmit(1) }}>
                 {isLoading ? <div className="loading"></div> : <div>문제 추가</div>}

@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { AxiosError } from "axios"
 import { getUserByUserId } from "../api/user"
-import { UserDTO } from "../types/UserDTO"
-import "../styles/UserView.css"
+import { UserDTO } from "../types/dto/UserDTO"
 
 const UserView: React.FC = () => {
   const { userId } = useParams();
@@ -38,13 +37,13 @@ const UserView: React.FC = () => {
   if (!curUser) return <></>
 
   return (
-    <div className="userView">
-      <h1>정보</h1>
+    <div className="list" style={{ maxWidth: "400px" }}>
+      <div className="description text30">정보</div>
       <div className="userElement">
-        <h4>{curUser?.name}</h4>
-        <div>아이디: {curUser?.userId}</div>
-        <div>이메일: {curUser?.email}</div>
-        <div>가입 날짜: {year}년 {month}월 {day}일</div>
+        <div className="text20">닉네임: {curUser?.name}</div>
+        <div className="text20">아이디: {curUser?.userId}</div>
+        <div className="text20">이메일: {curUser?.email}</div>
+        <div className="text20">가입 날짜: {year}년 {month}월 {day}일</div>
       </div>
     </div>
   )

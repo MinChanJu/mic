@@ -1,17 +1,19 @@
 import React, { useEffect, useRef, useState } from "react"
-import { MathJax, MathJaxContext } from "better-react-mathjax"
+import { MathJaxContext } from "better-react-mathjax"
 import { AxiosError } from "axios"
 import { getAllProblemsByUserId, getAllSolveProblemsByUserId } from "../api/problem"
 import { getAllContestsByUserId } from "../api/contest"
 import { getAllUsers, updateUser } from "../api/user"
 import { mathJaxConfig } from "../constants/mathJaxConfig"
 import { useUser } from "../context/UserContext"
-import { ProblemScoreDTO } from "../types/ProblemScoreDTO"
-import { Contest } from "../types/Contest"
-import { Problem } from "../types/Problem"
-import { User } from "../types/User"
+import { formatFunctions } from "../utils/formatter"
+import { ProblemScoreDTO } from "../types/dto/ProblemScoreDTO"
+import { Contest } from "../types/entity/Contest"
+import { Problem } from "../types/entity/Problem"
+import { User } from "../types/entity/User"
 import useNavigation from "../hooks/useNavigation"
-import '../styles/SettingView.css'
+import styles from "../assets/css/SettingView.module.css"
+import Table from "../components/Table"
 
 
 const SettingView: React.FC = () => {
@@ -19,21 +21,21 @@ const SettingView: React.FC = () => {
 
   const [data, setData] = useState<string>("정보")
   return (
-    <div className="setting-container">
-      <div className="setting-menu">
-        <div className={data === "정보" ? "setting-menu-select now" : "setting-menu-select"} onClick={() => { setData("정보") }}>정보</div>
-        <div className={data === "비밀번호 변경" ? "setting-menu-select now" : "setting-menu-select"} onClick={() => { setData("비밀번호 변경") }}>비밀번호 변경</div>
-        <div className={data === "내가 푼 문제" ? "setting-menu-select last now" : "setting-menu-select last"} onClick={() => { setData("내가 푼 문제") }}>내가 푼 문제</div>
+    <div className={styles.settingContainer}>
+      <div className={styles.settingMenu}>
+        <div className={data === "정보" ? styles.settingMenuSelect + " " + styles.now : styles.settingMenuSelect} onClick={() => { setData("정보") }}>정보</div>
+        <div className={data === "비밀번호 변경" ? styles.settingMenuSelect + " " + styles.now : styles.settingMenuSelect} onClick={() => { setData("비밀번호 변경") }}>비밀번호 변경</div>
+        <div className={data === "내가 푼 문제" ? styles.settingMenuSelect + " " + styles.last + " " + styles.now : styles.settingMenuSelect + " " + styles.last} onClick={() => { setData("내가 푼 문제") }}>내가 푼 문제</div>
 
         {user.authority == 5 && <>
-          <div className="admin-menu">관리자 메뉴</div>
-          <div className={data === "만든 문제" ? "setting-menu-select now" : "setting-menu-select"} onClick={() => { setData("만든 문제") }}>만든 문제</div>
-          <div className={data === "만든 대회" ? "setting-menu-select now" : "setting-menu-select"} onClick={() => { setData("만든 대회") }}>만든 대회</div>
-          <div className={data === "회원 관리" ? "setting-menu-select last now" : "setting-menu-select last"} onClick={() => { setData("회원 관리") }}>회원 관리</div>
+          <div className={styles.adminMenu}>관리자 메뉴</div>
+          <div className={data === "만든 문제" ? styles.settingMenuSelect + " " + styles.now : styles.settingMenuSelect} onClick={() => { setData("만든 문제") }}>만든 문제</div>
+          <div className={data === "만든 대회" ? styles.settingMenuSelect + " " + styles.now : styles.settingMenuSelect} onClick={() => { setData("만든 대회") }}>만든 대회</div>
+          <div className={data === "회원 관리" ? styles.settingMenuSelect + " " + styles.last + " " + styles.now : styles.settingMenuSelect + " " + styles.last} onClick={() => { setData("회원 관리") }}>회원 관리</div>
         </>}
       </div>
-      <div className="setting-view">
-        <div className="view-title">{data}</div>
+      <div className={styles.settingView}>
+        <div className={styles.viewTitle}>{data}</div>
         {data === "정보" && <Info />}
         {data === "비밀번호 변경" && <ChagePw />}
         {data === "내가 푼 문제" && <SolvePage />}
@@ -78,28 +80,28 @@ const Info: React.FC = () => {
 
   return (
     <div>
-      <div className="total-container">
-        <div className="view-container">
-          <div className="view-name">이름: </div>
-          <div className="view-content">{user.name}</div>
+      <div className="flexCol gap20">
+        <div className="flexRow">
+          <div className={styles.viewName}>이름: </div>
+          <div className={styles.viewContent}>{user.name}</div>
         </div>
-        <div className="view-container">
-          <div className="view-name">아이디: </div>
-          <div className="view-content">{user.userId}</div>
+        <div className="flexRow">
+          <div className={styles.viewName}>아이디: </div>
+          <div className={styles.viewContent}>{user.userId}</div>
         </div>
-        <div className="view-container">
-          <div className="view-name">전화번호: </div>
-          <input className="view-content" ref={phoneRef} type="text"></input>
+        <div className="flexRow">
+          <div className={styles.viewName}>전화번호: </div>
+          <input className={styles.viewContent} ref={phoneRef} type="text"></input>
         </div>
-        <div className="view-container">
-          <div className="view-name">이메일: </div>
-          <input className="view-content" ref={emailRef} type="text"></input>
+        <div className="flexRow">
+          <div className={styles.viewName}>이메일: </div>
+          <input className={styles.viewContent} ref={emailRef} type="text"></input>
         </div>
-        <div className="view-container">
-          <div className="view-name">비밀번호: </div>
-          <input className="view-content" ref={passwordRef} type="password"></input>
+        <div className="flexRow">
+          <div className={styles.viewName}>비밀번호: </div>
+          <input className={styles.viewContent} ref={passwordRef} type="password"></input>
         </div>
-        <div className="view-submit" onClick={handleSubmit}>변경</div>
+        <div className={styles.viewSubmit} onClick={handleSubmit}>변경</div>
       </div>
     </div>
   )
@@ -132,20 +134,20 @@ const ChagePw: React.FC = () => {
 
   return (
     <div>
-      <div className="total-container">
+      <div className="flexCol gap20">
         <div>
-          <div className="view-name">현재 비밀번호</div>
-          <input className="view-content" ref={passwordRef} type="password"></input>
+          <div className={styles.viewName}>현재 비밀번호</div>
+          <input className={styles.viewContent} ref={passwordRef} type="password"></input>
         </div>
         <div>
-          <div className="view-name">새로운 비밀번호</div>
-          <input className="view-content" ref={newPasswordRef} type="password"></input>
+          <div className={styles.viewName}>새로운 비밀번호</div>
+          <input className={styles.viewContent} ref={newPasswordRef} type="password"></input>
         </div>
         <div>
-          <div className="view-name">새로운 비밀번호 확인</div>
-          <input className="view-content" ref={newcheckPasswordRef} type="password"></input>
+          <div className={styles.viewName}>새로운 비밀번호 확인</div>
+          <input className={styles.viewContent} ref={newcheckPasswordRef} type="password"></input>
         </div>
-        <div className="view-submit" onClick={handleSubmit}>변경</div>
+        <div className={styles.viewSubmit} onClick={handleSubmit}>변경</div>
       </div>
     </div>
   )
@@ -157,51 +159,31 @@ const SolvePage: React.FC = () => {
   const { goToProblemId } = useNavigation()
 
   useEffect(() => {
-      async function loadProblemScores() {
-        try {
-          const response = await getAllSolveProblemsByUserId(user.userId);
-          setProblemScores(response.data);
-        } catch (error) {
-          if (error instanceof AxiosError) {
-            if (error.response) console.error("응답 에러: ", error.response.data.message);
-            else console.error("서버 에러: ", error)
-          } else {
-            console.error("알 수 없는 에러:", error);
-          }
+    async function loadProblemScores() {
+      try {
+        const response = await getAllSolveProblemsByUserId(user.userId);
+        setProblemScores(response.data);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          if (error.response) console.error("응답 에러: ", error.response.data.message);
+          else console.error("서버 에러: ", error)
+        } else {
+          console.error("알 수 없는 에러:", error);
         }
       }
-      loadProblemScores();
-    }, []);
+    }
+    loadProblemScores();
+  }, []);
   return (
-    <div>
-      <table>
-        <thead>
-          <tr>
-            <th style={{ width: "30px", textAlign: "center" }}>번호</th>
-            <th>문제 제목</th>
-            <th style={{ width: "30px", textAlign: "center" }}>해결</th>
-          </tr>
-        </thead>
-        <tbody>
-          {problemScores.map((problemSocre) => (
-            <tr key={problemSocre.problem.id} onClick={() => { goToProblemId(problemSocre.problem.id!) }}>
-              <td>{problemSocre.problem.id}</td>
-              <td>{problemSocre.problem.problemName}</td>
-              <td>
-                {(() => {
-                  const score = problemSocre.score;
-                  let style = { backgroundColor: "rgb(238, 255, 0)" };
-                  if (score === 1000) style.backgroundColor = "rgb(43, 255, 0)";
-                  if (score === 0) style.backgroundColor = "rgb(255, 0, 0)";
-
-                  return <div className="solve" style={style}>{score / 10}</div>;
-                })()}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <MathJaxContext config={mathJaxConfig}>
+      <Table
+        columnName={["번호", "문제 제목", "해결"]}
+        columnClass={["num", "", "solveHead"]}
+        data={problemScores}
+        dataName={["problemId", "problemName", "score"]}
+        dataFunc={formatFunctions}
+        onClick={(item) => { goToProblemId(item.problemId) }} />
+    </MathJaxContext>
   )
 }
 
@@ -216,7 +198,7 @@ const MakePro: React.FC = () => {
       try {
         const response = await getAllProblemsByUserId(user.userId);
         setProblems(response.data);
-      } catch(error) {
+      } catch (error) {
         if (error instanceof AxiosError) {
           if (error.response) console.error("응답 에러: ", error.response.data.message);
           else console.error("서버 에러: ", error)
@@ -229,30 +211,15 @@ const MakePro: React.FC = () => {
   }, [])
 
   return (
-    <div className="total-container">
-      <table>
-        <thead>
-          <tr>
-            <th style={{ width: "30px", textAlign: "center" }}>번호</th>
-            <th>문제 이름</th>
-            <th>주최자</th>
-          </tr>
-        </thead>
-        <tbody>
-          <MathJaxContext config={mathJaxConfig}>
-            {myProblems.map((problem, index) => (
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td style={{ cursor: "pointer" }} onClick={() => { goToProblemId(problem.id!) }}>
-                  <MathJax>{problem.problemName}</MathJax>
-                </td>
-                <td>{problem.userId}</td>
-              </tr>
-            ))}
-          </MathJaxContext>
-        </tbody>
-      </table>
-    </div>
+    <MathJaxContext config={mathJaxConfig}>
+      <Table
+        columnName={["번호", "문제 제목"]}
+        columnClass={["num", ""]}
+        data={myProblems}
+        dataName={["id", "problemName"]}
+        dataFunc={formatFunctions}
+        onClick={(item) => { goToProblemId(item.id!) }} />
+    </MathJaxContext>
   )
 }
 
@@ -267,7 +234,7 @@ const MakeCon: React.FC = () => {
       try {
         const response = await getAllContestsByUserId(user.userId);
         setContests(response.data);
-      } catch(error) {
+      } catch (error) {
         if (error instanceof AxiosError) {
           if (error.response) console.error("응답 에러: ", error.response.data.message);
           else console.error("서버 에러: ", error)
@@ -280,26 +247,15 @@ const MakeCon: React.FC = () => {
   }, [])
 
   return (
-    <div className="total-container">
-      <table>
-        <thead>
-          <tr>
-            <th style={{ width: "30px", textAlign: "center" }}>번호</th>
-            <th>대회 이름</th>
-            <th>주최자</th>
-          </tr>
-        </thead>
-        <tbody>
-          {myContests.map((contest, index) => (
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td style={{ cursor: "pointer" }} onClick={() => { goToContestId(contest.id!) }}>{contest.contestName}</td>
-              <td>{contest.userId}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <MathJaxContext config={mathJaxConfig}>
+      <Table
+        columnName={["번호", "대회 이름"]}
+        columnClass={["num", ""]}
+        data={myContests}
+        dataName={["id", "contestName"]}
+        dataFunc={formatFunctions}
+        onClick={(item) => { goToContestId(item.id!) }} />
+    </MathJaxContext>
   )
 }
 
@@ -335,6 +291,8 @@ const UserManage: React.FC = () => {
         console.error("알 수 없는 에러:", error);
       }
     }
+    console.log(index);
+    console.log(userDetail);
   };
 
   useEffect(() => {
@@ -348,7 +306,7 @@ const UserManage: React.FC = () => {
           setEnters(response.data.map((user) => {
             if (user.contestId) return user.contestId
             return -1;
-        }));
+          }));
         } catch (error) {
           if (error instanceof AxiosError) {
             if (error.response) console.error("응답 에러: ", error.response.data.message);
@@ -362,35 +320,24 @@ const UserManage: React.FC = () => {
     fetchData()
   }, []);
 
+  const formatUserManage = {
+    id: (_: number | null, idx: number) => <>{idx+1}</>,
+    authority: (_: number, idx: number) => <input type="number" value={authoritys[idx]} onChange={(event) => handleChangeAuthority(idx, event)} min="0" max="5" step="1" />,
+    contestId: (_: number | null, idx: number) => <input type="number" value={enters[idx]} onChange={(event) => handleChangeEnter(idx, event)} min="-1" max="100" step="1" />,
+    createdAt: (_: string, idx:number) => <button onClick={() => handleChange(users[idx], idx)}>수정</button>
+  }
+
   return (
     <div className="total-container">
       {user.authority !== 5 && <div>권한이 없음</div>}
-      <table>
-        <thead>
-          <tr>
-            <th style={{ width: "30px", textAlign: "center" }}>번호</th>
-            <th>이름</th>
-            <th>아이디</th>
-            <th>이메일</th>
-            <th>권한</th>
-            <th>대회여부</th>
-            <th>수정</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user, index) => (
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td>{user.name}</td>
-              <td>{user.userId}</td>
-              <td>{user.email}</td>
-              <td><input type="number" value={authoritys[index]} onChange={(event) => handleChangeAuthority(index, event)} min="0" max="5" step="1"></input></td>
-              <td><input type="number" value={enters[index]} onChange={(event) => handleChangeEnter(index, event)} min="-1" max="100" step="1"></input></td>
-              <td><button onClick={() => handleChange(user, index)}>수정</button></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <MathJaxContext config={mathJaxConfig}>
+      <Table
+        columnName={["번호", "이름", "아이디", "이메일", "권한", "대회", "수정"]}
+        columnClass={["num", "", "", "", "numIn", "numIn", "edit"]}
+        data={users}
+        dataName={["id", "name", "userId", "email", "authority", "contestId", "createdAt"]}
+        dataFunc={formatUserManage} />
+    </MathJaxContext>
     </div>
   )
 }

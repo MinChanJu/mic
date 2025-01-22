@@ -2,10 +2,8 @@ import React, { useRef, useState } from "react"
 import { AxiosError } from "axios"
 import { createContest } from "../api/contest"
 import { useUser } from "../context/UserContext"
-import { Contest } from "../types/Contest"
+import { Contest } from "../types/entity/Contest"
 import useNavigation from "../hooks/useNavigation"
-import "../styles/ContestMake.css"
-import "../styles/styles.css"
 
 const ContestMake: React.FC = () => {
   const { user } = useUser()
@@ -84,40 +82,40 @@ const ContestMake: React.FC = () => {
       {user.authority >= 3 &&
         <div className="makeBox">
           <h2>대회 정보 기입</h2>
-          <div className="make-group">
+          <div className="makeGroup">
             <div className="makeTitle">본인 아이디</div>
             <input className="makeField" ref={userIdRef} type="text" />
           </div>
-          <div className="make-group">
+          <div className="makeGroup">
             <div className="makeTitle">대회 제목</div>
             <input className="makeField" ref={contestNameRef} type="text" />
           </div>
-          <div className="double-make-group">
-            <div className="make-group">
+          <div className="doubleMakeGroup">
+            <div className="makeGroup">
               <div className="makeTitle">대회 비밀번호</div>
               <input className="makeField" ref={contestPasswordRef} type="password" />
             </div>
-            <div className="make-group">
+            <div className="makeGroup">
               <div className="makeTitle">비밀번호 확인</div>
               <input className="makeField" ref={contestCheckPasswordRef} type="password" />
             </div>
           </div>
           <div style={{ marginTop: '10px', color: 'red' }}>누구나 접근할 수 있는 대회를 개최하려면 빈칸으로 해주세요.</div>
-          <div className="double-make-group">
-            <div className="make-group">
+          <div className="doubleMakeGroup">
+            <div className="makeGroup">
               <div className="makeTitle">대회 개최 시간</div>
               <input className="makeField" ref={startTimeRef} type="datetime-local" />
             </div>
-            <div className="make-group">
+            <div className="makeGroup">
               <div className="makeTitle">대회 종료 시간</div>
               <input className="makeField" ref={endTimeRef} type="datetime-local" />
             </div>
           </div>
-          <div className="make-group">
+          <div className="makeGroup">
             <div className="makeTitle">대회 설명</div>
             <textarea className="makeField" ref={contestDescriptionRef} style={{ height: '100px' }} />
           </div>
-          <span className="message">{makeMessage}</span>
+          <span className="error">{makeMessage}</span>
           <div className="makeButton" onClick={handleSubmit}>
             {isLoading ? <div className="loading"></div> : <div>대회 개최</div>}
           </div>

@@ -1,9 +1,10 @@
 import axios from './axiosInstance';
-import { ApiResponse } from "../types/ApiResponse";
-import { Contest } from '../types/Contest';
+import { ApiResponse } from "../types/dto/ApiResponse";
+import { Contest } from '../types/entity/Contest';
+import { ContestListDTO } from '../types/dto/ContestListDTO';
 
-export const getAllContests = async (): Promise<ApiResponse<Contest[]>> => {
-  const response = await axios.get(`/contests`);
+export const getContestList = async (): Promise<ApiResponse<ContestListDTO[]>> => {
+  const response = await axios.get(`/contests/all`);
   return response.data;
 };
 

@@ -1,4 +1,4 @@
-import { Solve } from "./Solve"
+import { Solve } from "../entity/Solve"
 
 export type CodeResultDTO = {
     result: string

@@ -1,21 +1,27 @@
 import axios from './axiosInstance';
-import { ApiResponse } from '../types/ApiResponse';
-import { Problem } from '../types/Problem';
-import { ProblemDTO } from '../types/ProblemDTO';
-import { ProblemScoreDTO } from '../types/ProblemScoreDTO';
+import { ApiResponse } from '../types/dto/ApiResponse';
+import { Problem } from '../types/entity/Problem';
+import { ProblemDTO } from '../types/dto/ProblemDTO';
+import { ProblemScoreDTO } from '../types/dto/ProblemScoreDTO';
+import { ProblemListDTO } from '../types/dto/ProblemListDTO';
 
-export const getAllProblems = async (): Promise<ApiResponse<Problem[]>> => {
-  const response = await axios.get(`/problems`);
+export const getProblemListWithUserId = async (userId: string): Promise<ApiResponse<ProblemListDTO[]>> => {
+  let response;
+  if (userId === '') response = await axios.get(`/problems/all`);
+  else response = await axios.get(`/problems/all/${userId}`);
+
+  return response.data;
+};
+
+export const getProblemListByContestIdWithUserId = async (contestId: number, userId: string): Promise<ApiResponse<ProblemListDTO[]>> => {
+  let response;
+  if (userId === '') response = await axios.get(`/problems/contest/${contestId}`);
+  else response = await axios.get(`/problems/contest/${contestId}/${userId}`);
   return response.data;
 };
 
 export const getProblemById = async (id: number): Promise<ApiResponse<Problem>> => {
   const response = await axios.get(`/problems/${id}`);
-  return response.data;
-};
-
-export const getAllProblemsByContestId = async (contestId: number): Promise<ApiResponse<Problem[]>> => {
-  const response = await axios.get(`/problems/contest/${contestId}`);
   return response.data;
 };
 

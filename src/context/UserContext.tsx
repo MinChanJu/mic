@@ -1,8 +1,8 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { User, InitUser } from '../types/User';
 import { AxiosError } from 'axios';
-import { Solve } from '../types/Solve';
 import { getAllSolvesByUserId } from '../api/solve';
+import { User, InitUser } from '../types/entity/User';
+import { Solve } from '../types/entity/Solve';
 
 interface UserContextProps {
   user: User;

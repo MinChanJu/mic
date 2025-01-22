@@ -1,0 +1,80 @@
+.loginBox {
+    position: relative;
+    width: 850px;
+    height: 600px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border-radius: 30px;
+}
+
+.signUp,
+.signIn,
+.signInDes,
+.signUpDes,
+.changeBox {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    padding: 20px;
+    text-align: center;
+    align-content: center;
+    transition: transform 1s;
+    box-sizing: border-box;
+}
+
+.signIn {
+    transform: translateX(0);
+    z-index: 2;
+    position: relative;
+    background-color: white;
+}
+
+.signUp {
+    transform: translateX(0);
+    z-index: 1;
+    background-color: white;
+}
+
+.signInDes {
+    transform: translateX(100%);
+    z-index: 4;
+}
+
+.signInDes.moveRight {
+    transform: translateX(200%);
+}
+
+.signUpDes {
+    z-index: 4;
+}
+
+.signUpDes.moveLeft {
+    transform: translateX(-100%);
+}
+
+.changeBox {
+    transform: translateX(100%);
+    z-index: 3;
+    background-color: #355bc3;
+}
+
+.changeBox.moveLeft {
+    transform: translateX(0);
+}
+
+.changeBtn {
+    background-color: rgba(255, 0, 0, 0);
+    font-size: 20px;
+    border: none;
+    border-radius: 25px;
+    border: 1px solid white;
+    padding: 6px 12px;
+    color: white;
+    cursor: pointer;
+}
+
+.changeBtn:active {
+    transform: scale(0.9);
+}

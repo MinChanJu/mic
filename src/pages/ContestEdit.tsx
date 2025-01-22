@@ -3,8 +3,8 @@ import { useParams } from "react-router-dom"
 import { AxiosError } from "axios"
 import { getContestById, updateContest } from "../api/contest"
 import { useUser } from "../context/UserContext"
-import { Contest } from "../types/Contest"
 import { StringToTime } from "../utils/formatter"
+import { Contest } from "../types/entity/Contest"
 import useNavigation from "../hooks/useNavigation"
 
 
@@ -55,31 +55,32 @@ const EditContest: React.FC = () => {
       if (userIdRef.current.value === user.userId && user.userId !== "") {
         if (contestPasswordRef.current.value === contestCheckPasswordRef.current.value) {
           if (contestNameRef.current.value !== '') {
-            const startTime = new Date(startTimeRef.current.value).toISOString();
-            const endTime = new Date(endTimeRef.current.value).toISOString();
+            if (startTimeRef.current.value !== "" || endTimeRef.current.value === "") {
+              const requestData: Contest = {
+                id: contest.id,
+                userId: userIdRef.current.value,
+                contestName: contestNameRef.current.value,
+                contestDescription: contestDescriptionRef.current.value,
+                contestPw: contestPasswordRef.current.value === "" ? null : contestPasswordRef.current.value,
+                startTime: startTimeRef.current.value === "" ? null : new Date(startTimeRef.current.value).toISOString(),
+                endTime: endTimeRef.current.value === "" ? null : new Date(endTimeRef.current.value).toISOString(),
+                createdAt: contest.createdAt,
+              };
 
-            const requestData: Contest = {
-              id: contest.id,
-              userId: userIdRef.current.value,
-              contestName: contestNameRef.current.value,
-              contestDescription: contestDescriptionRef.current.value,
-              contestPw: contestPasswordRef.current.value,
-              startTime: startTime,
-              endTime: endTime,
-              createdAt: contest.createdAt,
-            };
-
-            try {
-              const response = await updateContest(requestData);
-              goToContestId(response.data.id!);
-              window.location.reload()
-            } catch (error) {
-              if (error instanceof AxiosError) {
-                if (error.response) setEditMessage("응답 에러: " + error.response.data.message);
-                else console.error("서버 에러: ", error)
-              } else {
-                console.error("알 수 없는 에러:", error);
+              try {
+                const response = await updateContest(requestData);
+                goToContestId(response.data.id!);
+                window.location.reload()
+              } catch (error) {
+                if (error instanceof AxiosError) {
+                  if (error.response) setEditMessage("응답 에러: " + error.response.data.message);
+                  else console.error("서버 에러: ", error)
+                } else {
+                  console.error("알 수 없는 에러:", error);
+                }
               }
+            } else {
+              setEditMessage("죵료 시간을 입력하려면 시작 시간을 입력해야합니다.")
             }
           } else {
             setEditMessage("이름 작성 필요")

@@ -1,0 +1,39 @@
+.flexRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.flexCol {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.gap10 {
+    gap: 10px;
+}
+
+.gap15 {
+    gap: 15px;
+}
+
+.gap20 {
+    gap: 20px;
+}
+
+.gap30 {
+    gap: 30px;
+}
+
+.gap50 {
+    gap: 50px;
+}
+
+.gap80 {
+    gap: 80px;
+}
+
+.gap100 {
+    gap: 100px;
+}

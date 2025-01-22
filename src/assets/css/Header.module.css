@@ -15,7 +15,6 @@ header {
 
 .logoImg {
     width: 100px;
-    
 }
 
 .logoTitle {
@@ -24,7 +23,7 @@ header {
     margin-bottom: 10px;
 }
 
-.menu-container {
+.menuContainer {
     width: 60%;
     display: flex;
     flex-direction: column;
@@ -53,7 +52,7 @@ header {
     box-sizing: border-box;
 }
 
-.select-menu {
+.selectMenu {
     flex: 1;
     align-content: center;
     text-align: center;
@@ -64,7 +63,7 @@ header {
     background-color: white;
 }
 
-.select-menu:hover {
+.selectMenu:hover {
     border-bottom: 2px solid rgb(93, 127, 247);
     color: rgb(93, 127, 247);
     background-color: rgb(237, 236, 236);
@@ -88,7 +87,7 @@ header {
     top: 45px;
 }
 
-.select-menu-description {
+.selectMenuDescription {
     flex: 1;
     box-sizing: border-box;
     padding: 20px;
@@ -100,7 +99,7 @@ header {
     gap: 10px;
 }
 
-.select-menu-description:not(:first-child)::before {
+.selectMenuDescription:not(:first-child)::before {
     content: '';
     position: absolute;
     left: 0;
@@ -110,6 +109,6 @@ header {
     background-color: #ccc;
 }
 
-.select-menu-description > div {
+.selectMenuDescription > div {
     cursor: pointer;
 }

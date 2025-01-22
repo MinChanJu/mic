@@ -13,7 +13,7 @@ const URL = process.env.NODE_ENV === 'production'
 // Axios 인스턴스 생성
 const axiosInstance = axios.create({
   baseURL: URL,                          // Spring Boot 서버 주소
-  timeout: 5000,                         // 요청 제한 시간 (5초)
+  timeout: 10000,                         // 요청 제한 시간 (10초)
   headers: {
     'Content-Type': 'application/json',
   },

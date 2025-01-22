@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react"
-import logo from "../assets/MiC_logo.png"
-import '../styles/Header.css'
-import { useUser } from "../context/UserContext"
-import { Contest } from "../types/Contest"
-import { Problem } from "../types/Problem"
-import useNavigation from "../hooks/useNavigation"
-import { getAllFilterContestsAndProblems } from "../api/myData"
+import { MathJax, MathJaxContext } from "better-react-mathjax"
 import { AxiosError } from "axios"
+import { getAllFilterContestsAndProblems } from "../api/myData"
+import { mathJaxConfig } from "../constants/mathJaxConfig"
+import { useUser } from "../context/UserContext"
+import { Contest } from "../types/entity/Contest"
+import { Problem } from "../types/entity/Problem"
+import logo from "../assets/images/MiC_logo.png"
+import useNavigation from "../hooks/useNavigation"
+import styles from "../assets/css/Header.module.css"
 
 const Header: React.FC = () => {
   const { user, logout } = useUser()
@@ -34,15 +36,15 @@ const Header: React.FC = () => {
 
   return (
     <header>
-      <div className="logo" onClick={() => { goToHome(); window.location.reload(); }}>
-        <img className="logoImg" src={logo} alt="" />
-        <span className="logoTitle">
+      <div className={styles.logo} onClick={() => { goToHome(); window.location.reload(); }}>
+        <img style={{width: "100px"}} src={logo} alt="" />
+        <span className={styles.logoTitle}>
           <div>Mathematics</div>
           <div>in Coding</div>
         </span>
       </div>
-      <div className="menu-container">
-        <div className="login">
+      <div className={styles.menuContainer}>
+        <div className={styles.login}>
           {user.name !== "" && <span onClick={() => { goToUserId(user.userId) }}>{user.name}</span>}
           {user.name !== "" && <span style={{ marginLeft: '10px', marginRight: '10px', fontSize: '20px' }}>|</span>}
           {user.name !== "" && <span onClick={goToSetting}>설정</span>}
@@ -50,17 +52,23 @@ const Header: React.FC = () => {
           {user.name === "" && <span onClick={goToLogin}>로그인</span>}
           {user.name !== "" && <span onClick={logout}>로그아웃</span>}
         </div>
-        <div className="menu">
-          {user.contestId == null && <div className="select-menu" onClick={goToProblem}>문제</div>}
-          <div className="select-menu" onClick={goToContest}>대회</div>
-          <div className="description">
-            {user.contestId == null && <div className="select-menu-description">
+        <div className={styles.menu}>
+          {user.contestId == null && <div className={styles.selectMenu} onClick={goToProblem}>문제</div>}
+          <div className={styles.selectMenu} onClick={goToContest}>대회</div>
+          <div className={styles.description}>
+            {user.contestId == null && <div className={styles.selectMenuDescription}>
               <h2>문제</h2>
-              {problems.slice(-5).map((problem) => (
-                <div key={problem.id} onClick={() => { goToProblemId(problem.id!) }}>{String(problem.id).padStart(3, '0')}. {problem.problemName}</div>
-              ))}
+              <MathJaxContext config={mathJaxConfig}>
+                {problems.slice(-5).map((problem) => (
+                  <div key={problem.id} onClick={() => { goToProblemId(problem.id!) }}>
+                    <MathJax>
+                      {String(problem.id).padStart(3, '0')}. {problem.problemName}
+                    </MathJax>
+                  </div>
+                ))}
+              </MathJaxContext>
             </div>}
-            <div className="select-menu-description">
+            <div className={styles.selectMenuDescription}>
               <h2>대회</h2>
               {contests.slice(0, 5).map((contest) => (
                 <div key={contest.id} onClick={() => { goToContestId(contest.id!) }}>{contest.contestName}</div>

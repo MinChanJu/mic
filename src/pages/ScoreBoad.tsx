@@ -3,12 +3,12 @@ import { useParams } from 'react-router-dom'
 import { MathJax, MathJaxContext } from 'better-react-mathjax'
 import { AxiosError } from 'axios'
 import { getContestById } from '../api/contest'
-import { getAllProblemsByContestId } from '../api/problem'
+import { getProblemListByContestIdWithUserId } from '../api/problem'
 import { getScoreBoardByContestId } from '../api/myData'
 import { mathJaxConfig } from '../constants/mathJaxConfig'
-import { ContestScoreDTO } from '../types/ContestScoreDTO'
-import { Contest } from '../types/Contest'
-import { Problem } from '../types/Problem'
+import { ContestScoreDTO } from '../types/dto/ContestScoreDTO'
+import { Contest } from '../types/entity/Contest'
+import { ProblemListDTO } from '../types/dto/ProblemListDTO'
 
 
 const ScoreBoard: React.FC = () => {
@@ -16,7 +16,7 @@ const ScoreBoard: React.FC = () => {
   const [contestScores, setContestScores] = useState<ContestScoreDTO[]>([]);
 
   const [contest, setContest] = useState<Contest>();
-  const [problems, setProblems] = useState<Problem[]>([]);
+  const [problemList, setProblemList] = useState<ProblemListDTO[]>([]);
 
   useEffect(() => {
     async function loadContest() {
@@ -34,8 +34,8 @@ const ScoreBoard: React.FC = () => {
     }
     async function loadProblems() {
       try {
-        const response = await getAllProblemsByContestId(Number(contestId));
-        setProblems(response.data);
+        const response = await getProblemListByContestIdWithUserId(Number(contestId), '');
+        setProblemList(response.data);
       } catch (error) {
         if (error instanceof AxiosError) {
           if (error.response) console.error("응답 에러: ", error.response.data.message);
@@ -80,10 +80,10 @@ const ScoreBoard: React.FC = () => {
           <thead>
             <tr>
               <th style={{ width: "30px", textAlign: "center" }}>등수</th>
-              <th style={{ width: `calc((100% - 85px) / ${problems.length + 1})`, textAlign: "center" }}>이름</th>
+              <th style={{ width: `calc((100% - 85px) / ${problemList.length + 1})`, textAlign: "center" }}>이름</th>
               <MathJaxContext config={mathJaxConfig}>
-                {problems.map((problem, index) => (
-                  <th key={index} style={{ width: `calc((100% - 85px) / ${problems.length + 1})`, textAlign: "center" }}>
+                {problemList.map((problem, index) => (
+                  <th key={index} style={{ width: `calc((100% - 85px) / ${problemList.length + 1})`, textAlign: "center" }}>
                     <MathJax>{problem.problemName}</MathJax>
                   </th>
                 ))}
