@@ -1,7 +1,7 @@
 export const ROUTES = {
     HOME: '/',
     LOGIN: '/login',
-    USER: (userId: string) => `/users/${userId}`,
+    USER: (userId: string) => `/user/${userId}`,
     SETTING: '/setting',
 
     CONTEST: '/contest',

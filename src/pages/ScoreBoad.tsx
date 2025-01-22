@@ -9,6 +9,8 @@ import { mathJaxConfig } from '../constants/mathJaxConfig'
 import { ContestScoreDTO } from '../types/dto/ContestScoreDTO'
 import { Contest } from '../types/entity/Contest'
 import { ProblemListDTO } from '../types/dto/ProblemListDTO'
+import Table from '../components/Table'
+import { SubmitDTO } from '../types/dto/SubmitDTO'
 
 
 const ScoreBoard: React.FC = () => {
@@ -72,51 +74,42 @@ const ScoreBoard: React.FC = () => {
 
   if (!contest) return <></>
 
+  const formatScoreBoard = {
+    name: (value: string, row: number, col: number) => {
+      if (col == 0) return <>{row + 1}</>
+      return <>{value}</>
+    },
+    solveProblems: (value: SubmitDTO[], _: number, col: number) => {
+      if (col >= value.length + 2) {
+        let sum = 0;
+        value.forEach(element => { sum += element.score / 10; });
+        return <>{sum}</>
+      }
+
+      const score = value[col - 2].score;
+      let style: React.CSSProperties = { backgroundColor: "rgb(238, 255, 0)" };
+      if (score === 1000) style.backgroundColor = "rgb(43, 255, 0)";
+      if (score === 0) style.backgroundColor = "rgb(255, 0, 0)";
+
+      return <div style={style}>{score / 10}</div>
+    },
+  }
+
   return (
-    <div>
-      <div className="list">
-        <h2>대회명 : {contest.contestName}</h2>
-        <table style={{ tableLayout: "fixed" }}>
-          <thead>
-            <tr>
-              <th style={{ width: "30px", textAlign: "center" }}>등수</th>
-              <th style={{ width: `calc((100% - 85px) / ${problemList.length + 1})`, textAlign: "center" }}>이름</th>
-              <MathJaxContext config={mathJaxConfig}>
-                {problemList.map((problem, index) => (
-                  <th key={index} style={{ width: `calc((100% - 85px) / ${problemList.length + 1})`, textAlign: "center" }}>
-                    <MathJax>{problem.problemName}</MathJax>
-                  </th>
-                ))}
-              </MathJaxContext>
-              <th style={{ width: "55px", textAlign: "center" }}>총점</th>
-            </tr>
-          </thead>
-          <tbody>
-            {contestScores.map((contestScore, index) => (
-              <tr key={index}>
-                <td style={{ textAlign: "center" }}>{index + 1}</td>
-                <td style={{ textAlign: "center" }}>{contestScore.name}</td>
-                {contestScore.solveProblems.sort((a, b) => a.problemId - b.problemId).map((solve) => {
-                  const score = solve.score;
-                  let style: React.CSSProperties = { textAlign: "center", backgroundColor: "rgb(238, 255, 0)" };
-                  if (score === 100) style.backgroundColor = "rgb(43, 255, 0)";
-                  if (score === 0) style.backgroundColor = "rgb(255, 0, 0)";
-
-                  return <td key={solve.problemId} style={style}>{score}</td>
-                })}
-                {(() => {
-                  let sum = 0;
-                  contestScore.solveProblems.map((solve) => (
-                    sum += Number(solve.score)
-                  ))
-                  return <td style={{ textAlign: "center" }}>{sum}</td>
-                })()}
-
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <div className="list">
+      <h2>대회명 : {contest.contestName}</h2>
+      <MathJaxContext config={mathJaxConfig}>
+        <Table
+          columnName={["등수", "이름", ...problemList.map((problem) => problem.problemName), "총점"]}
+          columnClass={["num", "center", "center", ...problemList.map(() => "center")]}
+          columnFunc={(value: string, col: number) => {
+            if (col == 0 || col == 1 || col == problemList.length + 2) return <>{value}</>
+            return <MathJax>{value}</MathJax>
+          }}
+          data={contestScores}
+          dataName={["name", "name", ...problemList.map(() => "solveProblems" as keyof ContestScoreDTO), "solveProblems"]}
+          dataFunc={formatScoreBoard} />
+      </MathJaxContext>
     </div>
   )
 }

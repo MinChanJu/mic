@@ -6,7 +6,7 @@ import { mathJaxConfig } from "../constants/mathJaxConfig"
 import { useUser } from "../context/UserContext"
 import { Contest } from "../types/entity/Contest"
 import { Problem } from "../types/entity/Problem"
-import logo from "../assets/images/MiC_logo.png"
+import logo from "../assets/images/logo.png"
 import useNavigation from "../hooks/useNavigation"
 import styles from "../assets/css/Header.module.css"
 

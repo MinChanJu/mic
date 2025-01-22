@@ -291,8 +291,6 @@ const UserManage: React.FC = () => {
         console.error("알 수 없는 에러:", error);
       }
     }
-    console.log(index);
-    console.log(userDetail);
   };
 
   useEffect(() => {

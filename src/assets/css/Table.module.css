@@ -64,3 +64,7 @@
 .before {
     background-color: rgb(192, 192, 192);
 }
+
+.center {
+    text-align: center;
+}
