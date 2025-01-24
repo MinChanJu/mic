@@ -15,6 +15,7 @@ const useNavigation = () => {
 	// 대회 이동
 	goToContest: () => navigate(ROUTES.CONTEST),
 	goToContestMake: () => navigate(ROUTES.CONTEST_MAKE),
+	goToContestManage: (contestId: number) => navigate(ROUTES.CONTEST_MANAGE(contestId)),
 	goToContestEdit: (contestId: number) => navigate(ROUTES.CONTEST_EDIT(contestId)),
 	goToContestId: (contestId: number) => navigate(ROUTES.CONTEST_ID(contestId)),
 	goToContestScoreBoard: (contestId: number) => navigate(ROUTES.CONTEST_SCORE_BOARD(contestId)),

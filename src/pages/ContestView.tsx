@@ -14,7 +14,7 @@ import Table from "../components/Table"
 
 const ContestView: React.FC = () => {
   const { user } = useUser()
-  const { goToContestEdit, goToProblemMake, goToProblemId, goToContestScoreBoard, goToUserId, goToContest } = useNavigation();
+  const { goToContestEdit, goToProblemMake, goToProblemId, goToContestScoreBoard, goToContestManage, goToUserId, goToContest } = useNavigation();
   const { contestId } = useParams();
   const [contest, setContest] = useState<Contest>()
   const [problemList, setProblemList] = useState<ProblemListDTO[]>([])
@@ -77,7 +77,7 @@ const ContestView: React.FC = () => {
       {(user.authority === 5 || user.userId === contest.userId) &&
         <div className="flexRow gap50">
           <span className="button" onClick={() => { goToContestEdit(contest.id!) }}>편집</span>
-          <span className="button">참가자 추가</span>
+          <span className="button" onClick={() => { goToContestManage(contest.id!) }}>참가자 관리</span>
           <span className="button" onClick={() => { deleteContest(contest.id!) }}>삭제</span>
         </div>
       }

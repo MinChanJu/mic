@@ -27,6 +27,7 @@ const PageTitle = () => {
     // 동적 경로를 위한 패턴 매칭
     const dynamicRoutes = [
       { pattern: "/contest/edit/:contestId", title: "대회 수정" },
+      { pattern: "/contest/manage/:contestId", title: "대회 관리" },
       { pattern: "/contest/:contestId", title: "대회 상세" },
       { pattern: "/problem/edit/:problemId", title: "문제 수정" },
       { pattern: "/problem/make/:contestId", title: "문제 생성" },

@@ -14,16 +14,6 @@
     animation: spin 1s linear infinite;
 }
 
-.list {
-    display: flex;
-    flex-direction: column;
-    margin: 0px auto;
-    max-width: 1200px;
-    padding: 20px;
-    gap: 20px;
-    box-sizing: border-box;
-}
-
 .description {
     max-width: 600px;
     padding: 15px 0px;

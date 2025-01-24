@@ -25,7 +25,7 @@ const Table = <T,>({ columnName, columnClass, columnFunc, data, dataName, dataFu
         {data.map((row, rowIndex) => (
           <tr key={rowIndex} className={rowClass?.(row) ? styles[rowClass(row)] : ""} onClick={() => onClick?.(row)}>
             {dataName.map((key, idx) => (
-              <td key={idx} className={styles.tableCell + " " + styles[columnClass[idx]]}>
+              <td key={idx} className={(onClick ? styles.cursor :  '') + " " + styles.tableCell + " " + styles[columnClass[idx]]}>
                 {dataFunc?.[key] ? dataFunc[key](row[key], rowIndex, idx) : (row[key] as React.ReactNode)}
               </td>
             ))}

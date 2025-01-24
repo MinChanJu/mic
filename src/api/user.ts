@@ -18,6 +18,11 @@ export const getUserByUserId = async (userId: string): Promise<ApiResponse<UserD
   return response.data;
 };
 
+export const getAllUsersByContestId = async (contestId: number): Promise<ApiResponse<User[]>> => {
+  const response = await axios.get(`/users/contest/${contestId}`);
+  return response.data;
+};
+
 export const login = async (loginData: UserLoginDTO): Promise<ApiResponse<User>> => {
   const response = await axios.post('/users/login', loginData);
   return response.data;

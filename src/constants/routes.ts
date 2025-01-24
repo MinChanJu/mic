@@ -7,6 +7,7 @@ export const ROUTES = {
     CONTEST: '/contest',
     CONTEST_MAKE: '/contest/make',
     CONTEST_EDIT: (contestId: number) => `/contest/edit/${contestId}`,
+    CONTEST_MANAGE: (contestId: number) => `/contest/manage/${contestId}`,
     CONTEST_ID: (contestId: number) => `/contest/${contestId}`,
     CONTEST_SCORE_BOARD: (contestId: number) => `/score/${contestId}`,
 

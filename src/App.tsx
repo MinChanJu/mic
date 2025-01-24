@@ -6,6 +6,7 @@ import './styles/Global.css'
 import './styles/Text.css'
 import './styles/Flex.css'
 import './styles/Input.css'
+import './styles/Color.css'
 
 function App() {
   return (

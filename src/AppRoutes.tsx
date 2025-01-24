@@ -13,6 +13,7 @@ import UserView from './pages/UserView';
 import SettingView from './pages/SettingView';
 import ScoreBoard from './pages/ScoreBoad';
 import PageTitle from './components/PageTitle';
+import ContestManage from './pages/ContestManage';
 
 const AppRoutes = () => (
   <>
@@ -23,6 +24,7 @@ const AppRoutes = () => (
       <Route path="/contest" element={<ContestList />} />
       <Route path="/contest/edit/:contestId" element={<EditContest />} />
       <Route path="/contest/make" element={<ContestMake />} />
+      <Route path="/contest/manage/:contestId" element={<ContestManage />} />
       <Route path="/contest/:contestId" element={<ContestView />} />
       <Route path="/score/:contestId" element={<ScoreBoard />} />
       <Route path="/problem" element={<ProblemList />} />
