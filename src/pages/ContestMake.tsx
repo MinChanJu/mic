@@ -4,6 +4,7 @@ import { createContest } from "../api/contest"
 import { useUser } from "../context/UserContext"
 import { Contest } from "../types/entity/Contest"
 import useNavigation from "../hooks/useNavigation"
+import Loading from "../components/Loading"
 
 const ContestMake: React.FC = () => {
   const { user } = useUser()
@@ -42,8 +43,6 @@ const ContestMake: React.FC = () => {
                 endTime: endTimeRef.current.value === "" ? null : new Date(endTimeRef.current.value).toISOString(),
                 createdAt: new Date().toISOString()
               };
-
-              console.log(requestData)
 
               try {
                 const response = await createContest(requestData);
@@ -115,9 +114,9 @@ const ContestMake: React.FC = () => {
             <div className="makeTitle">대회 설명</div>
             <textarea className="makeField" ref={contestDescriptionRef} style={{ height: '100px' }} />
           </div>
-          <span className="error">{makeMessage}</span>
+          <span className="red">{makeMessage}</span>
           <div className="makeButton" onClick={handleSubmit}>
-            {isLoading ? <div className="loading"></div> : <div>대회 개최</div>}
+            {isLoading ? <Loading /> : <div>대회 개최</div>}
           </div>
         </div>
       }

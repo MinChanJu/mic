@@ -64,6 +64,7 @@ const ProblemMake: React.FC = () => {
         const exampleData: Example[] = examples.map((example) => ({
           id: null,
           problemId: -1,
+          userId: user.userId,
           exampleInput: example.exampleInput,
           exampleOutput: example.exampleOutput,
           createdAt: new Date().toISOString()
@@ -122,7 +123,7 @@ const ProblemMake: React.FC = () => {
         <div className="makeBox">
           <h2>문제 정보 기입</h2>
           {Number(contestId) === -1 && <div>대회에 종속되지 않음</div>}
-          {Number(contestId) !== -1 && <div>Contest Id: {Number(contestId)} Contest Name: {Number(contestId)}</div>}
+          {Number(contestId) !== -1 && <div>Contest Id: {Number(contestId)}</div>}
           <div className="makeGroup">
             <div className="makeTitle">문제 제목</div>
             <input className="makeField" ref={problemNameRef} type="text" />
@@ -169,7 +170,7 @@ const ProblemMake: React.FC = () => {
             </div>
           ))}
           <div className="addExample" onClick={addExample}>예제 추가</div>
-          <span className="error">{makeMessage}</span>
+          <span className="red">{makeMessage}</span>
           <div className="doubleMakeGroup">
             {Number(contestId) !== -1 &&
               <div className="makeButton" onClick={() => { handleSubmit(1) }}>

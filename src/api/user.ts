@@ -2,6 +2,7 @@ import axios from './axiosInstance';
 import { ApiResponse } from '../types/dto/ApiResponse';
 import { User } from '../types/entity/User';
 import { UserDTO } from '../types/dto/UserDTO';
+import { UserResponseDTO } from '../types/dto/UserResponseDTO';
 
 interface UserLoginDTO {
   userId: string;
@@ -23,7 +24,7 @@ export const getAllUsersByContestId = async (contestId: number): Promise<ApiResp
   return response.data;
 };
 
-export const login = async (loginData: UserLoginDTO): Promise<ApiResponse<User>> => {
+export const login = async (loginData: UserLoginDTO): Promise<ApiResponse<UserResponseDTO>> => {
   const response = await axios.post('/users/login', loginData);
   return response.data;
 };

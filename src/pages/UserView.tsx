@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom"
 import { AxiosError } from "axios"
 import { getUserByUserId } from "../api/user"
 import { UserDTO } from "../types/dto/UserDTO"
+import ErrorPage from "../components/ErrorPage"
+import Loading from "../components/Loading"
 
 const UserView: React.FC = () => {
   const { userId } = useParams();
@@ -10,6 +12,7 @@ const UserView: React.FC = () => {
   const [year, setYear] = useState<string>();
   const [month, setMonth] = useState<string>();
   const [day, setDay] = useState<string>();
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     async function serverObject() {
@@ -23,6 +26,7 @@ const UserView: React.FC = () => {
         } else {
           console.error("알 수 없는 에러:", error);
         }
+        setError(true);
       }
     }
     serverObject();
@@ -34,15 +38,16 @@ const UserView: React.FC = () => {
     setDay(curUser?.createdAt.substring(8, 10))
   }, [curUser])
 
-  if (!curUser) return <></>
+  if (error) return <ErrorPage />
+  if (!curUser) return <Loading width={60} border={6} />
 
   return (
     <div className="list" style={{ maxWidth: "400px" }}>
       <div className="description text30">정보</div>
       <div className="userElement">
-        <div className="text20">닉네임: {curUser?.name}</div>
-        <div className="text20">아이디: {curUser?.userId}</div>
-        <div className="text20">이메일: {curUser?.email}</div>
+        <div className="text20">닉네임: {curUser.name}</div>
+        <div className="text20">아이디: {curUser.userId}</div>
+        <div className="text20">이메일: {curUser.email}</div>
         <div className="text20">가입 날짜: {year}년 {month}월 {day}일</div>
       </div>
     </div>

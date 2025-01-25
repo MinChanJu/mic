@@ -11,6 +11,8 @@ import { Problem } from "../types/entity/Problem"
 import { CodeDTO } from "../types/dto/CodeDTO"
 import useNavigation from "../hooks/useNavigation"
 import styles from "../assets/css/ProblemView.module.css"
+import Loading from "../components/Loading"
+import ErrorPage from "../components/ErrorPage"
 
 const ProblemView: React.FC = () => {
   const { problemId } = useParams();
@@ -21,6 +23,8 @@ const ProblemView: React.FC = () => {
   const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [code, setCode] = useState<string>("");
+  const [error, setError] = useState(false);
+
 
   useEffect(() => {
     async function loadProblem() {
@@ -34,13 +38,14 @@ const ProblemView: React.FC = () => {
         } else {
           console.error("알 수 없는 에러:", error);
         }
+        setError(true);
       }
     }
     loadProblem();
   }, []);
 
-  if (!problem) return <div className="loading"></div> 
-
+  if (error) return <ErrorPage />
+  if (!problem) return <Loading width={60} border={6} />
 
   const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setLang(event.target.value);

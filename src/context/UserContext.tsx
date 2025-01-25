@@ -30,7 +30,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           setSolves(response.data);
         } catch (error) {
           if (error instanceof AxiosError) {
-            if (error.response) console.error(error.response.data.message);
+            if (error.response) console.error(error.response);
             else console.error("서버 에러: ", error)
           } else {
             console.error("알 수 없는 에러:", error);
@@ -44,6 +44,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     sessionStorage.removeItem('user');
+    sessionStorage.removeItem('token');
     setUser(InitUser);
     setSolves([])
     window.location.reload();

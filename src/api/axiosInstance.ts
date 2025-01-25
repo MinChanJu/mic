@@ -22,9 +22,10 @@ const axiosInstance = axios.create({
 // 요청 인터셉터 (예: 토큰 추가)
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');  // 로컬 스토리지에서 토큰 가져오기
+    const token = sessionStorage.getItem('token');  // 로컬 스토리지에서 토큰 가져오기
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      config.withCredentials = true;
     }
     return config;
   },

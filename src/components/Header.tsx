@@ -5,23 +5,23 @@ import { getAllFilterContestsAndProblems } from "../api/myData"
 import { mathJaxConfig } from "../constants/mathJaxConfig"
 import { useUser } from "../context/UserContext"
 import { Contest } from "../types/entity/Contest"
-import { Problem } from "../types/entity/Problem"
 import logo from "../assets/images/logo.png"
 import useNavigation from "../hooks/useNavigation"
 import styles from "../assets/css/Header.module.css"
+import { ProblemListDTO } from "../types/dto/ProblemListDTO"
 
 const Header: React.FC = () => {
   const { user, logout } = useUser()
   const { goToContest, goToContestId, goToHome, goToLogin, goToProblem, goToProblemId, goToSetting, goToUserId } = useNavigation()
   const [contests, setContests] = useState<Contest[]>([])
-  const [problems, setProblems] = useState<Problem[]>([])
+  const [problemList, setProblemList] = useState<ProblemListDTO[]>([])
 
   useEffect(() => {
     async function loadContestsAndProblems() {
       try {
         const response = await getAllFilterContestsAndProblems();
         setContests(response.data.contests);
-        setProblems(response.data.problems);
+        setProblemList(response.data.problems);
       } catch (error) {
         if (error instanceof AxiosError) {
           if (error.response) console.error(error.response.data.message);
@@ -53,13 +53,13 @@ const Header: React.FC = () => {
           {user.name !== "" && <span onClick={logout}>로그아웃</span>}
         </div>
         <div className={styles.menu}>
-          {user.contestId == null && <div className={styles.selectMenu} onClick={goToProblem}>문제</div>}
+          {user.contestId == -1 && <div className={styles.selectMenu} onClick={goToProblem}>문제</div>}
           <div className={styles.selectMenu} onClick={goToContest}>대회</div>
           <div className={styles.description}>
-            {user.contestId == null && <div className={styles.selectMenuDescription}>
+            {user.contestId == -1 && <div className={styles.selectMenuDescription}>
               <h2>문제</h2>
               <MathJaxContext config={mathJaxConfig}>
-                {problems.slice(-5).map((problem) => (
+                {problemList.slice(-5).map((problem) => (
                   <div key={problem.id} onClick={() => { goToProblemId(problem.id!) }}>
                     <MathJax>
                       {String(problem.id).padStart(3, '0')}. {problem.problemName}

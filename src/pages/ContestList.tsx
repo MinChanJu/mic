@@ -15,7 +15,7 @@ const ContestList: React.FC = () => {
   useEffect(() => {
     async function loadProblems() {
       try {
-        if (user.contestId === null) {
+        if (user.contestId === -1) {
           const response = await getContestList();
           setContestList(response.data);
         } else {

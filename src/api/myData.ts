@@ -5,11 +5,6 @@ import { ContestScoreDTO } from '../types/dto/ContestScoreDTO';
 import { CodeDTO } from '../types/dto/CodeDTO';
 import { CodeResultDTO } from '../types/dto/CodeResultDTO';
 
-export const getAllContestsAndProblems = async (): Promise<ApiResponse<ContestsAndProblemsDTO>> => {
-  const response = await axios.get('/data');
-  return response.data;
-};
-
 export const getAllFilterContestsAndProblems = async (): Promise<ApiResponse<ContestsAndProblemsDTO>> => {
   const response = await axios.get('/data/filter');
   return response.data;

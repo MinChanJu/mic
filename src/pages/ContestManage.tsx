@@ -4,6 +4,8 @@ import { deleteUserById, getAllUsersByContestId, register } from "../api/user";
 import { useParams } from "react-router-dom";
 import { AxiosError } from "axios";
 import Table from "../components/Table";
+import ErrorPage from "../components/ErrorPage";
+import Loading from "../components/Loading";
 
 const ContestManage = () => {
   const { contestId } = useParams();
@@ -11,6 +13,7 @@ const ContestManage = () => {
   const [size, serSize] = useState<number>(0);
   const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -25,10 +28,14 @@ const ContestManage = () => {
         } else {
           console.error("알 수 없는 에러:", error);
         }
+        setError(true);
       }
     }
     fetchData();
   }, [])
+
+  if (error) return <ErrorPage />
+  if(!participants) return <Loading width={60} border={6} />
 
   const generateUserId = (idx: number) => {
     const now = new Date()
@@ -36,7 +43,7 @@ const ContestManage = () => {
 
     let result = String(contestId)
     date.map((d) => {
-      while (d > 26) {
+      while (d >= 26) {
         result += 'Z'
         d -= 26
       }
@@ -103,6 +110,7 @@ const ContestManage = () => {
 
   const deleteExample = async (index: number) => {
     if (participants[index].id != null) {
+      serSize((prev) => prev-1)
       try {
         await deleteUserById(participants[index].id);
       } catch (error) {
@@ -151,7 +159,7 @@ const ContestManage = () => {
       <div className="flexRow red">{message}</div>
       <div className="flexRow gap20">
         <div className="button backBlue white" onClick={addParticipant}>참가자 추가</div>
-        {size < participants.length && <div className="button backBlue white" onClick={handleSubmit}>{isLoading ? <div className="loading"></div> : <>문제 편집</>}</div>}
+        {size < participants.length && <div className="button backBlue white" onClick={handleSubmit}>{isLoading ? <div className="loading"></div> : <>저장</>}</div>}
       </div>
     </div>
   )

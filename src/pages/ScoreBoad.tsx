@@ -11,6 +11,8 @@ import { Contest } from '../types/entity/Contest'
 import { ProblemListDTO } from '../types/dto/ProblemListDTO'
 import Table from '../components/Table'
 import { SubmitDTO } from '../types/dto/SubmitDTO'
+import ErrorPage from '../components/ErrorPage'
+import Loading from '../components/Loading'
 
 
 const ScoreBoard: React.FC = () => {
@@ -19,6 +21,7 @@ const ScoreBoard: React.FC = () => {
 
   const [contest, setContest] = useState<Contest>();
   const [problemList, setProblemList] = useState<ProblemListDTO[]>([]);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     async function loadContest() {
@@ -32,6 +35,7 @@ const ScoreBoard: React.FC = () => {
         } else {
           console.error("알 수 없는 에러:", error);
         }
+        setError(true);
       }
     }
     async function loadProblems() {
@@ -45,13 +49,9 @@ const ScoreBoard: React.FC = () => {
         } else {
           console.error("알 수 없는 에러:", error);
         }
+        setError(true);
       }
     }
-    loadContest();
-    loadProblems();
-  }, []);
-
-  useEffect(() => {
     async function fetchData() {
       try {
         const response = await getScoreBoardByContestId(Number(contestId));
@@ -63,8 +63,11 @@ const ScoreBoard: React.FC = () => {
         } else {
           console.error("알 수 없는 에러:", error);
         }
+        setError(true);
       }
     }
+    loadContest();
+    loadProblems();
     fetchData();
 
     const interval = setInterval(fetchData, 15_000);
@@ -72,7 +75,8 @@ const ScoreBoard: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  if (!contest) return <></>
+  if (error) return <ErrorPage />
+  if (!contest) return <Loading width={60} border={6} />
 
   const formatScoreBoard = {
     name: (value: string, row: number, col: number) => {

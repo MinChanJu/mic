@@ -6,8 +6,8 @@ export type User = {
     phone: string
     email: string
     authority: number
-    contestId: number | null
+    contestId: number
     createdAt: string
   }
 
-export const InitUser: User = { id: null, name: '', userId: '', userPw: '', phone: '', email: '', authority: -1, contestId: null, createdAt: '' };
+export const InitUser: User = { id: null, name: '', userId: '', userPw: '', phone: '', email: '', authority: -1, contestId: -1, createdAt: '' };

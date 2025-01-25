@@ -280,7 +280,7 @@ const UserManage: React.FC = () => {
   const handleChange = async (user: User, index: number) => {
     let userDetail = user;
     userDetail.authority = authoritys[index]
-    userDetail.contestId = enters[index] === -1 ? null : enters[index]
+    userDetail.contestId = enters[index] === -1 ? -1 : enters[index]
     try {
       await updateUser(userDetail);
     } catch (error) {

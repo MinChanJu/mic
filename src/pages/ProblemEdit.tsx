@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useEffect, useRef, useState } from "react"
 import { useParams } from "react-router-dom"
 import { AxiosError } from "axios"
@@ -9,6 +8,8 @@ import { Problem } from "../types/entity/Problem"
 import { Example, InitExample } from "../types/entity/Example"
 import { ProblemDTO } from "../types/dto/ProblemDTO"
 import useNavigation from "../hooks/useNavigation"
+import ErrorPage from "../components/ErrorPage"
+import Loading from "../components/Loading"
 
 const EditProblem: React.FC = () => {
   const { problemId } = useParams();
@@ -23,6 +24,7 @@ const EditProblem: React.FC = () => {
   const problemOutputDescriptionRef = useRef<HTMLTextAreaElement>(null);
   const problemExampleInputRef = useRef<HTMLTextAreaElement>(null);
   const problemExampleOutputRef = useRef<HTMLTextAreaElement>(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     async function loadProblem() {
@@ -36,6 +38,7 @@ const EditProblem: React.FC = () => {
         } else {
           console.error("알 수 없는 에러:", error);
         }
+        setError(true)
       }
     }
     async function loadExamples() {
@@ -49,13 +52,15 @@ const EditProblem: React.FC = () => {
         } else {
           console.error("알 수 없는 에러:", error);
         }
+        setError(true)
       }
     }
     loadProblem();
     loadExamples();
   }, []);
 
-  if (!problem) return <></>
+  if (error) return <ErrorPage />
+  if (!problem) return <Loading width={60} border={6} />
 
   const addExample = () => {
     setExamples((prev) => [...prev, InitExample]);
@@ -102,6 +107,7 @@ const EditProblem: React.FC = () => {
         const exampleData: Example[] = examples.map((example) => ({
           id: example.id,
           problemId: problem.id!,
+          userId: problem.userId,
           exampleInput: example.exampleInput,
           exampleOutput: example.exampleOutput,
           createdAt: example.createdAt
@@ -151,54 +157,56 @@ const EditProblem: React.FC = () => {
         <h2>문제 정보 기입</h2>
         {problem.contestId == -1 && <div>대회에 종속되지 않음</div>}
         {problem.contestId !== -1 && <div>Contest Id: {problem.contestId} Contest Name: {problem.contestId}</div>}
-        <span>{editMessage}</span>
-        <div className="make-group">
+        <div className="makeGroup">
           <div className="makeTitle">문제 제목</div>
           <input className="makeField" ref={problemNameRef} defaultValue={problem.problemName} type="text" />
         </div>
-        <div className="make-group">
+        <div className="makeGroup">
           <div className="makeTitle">문제 설명</div>
           <textarea className="makeField" ref={problemDescriptionRef} defaultValue={problem.problemDescription} style={{ minHeight: '100px' }} onInput={autoResize} />
         </div>
-        <div className="make-group">
+        <div className="makeGroup">
           <div className="makeTitle">입력에 대한 설명</div>
           <textarea className="makeField" ref={problemInputDescriptionRef} defaultValue={problem.problemInputDescription} style={{ minHeight: '100px' }} onInput={autoResize} />
         </div>
-        <div className="make-group">
+        <div className="makeGroup">
           <div className="makeTitle">출력에 대한 설명</div>
           <textarea className="makeField" ref={problemOutputDescriptionRef} defaultValue={problem.problemOutputDescription} style={{ minHeight: '100px' }} onInput={autoResize} />
         </div>
-        <div className="double-make-group">
-          <div className="make-group">
+        <div className="doubleMakeGroup">
+          <div className="makeGroup">
             <div className="makeTitle">입력 예제</div>
             <textarea className="makeField" ref={problemExampleInputRef} defaultValue={problem.problemExampleInput} style={{ minHeight: '100px' }} onInput={autoResize} />
           </div>
-          <div className="make-group">
+          <div className="makeGroup">
             <div className="makeTitle">출력 예제</div>
             <textarea className="makeField" ref={problemExampleOutputRef} defaultValue={problem.problemExampleOutput} style={{ minHeight: '100px' }} onInput={autoResize} />
           </div>
         </div>
         {examples.map((example, index) => (
-          <div key={index} className="double-make-group">
-            <div className="make-group">
+          <div key={index} className="doubleMakeGroup">
+            <div className="makeGroup">
               <div className="makeTitle">입력 예제 {index + 1}</div>
               <textarea className="makeField" value={example.exampleInput}
-              onChange={(e) => handleExampleChange(index, "exampleInput", e.target.value)}
-              style={{ minHeight: '100px' }} onInput={autoResize} />
+                onChange={(e) => handleExampleChange(index, "exampleInput", e.target.value)}
+                style={{ minHeight: '100px' }} onInput={autoResize} />
             </div>
-            <div className="make-group">
+            <div className="makeGroup">
               <div className="makeTitle" style={{ display: "flex", justifyContent: "space-between" }}>
                 <span>출력 예제 {index + 1}</span>
                 <span style={{ cursor: "pointer" }} onClick={() => { deleteExample(index) }}>예제 삭제</span>
               </div>
               <textarea className="makeField" value={example.exampleOutput}
-              onChange={(e) => handleExampleChange(index, "exampleOutput", e.target.value)}
-              style={{ minHeight: '100px' }} onInput={autoResize} />
+                onChange={(e) => handleExampleChange(index, "exampleOutput", e.target.value)}
+                style={{ minHeight: '100px' }} onInput={autoResize} />
             </div>
           </div>
         ))}
         <div className="addExample" onClick={addExample}>예제 추가</div>
-        <div className="makeButton" onClick={handleSubmit}>{isLoading ? <div className="loading"></div> : <>문제 편집</>}</div>
+        <span className="red">{editMessage}</span>
+        <div className="makeButton" onClick={handleSubmit}>
+          {isLoading ? <Loading /> : <>문제 편집</>}
+        </div>
       </div>
     </div>
   )

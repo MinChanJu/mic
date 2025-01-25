@@ -14,6 +14,7 @@ import SettingView from './pages/SettingView';
 import ScoreBoard from './pages/ScoreBoad';
 import PageTitle from './components/PageTitle';
 import ContestManage from './pages/ContestManage';
+import ErrorPage from './components/ErrorPage';
 
 const AppRoutes = () => (
   <>
@@ -33,7 +34,7 @@ const AppRoutes = () => (
       <Route path="/problem/:problemId" element={<ProblemView />} />
       <Route path="/user/:userId" element={<UserView />} />
       <Route path="/setting" element={<SettingView />} />
-      <Route path='*' element={<div>404 에러</div>} />
+      <Route path='*' element={<ErrorPage />} />
     </Routes>
   </>
 );

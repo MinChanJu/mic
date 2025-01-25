@@ -11,6 +11,8 @@ import { ProblemListDTO } from "../types/dto/ProblemListDTO"
 import { Contest } from "../types/entity/Contest"
 import useNavigation from "../hooks/useNavigation"
 import Table from "../components/Table"
+import ErrorPage from "../components/ErrorPage"
+import Loading from "../components/Loading"
 
 const ContestView: React.FC = () => {
   const { user } = useUser()
@@ -18,6 +20,7 @@ const ContestView: React.FC = () => {
   const { contestId } = useParams();
   const [contest, setContest] = useState<Contest>()
   const [problemList, setProblemList] = useState<ProblemListDTO[]>([])
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     async function loadContest() {
@@ -31,6 +34,7 @@ const ContestView: React.FC = () => {
         } else {
           console.error("알 수 없는 에러:", error);
         }
+        setError(true);
       }
     }
     async function loadProblems() {
@@ -44,13 +48,15 @@ const ContestView: React.FC = () => {
         } else {
           console.error("알 수 없는 에러:", error);
         }
+        setError(true);
       }
     }
     loadContest();
     loadProblems();
   }, []);
 
-  if (!contest) return <></>
+  if (error) return <ErrorPage />
+  if (!contest) return <Loading width={60} border={6} />
 
   if (contest.startTime != null && new Date(contest.startTime) >= new Date() && user.authority != 5 && user.userId !== contest.userId) return (<div>아직 아님</div>)
 

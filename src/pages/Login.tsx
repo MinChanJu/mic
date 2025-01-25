@@ -5,6 +5,7 @@ import { useUser } from "../context/UserContext"
 import { User } from "../types/entity/User"
 import useNavigation from "../hooks/useNavigation"
 import styles from "../assets/css/Login.module.css"
+import { UserLoginDTO } from "../types/dto/UserLoginDTO"
 
 const Login: React.FC = () => {
   const {setUser} = useUser();
@@ -110,7 +111,7 @@ const Login: React.FC = () => {
             phone: signUpPhoneRef.current.value,
             email: signUpEmailRef.current.value,
             authority: 1,
-            contestId: null,
+            contestId: -1,
             createdAt: new Date().toISOString()
           };
 
@@ -148,12 +149,13 @@ const Login: React.FC = () => {
     if (signInIdRef.current && signInPasswordRef.current) {
       if (signInIdRef.current.value !== "" && signInPasswordRef.current.value !== "") {
         try {
-          const requestData = {
+          const requestData: UserLoginDTO = {
             userId: signInIdRef.current.value,
             userPw: signInPasswordRef.current.value
           }
           const response = await login(requestData);
-          setUser(response.data)
+          setUser(response.data.user)
+          sessionStorage.setItem('token', response.data.token);
           goToHome();
           window.location.reload()
         } catch (error) {
@@ -176,7 +178,7 @@ const Login: React.FC = () => {
       <div className={styles.loginBox} style={{ margin: "auto auto" }}>
         <div ref={signUpRef} className={styles.signUp} style={{ transform: isMovedLeft ? 'translateX(100%)' : 'translateX(0%)' }}>
           <h1>회원가입</h1>
-          <span className="error">{registerMessage}</span>
+          <span className="red">{registerMessage}</span>
           <div className="makeGroup">
             <input className="makeField" ref={signUpNameRef} type="text" placeholder="닉네임"></input>
           </div>
@@ -218,7 +220,7 @@ const Login: React.FC = () => {
 
         <div ref={signInRef} className={styles.signIn} style={{ transform: isMovedLeft ? 'translateX(100%)' : 'translateX(0%)' }}>
           <h1>로그인</h1>
-          <span className="error">{loginMessage}</span>
+          <span className="red">{loginMessage}</span>
           <div className="makeGroup">
             <input className="makeField" ref={signInIdRef} type="text" placeholder="아이디"></input>
           </div>
