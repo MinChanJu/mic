@@ -27,6 +27,7 @@ const ProblemView: React.FC = () => {
 
 
   useEffect(() => {
+    setError(false)
     async function loadProblem() {
       try {
         const response = await getProblemById(Number(problemId));
@@ -42,7 +43,7 @@ const ProblemView: React.FC = () => {
       }
     }
     loadProblem();
-  }, []);
+  }, [problemId]);
 
   if (error) return <ErrorPage />
   if (!problem) return <Loading width={60} border={6} />

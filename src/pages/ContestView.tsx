@@ -23,6 +23,7 @@ const ContestView: React.FC = () => {
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    setError(false)
     async function loadContest() {
       try {
         const response = await getContestById(Number(contestId));
@@ -53,7 +54,7 @@ const ContestView: React.FC = () => {
     }
     loadContest();
     loadProblems();
-  }, []);
+  }, [contestId]);
 
   if (error) return <ErrorPage />
   if (!contest) return <Loading width={60} border={6} />

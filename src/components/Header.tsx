@@ -60,9 +60,9 @@ const Header: React.FC = () => {
               <h2>문제</h2>
               <MathJaxContext config={mathJaxConfig}>
                 {problemList.slice(-5).map((problem) => (
-                  <div key={problem.id} onClick={() => { goToProblemId(problem.id!) }}>
+                  <div key={problem.id} onClick={() => { goToProblemId(problem.problemId!) }}>
                     <MathJax>
-                      {String(problem.id).padStart(3, '0')}. {problem.problemName}
+                      {String(problem.problemId).padStart(3, '0')}. {problem.problemName}
                     </MathJax>
                   </div>
                 ))}
