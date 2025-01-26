@@ -8,3 +8,5 @@ export type Contest = {
   endTime: string | null
   createdAt: string
 }
+
+export const InitContest: Contest = { id: null, userId: '', contestName: '', contestDescription: '', contestPw: null, startTime: null, endTime: null, createdAt: '' };

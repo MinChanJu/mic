@@ -21,10 +21,11 @@ const ContestView: React.FC = () => {
   const [contest, setContest] = useState<Contest>()
   const [problemList, setProblemList] = useState<ProblemListDTO[]>([])
   const [error, setError] = useState(false);
+  const [load, setLoad] = useState(false);
 
   useEffect(() => {
     setError(false)
-    async function loadContest() {
+    async function loadContestAndProblems() {
       try {
         const response = await getContestById(Number(contestId));
         setContest(response.data);
@@ -37,8 +38,6 @@ const ContestView: React.FC = () => {
         }
         setError(true);
       }
-    }
-    async function loadProblems() {
       try {
         const response = await getProblemListByContestIdWithUserId(Number(contestId), user.userId);
         setProblemList(response.data.sort((a, b) => a.id! - b.id!));
@@ -51,13 +50,16 @@ const ContestView: React.FC = () => {
         }
         setError(true);
       }
+      setLoad(true);
     }
-    loadContest();
-    loadProblems();
+
+    loadContestAndProblems();
   }, [contestId]);
 
   if (error) return <ErrorPage />
-  if (!contest) return <Loading width={60} border={6} />
+  if (!load) return <Loading width={60} border={6} marginTop={250} />
+  if (!contest) return <ErrorPage />
+
 
   if (contest.startTime != null && new Date(contest.startTime) >= new Date() && user.authority != 5 && user.userId !== contest.userId) return (<div>아직 아님</div>)
 
@@ -76,6 +78,23 @@ const ContestView: React.FC = () => {
     }
   };
 
+  const scoreBoard = () => {
+    const now = new Date();
+    if (contest.startTime == null) return <></>
+    if (contest.endTime == null) return <></>
+
+    const event = new Date(contest.startTime);
+    const finish = new Date(contest.endTime);
+
+    if (now < event || finish <= now) return <></>
+
+    return (
+      <div className="flexRow">
+        <span onClick={() => { goToContestScoreBoard(contest.id!) }} className="button" style={{ marginTop: "10px" }}>스코어보드</span>
+      </div>
+    )
+  }
+
   return (
     <div className='list' style={{ maxWidth: "600px" }}>
       <div className="description text40">{contest.contestName}</div>
@@ -88,22 +107,7 @@ const ContestView: React.FC = () => {
           <span className="button" onClick={() => { deleteContest(contest.id!) }}>삭제</span>
         </div>
       }
-      {(() => {
-        const now = new Date();
-        if (contest.startTime == null) return <></>
-        if (contest.endTime == null) return <></>
-
-        const event = new Date(contest.startTime);
-        const finish = new Date(contest.endTime);
-
-        if (now < event || finish <= now) return <></>
-
-        return (
-          <div className="flexRow">
-            <span onClick={() => { goToContestScoreBoard(contest.id!) }} className="button" style={{ marginTop: "10px" }}>스코어보드</span>
-          </div>
-        )
-      })()}
+      {scoreBoard()}
       <MathJaxContext config={mathJaxConfig}>
         <Table
           columnName={["번호", "문제 제목", "해결"]}

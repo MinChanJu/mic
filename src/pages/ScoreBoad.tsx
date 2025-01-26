@@ -76,7 +76,7 @@ const ScoreBoard: React.FC = () => {
   }, []);
 
   if (error) return <ErrorPage />
-  if (!contest) return <Loading width={60} border={6} />
+  if (!contest) return <Loading width={60} border={6} marginTop={250} />
 
   const formatScoreBoard = {
     name: (value: string, row: number, col: number) => {

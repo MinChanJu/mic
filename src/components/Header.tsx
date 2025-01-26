@@ -9,12 +9,16 @@ import logo from "../assets/images/logo.png"
 import useNavigation from "../hooks/useNavigation"
 import styles from "../assets/css/Header.module.css"
 import { ProblemListDTO } from "../types/dto/ProblemListDTO"
+import Loading from "./Loading"
+import ErrorPage from "./ErrorPage"
 
 const Header: React.FC = () => {
   const { user, logout } = useUser()
   const { goToContest, goToContestId, goToHome, goToLogin, goToProblem, goToProblemId, goToSetting, goToUserId } = useNavigation()
   const [contests, setContests] = useState<Contest[]>([])
   const [problemList, setProblemList] = useState<ProblemListDTO[]>([])
+  const [error, setError] = useState(false);
+  const [load, setLoad] = useState(false);
 
   useEffect(() => {
     async function loadContestsAndProblems() {
@@ -29,15 +33,42 @@ const Header: React.FC = () => {
         } else {
           console.error("알 수 없는 에러:", error);
         }
+        setError(true);
       }
+      setLoad(true);
     }
     loadContestsAndProblems();
   }, []);
 
+  const description = () => {
+    return (
+      <>
+        {user.contestId == -1 && <div className={styles.selectMenuDescription}>
+          <h2>문제</h2>
+          <MathJaxContext config={mathJaxConfig}>
+            {problemList.slice(-5).map((problem) => (
+              <div key={problem.id} onClick={() => { goToProblemId(problem.problemId!) }}>
+                <MathJax>
+                  {String(problem.problemId).padStart(3, '0')}. {problem.problemName}
+                </MathJax>
+              </div>
+            ))}
+          </MathJaxContext>
+        </div>}
+        <div className={styles.selectMenuDescription}>
+          <h2>대회</h2>
+          {contests.slice(0, 5).map((contest) => (
+            <div key={contest.id} onClick={() => { goToContestId(contest.id!) }}>{contest.contestName}</div>
+          ))}
+        </div>
+      </>
+    )
+  }
+
   return (
     <header>
       <div className={styles.logo} onClick={() => { goToHome(); window.location.reload(); }}>
-        <img style={{width: "100px"}} src={logo} alt="" />
+        <img style={{ width: "100px" }} src={logo} alt="" />
         <span className={styles.logoTitle}>
           <div>Mathematics</div>
           <div>in Coding</div>
@@ -56,24 +87,9 @@ const Header: React.FC = () => {
           {user.contestId == -1 && <div className={styles.selectMenu} onClick={goToProblem}>문제</div>}
           <div className={styles.selectMenu} onClick={goToContest}>대회</div>
           <div className={styles.description}>
-            {user.contestId == -1 && <div className={styles.selectMenuDescription}>
-              <h2>문제</h2>
-              <MathJaxContext config={mathJaxConfig}>
-                {problemList.slice(-5).map((problem) => (
-                  <div key={problem.id} onClick={() => { goToProblemId(problem.problemId!) }}>
-                    <MathJax>
-                      {String(problem.problemId).padStart(3, '0')}. {problem.problemName}
-                    </MathJax>
-                  </div>
-                ))}
-              </MathJaxContext>
-            </div>}
-            <div className={styles.selectMenuDescription}>
-              <h2>대회</h2>
-              {contests.slice(0, 5).map((contest) => (
-                <div key={contest.id} onClick={() => { goToContestId(contest.id!) }}>{contest.contestName}</div>
-              ))}
-            </div>
+            {!load && <Loading width={30} marginTop={50} marginBottom={50} />}
+            {load && !error && description()}
+            {load && error && <ErrorPage message="" subMessage="서버 에러" marginTop={50} marginBottom={50} />}
           </div>
         </div>
       </div>

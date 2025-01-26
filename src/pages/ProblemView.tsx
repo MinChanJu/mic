@@ -24,6 +24,7 @@ const ProblemView: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [code, setCode] = useState<string>("");
   const [error, setError] = useState(false);
+  const [load, setLoad] = useState(false);
 
 
   useEffect(() => {
@@ -41,12 +42,14 @@ const ProblemView: React.FC = () => {
         }
         setError(true);
       }
+      setLoad(true);
     }
     loadProblem();
   }, [problemId]);
 
   if (error) return <ErrorPage />
-  if (!problem) return <Loading width={60} border={6} />
+  if (!load) return <Loading width={60} border={6} marginTop={250} />
+  if (!problem) return <ErrorPage />
 
   const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setLang(event.target.value);

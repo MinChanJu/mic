@@ -6,11 +6,15 @@ import { formatFunctions } from '../utils/formatter'
 import { ContestListDTO } from '../types/dto/ContestListDTO'
 import useNavigation from '../hooks/useNavigation'
 import Table from '../components/Table'
+import ErrorPage from '../components/ErrorPage'
+import Loading from '../components/Loading'
 
 const ContestList: React.FC = () => {
   const { user } = useUser();
   const [contestList, setContestList] = useState<ContestListDTO[]>([]);
   const { goToContestId, goToContestMake } = useNavigation()
+  const [error, setError] = useState(false);
+  const [load, setLoad] = useState(false);
 
   useEffect(() => {
     async function loadProblems() {
@@ -38,10 +42,15 @@ const ContestList: React.FC = () => {
         } else {
           console.error("알 수 없는 에러:", error);
         }
+        setError(true);
       }
+      setLoad(true)
     }
     loadProblems();
   }, []);
+
+  if (error) return <ErrorPage />
+  if (!load) return <Loading width={60} border={6} marginTop={250} />
 
   const check = (item: ContestListDTO, click: boolean): string => {
     if (click) {
@@ -93,6 +102,7 @@ const ContestList: React.FC = () => {
         dataFunc={formatFunctions}
         onClick={(item) => { check(item, true); }}
         rowClass={(item) => { return check(item, false); }} />
+      {contestList.length === 0 && <div>대회가 존재하지 않습니다.</div>}
     </div>
   );
 }

@@ -1,35 +1,22 @@
-import React, { useRef, useState } from "react"
+import React, { useState } from "react"
 import { useParams } from "react-router-dom"
 import { AxiosError } from "axios"
 import { createProblem } from "../api/problem"
 import { useUser } from "../context/UserContext"
 import { autoResize } from "../utils/resize"
-import { Problem } from "../types/entity/Problem"
+import { InitProblem, Problem } from "../types/entity/Problem"
 import { ProblemDTO } from "../types/dto/ProblemDTO"
 import { Example, InitExample } from "../types/entity/Example"
 import useNavigation from "../hooks/useNavigation"
 
 const ProblemMake: React.FC = () => {
-  const {user} = useUser()
+  const { user } = useUser()
   const { goToHome } = useNavigation()
   const { contestId } = useParams();
   const [makeMessage, setMakeMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [examples, setExamples] = useState<Example[]>([]);
-  const problemNameRef = useRef<HTMLInputElement>(null);
-  const problemDescriptionRef = useRef<HTMLTextAreaElement>(null);
-  const problemInputDescriptionRef = useRef<HTMLTextAreaElement>(null);
-  const problemOutputDescriptionRef = useRef<HTMLTextAreaElement>(null);
-  const problemExampleInputRef = useRef<HTMLTextAreaElement>(null);
-  const problemExampleOutputRef = useRef<HTMLTextAreaElement>(null);
-  const refs = [
-    problemNameRef,
-    problemDescriptionRef,
-    problemInputDescriptionRef,
-    problemOutputDescriptionRef,
-    problemExampleInputRef,
-    problemExampleOutputRef
-  ];
+  const [problem, setProblem] = useState<Problem>(InitProblem);
 
   const addExample = () => {
     setExamples((prev) => [...prev, InitExample]);
@@ -50,64 +37,48 @@ const ProblemMake: React.FC = () => {
   const handleSubmit = async (cont: number) => {
     setIsLoading(true)
     setMakeMessage("")
-    if (problemNameRef.current &&
-      problemDescriptionRef.current &&
-      problemInputDescriptionRef.current &&
-      problemOutputDescriptionRef.current &&
-      problemExampleInputRef.current &&
-      problemExampleOutputRef.current) {
-      if (problemNameRef.current.value !== "" &&
-        problemDescriptionRef.current.value !== "" &&
-        problemInputDescriptionRef.current.value !== "" &&
-        problemOutputDescriptionRef.current.value !== "") {
+    if (problem.problemName !== "" &&
+      problem.problemDescription !== "" &&
+      problem.problemInputDescription !== "" &&
+      problem.problemOutputDescription !== "") {
 
-        const exampleData: Example[] = examples.map((example) => ({
-          id: null,
-          problemId: -1,
-          userId: user.userId,
-          exampleInput: example.exampleInput,
-          exampleOutput: example.exampleOutput,
-          createdAt: new Date().toISOString()
-        }));
+      const exampleData: Example[] = examples.map((example) => ({
+        id: null,
+        problemId: -1,
+        userId: user.userId,
+        exampleInput: example.exampleInput,
+        exampleOutput: example.exampleOutput,
+        createdAt: new Date().toISOString()
+      }));
 
-        const problemData: Problem = {
-          id: null,
-          contestId: Number(contestId),
-          userId: user.userId,
-          problemName: problemNameRef.current.value,
-          problemDescription: problemDescriptionRef.current.value,
-          problemInputDescription: problemInputDescriptionRef.current.value,
-          problemOutputDescription: problemOutputDescriptionRef.current.value,
-          problemExampleInput: problemExampleInputRef.current.value,
-          problemExampleOutput: problemExampleOutputRef.current.value,
-          createdAt: new Date().toISOString()
-        };
+      problem.contestId = Number(contestId)
+      problem.userId = user.userId
+      problem.createdAt = new Date().toISOString()
 
-        const requestData: ProblemDTO = {
-          problem: problemData,
-          examples: exampleData
-        };
+      const requestData: ProblemDTO = {
+        problem: problem,
+        examples: exampleData
+      };
 
-        try {
-          await createProblem(requestData)
-          if (cont === 1) {
-            setExamples([])
-            refs.forEach(ref => {if (ref.current) ref.current.value = "";});
-          } else {
-            goToHome()
-            window.location.reload()
-          }
-        } catch (error) {
-          if (error instanceof AxiosError) {
-            if (error.response) setMakeMessage("응답 에러: " + error.response.data.message);
-            else console.error("서버 에러: ", error)
-          } else {
-            console.error("알 수 없는 에러:", error);
-          }
+      try {
+        await createProblem(requestData)
+        if (cont === 1) {
+          setExamples([])
+          setProblem(InitProblem)
+        } else {
+          goToHome()
+          window.location.reload()
         }
-      } else {
-        setMakeMessage("설명을 채워 넣어주세요")
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          if (error.response) setMakeMessage("응답 에러: " + error.response.data.message);
+          else console.error("서버 에러: ", error)
+        } else {
+          console.error("알 수 없는 에러:", error);
+        }
       }
+    } else {
+      setMakeMessage("설명을 채워 넣어주세요")
     }
     setIsLoading(false)
   };
@@ -126,28 +97,28 @@ const ProblemMake: React.FC = () => {
           {Number(contestId) !== -1 && <div>Contest Id: {Number(contestId)}</div>}
           <div className="makeGroup">
             <div className="makeTitle">문제 제목</div>
-            <input className="makeField" ref={problemNameRef} type="text" />
+            <input className="makeField" value={problem.problemName} onChange={(e) => setProblem({ ...problem, "problemName": e.target.value || "" })} type="text" />
           </div>
           <div className="makeGroup">
             <div className="makeTitle">문제 설명</div>
-            <textarea className="makeField" ref={problemDescriptionRef} style={{ minHeight: '100px' }} onInput={autoResize} />
+            <textarea className="makeField" value={problem.problemDescription} onChange={(e) => setProblem({ ...problem, "problemDescription": e.target.value || "" })} style={{ minHeight: '100px' }} onInput={autoResize} />
           </div>
           <div className="makeGroup">
             <div className="makeTitle">입력에 대한 설명</div>
-            <textarea className="makeField" ref={problemInputDescriptionRef} style={{ minHeight: '100px' }} onInput={autoResize} />
+            <textarea className="makeField" value={problem.problemInputDescription} onChange={(e) => setProblem({ ...problem, "problemInputDescription": e.target.value || "" })} style={{ minHeight: '100px' }} onInput={autoResize} />
           </div>
           <div className="makeGroup">
             <div className="makeTitle">출력에 대한 설명</div>
-            <textarea className="makeField" ref={problemOutputDescriptionRef} style={{ minHeight: '100px' }} onInput={autoResize} />
+            <textarea className="makeField" value={problem.problemOutputDescription} onChange={(e) => setProblem({ ...problem, "problemOutputDescription": e.target.value || "" })} style={{ minHeight: '100px' }} onInput={autoResize} />
           </div>
           <div className="doubleMakeGroup">
             <div className="makeGroup">
               <div className="makeTitle">입력 예제</div>
-              <textarea className="makeField" ref={problemExampleInputRef} style={{ minHeight: '100px' }} onInput={autoResize} />
+              <textarea className="makeField" value={problem.problemExampleInput} onChange={(e) => setProblem({ ...problem, "problemExampleInput": e.target.value || "" })} style={{ minHeight: '100px' }} onInput={autoResize} />
             </div>
             <div className="makeGroup">
               <div className="makeTitle">출력 예제</div>
-              <textarea className="makeField" ref={problemExampleOutputRef} style={{ minHeight: '100px' }} onInput={autoResize} />
+              <textarea className="makeField" value={problem.problemExampleOutput} onChange={(e) => setProblem({ ...problem, "problemExampleOutput": e.target.value || "" })} style={{ minHeight: '100px' }} onInput={autoResize} />
             </div>
           </div>
           {examples.map((example, index) => (
@@ -155,8 +126,8 @@ const ProblemMake: React.FC = () => {
               <div className="makeGroup">
                 <div className="makeTitle">입력 예제 {index + 1}</div>
                 <textarea className="makeField" value={example.exampleInput}
-                onChange={(e) => handleExampleChange(index, "exampleInput", e.target.value)}
-                style={{ minHeight: '100px' }} onInput={autoResize} />
+                  onChange={(e) => handleExampleChange(index, "exampleInput", e.target.value)}
+                  style={{ minHeight: '100px' }} onInput={autoResize} />
               </div>
               <div className="makeGroup">
                 <div className="makeTitle" style={{ display: "flex", justifyContent: "space-between" }}>
@@ -164,8 +135,8 @@ const ProblemMake: React.FC = () => {
                   <span style={{ cursor: "pointer" }} onClick={() => { deleteExample(index) }}>예제 삭제</span>
                 </div>
                 <textarea className="makeField" value={example.exampleOutput}
-                onChange={(e) => handleExampleChange(index, "exampleOutput", e.target.value)}
-                style={{ minHeight: '100px' }} onInput={autoResize} />
+                  onChange={(e) => handleExampleChange(index, "exampleOutput", e.target.value)}
+                  style={{ minHeight: '100px' }} onInput={autoResize} />
               </div>
             </div>
           ))}

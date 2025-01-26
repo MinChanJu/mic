@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { AxiosError } from "axios"
 import { getProblemById, updateProblem } from "../api/problem"
@@ -18,12 +18,6 @@ const EditProblem: React.FC = () => {
   const [editMessage, setEditMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [examples, setExamples] = useState<Example[]>([]);
-  const problemNameRef = useRef<HTMLInputElement>(null);
-  const problemDescriptionRef = useRef<HTMLTextAreaElement>(null);
-  const problemInputDescriptionRef = useRef<HTMLTextAreaElement>(null);
-  const problemOutputDescriptionRef = useRef<HTMLTextAreaElement>(null);
-  const problemExampleInputRef = useRef<HTMLTextAreaElement>(null);
-  const problemExampleOutputRef = useRef<HTMLTextAreaElement>(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
@@ -93,60 +87,40 @@ const EditProblem: React.FC = () => {
   const handleSubmit = async () => {
     setIsLoading(true)
     setEditMessage("")
-    if (problemNameRef.current &&
-      problemDescriptionRef.current &&
-      problemInputDescriptionRef.current &&
-      problemOutputDescriptionRef.current &&
-      problemExampleInputRef.current &&
-      problemExampleOutputRef.current) {
-      if (problemNameRef.current.value !== "" &&
-        problemDescriptionRef.current.value !== "" &&
-        problemInputDescriptionRef.current.value !== "" &&
-        problemOutputDescriptionRef.current.value !== "") {
+    if (problem.problemName !== "" &&
+      problem.problemDescription !== "" &&
+      problem.problemInputDescription !== "" &&
+      problem.problemOutputDescription !== "") {
 
-        const exampleData: Example[] = examples.map((example) => ({
-          id: example.id,
-          problemId: problem.id!,
-          userId: problem.userId,
-          exampleInput: example.exampleInput,
-          exampleOutput: example.exampleOutput,
-          createdAt: example.createdAt
-        }));
+      const exampleData: Example[] = examples.map((example) => ({
+        id: example.id,
+        problemId: problem.id!,
+        userId: problem.userId,
+        exampleInput: example.exampleInput,
+        exampleOutput: example.exampleOutput,
+        createdAt: example.createdAt
+      }));
 
-        const problemData: Problem = {
-          id: problem.id,
-          contestId: problem.contestId,
-          userId: problem.userId,
-          problemName: problemNameRef.current.value,
-          problemDescription: problemDescriptionRef.current.value,
-          problemInputDescription: problemInputDescriptionRef.current.value,
-          problemOutputDescription: problemOutputDescriptionRef.current.value,
-          problemExampleInput: problemExampleInputRef.current.value,
-          problemExampleOutput: problemExampleOutputRef.current.value,
-          createdAt: problem.createdAt
-        };
+      const requestData: ProblemDTO = {
+        problem: problem,
+        examples: exampleData
+      };
 
-        const requestData: ProblemDTO = {
-          problem: problemData,
-          examples: exampleData
-        };
+      try {
+        const response = await updateProblem(requestData);
 
-        try {
-          const response = await updateProblem(requestData);
-
-          goToProblemId(response.data.id!)
-          window.location.reload()
-        } catch (error) {
-          if (error instanceof AxiosError) {
-            if (error.response) setEditMessage("응답 에러: " + error.response.data.message);
-            else console.error("서버 에러: ", error)
-          } else {
-            console.error("알 수 없는 에러:", error);
-          }
+        goToProblemId(response.data.id!)
+        window.location.reload()
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          if (error.response) setEditMessage("응답 에러: " + error.response.data.message);
+          else console.error("서버 에러: ", error)
+        } else {
+          console.error("알 수 없는 에러:", error);
         }
-      } else {
-        setEditMessage("설명을 채워 넣어주세요")
       }
+    } else {
+      setEditMessage("설명을 채워 넣어주세요")
     }
     setIsLoading(false)
   }
@@ -159,28 +133,28 @@ const EditProblem: React.FC = () => {
         {problem.contestId !== -1 && <div>Contest Id: {problem.contestId} Contest Name: {problem.contestId}</div>}
         <div className="makeGroup">
           <div className="makeTitle">문제 제목</div>
-          <input className="makeField" ref={problemNameRef} defaultValue={problem.problemName} type="text" />
+          <input className="makeField" value={problem.problemName} onChange={(e) => setProblem({ ...problem, "problemName": e.target.value || "" })} type="text" />
         </div>
         <div className="makeGroup">
           <div className="makeTitle">문제 설명</div>
-          <textarea className="makeField" ref={problemDescriptionRef} defaultValue={problem.problemDescription} style={{ minHeight: '100px' }} onInput={autoResize} />
+          <textarea className="makeField" value={problem.problemDescription} onChange={(e) => setProblem({ ...problem, "problemDescription": e.target.value || "" })} style={{ minHeight: '100px' }} onInput={autoResize} />
         </div>
         <div className="makeGroup">
           <div className="makeTitle">입력에 대한 설명</div>
-          <textarea className="makeField" ref={problemInputDescriptionRef} defaultValue={problem.problemInputDescription} style={{ minHeight: '100px' }} onInput={autoResize} />
+          <textarea className="makeField" value={problem.problemInputDescription} onChange={(e) => setProblem({ ...problem, "problemInputDescription": e.target.value || "" })} style={{ minHeight: '100px' }} onInput={autoResize} />
         </div>
         <div className="makeGroup">
           <div className="makeTitle">출력에 대한 설명</div>
-          <textarea className="makeField" ref={problemOutputDescriptionRef} defaultValue={problem.problemOutputDescription} style={{ minHeight: '100px' }} onInput={autoResize} />
+          <textarea className="makeField" value={problem.problemOutputDescription} onChange={(e) => setProblem({ ...problem, "problemOutputDescription": e.target.value || "" })} style={{ minHeight: '100px' }} onInput={autoResize} />
         </div>
         <div className="doubleMakeGroup">
           <div className="makeGroup">
             <div className="makeTitle">입력 예제</div>
-            <textarea className="makeField" ref={problemExampleInputRef} defaultValue={problem.problemExampleInput} style={{ minHeight: '100px' }} onInput={autoResize} />
+            <textarea className="makeField" value={problem.problemExampleInput} onChange={(e) => setProblem({ ...problem, "problemExampleInput": e.target.value || "" })} style={{ minHeight: '100px' }} onInput={autoResize} />
           </div>
           <div className="makeGroup">
             <div className="makeTitle">출력 예제</div>
-            <textarea className="makeField" ref={problemExampleOutputRef} defaultValue={problem.problemExampleOutput} style={{ minHeight: '100px' }} onInput={autoResize} />
+            <textarea className="makeField" value={problem.problemExampleOutput} onChange={(e) => setProblem({ ...problem, "problemExampleOutput": e.target.value || "" })} style={{ minHeight: '100px' }} onInput={autoResize} />
           </div>
         </div>
         {examples.map((example, index) => (
