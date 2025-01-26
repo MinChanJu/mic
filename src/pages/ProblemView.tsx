@@ -188,7 +188,7 @@ const ProblemView: React.FC = () => {
         </div>
         <textarea className={styles.codeForm} value={code} onInput={handleInput} onKeyDown={insertKey} spellCheck={false} />
         <div className={styles.submitCode} onClick={submitCode}>
-          {isLoading ? <div className="loading"></div> : <div>제출</div>}
+          {isLoading ? <Loading />  : <div>제출</div>}
         </div></>}
     </div>
   )
