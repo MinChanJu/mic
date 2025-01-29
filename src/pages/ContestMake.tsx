@@ -6,6 +6,7 @@ import { Contest, InitContest } from "../types/entity/Contest"
 import useNavigation from "../hooks/useNavigation"
 import Loading from "../components/Loading"
 import { StringToTime } from "../utils/formatter"
+import { resultInterval } from "../utils/resultInterval"
 
 const ContestMake: React.FC = () => {
   const { user } = useUser()
@@ -24,10 +25,23 @@ const ContestMake: React.FC = () => {
         if (contest.contestName !== '') {
           if (contest.startTime !== null || contest.endTime === null) {
             contest.createdAt = new Date().toISOString()
+            let requestId = ''
 
             try {
               const response = await createContest(contest);
-              goToProblemMake(response.data.id!)
+              requestId = response.data;
+            } catch (error) {
+              if (error instanceof AxiosError) {
+                if (error.response) console.error("응답 에러: " + error.response.data.message);
+                else console.error("서버 에러: ", error)
+              } else {
+                console.error("알 수 없는 에러:", error);
+              }
+            }
+
+            try {
+              const response = await resultInterval<Contest>("contests", requestId, 500);
+              goToProblemMake(response.id!);
             } catch (error) {
               if (error instanceof AxiosError) {
                 if (error.response) setMakeMessage("응답 에러: " + error.response.data.message);
@@ -36,6 +50,7 @@ const ContestMake: React.FC = () => {
                 console.error("알 수 없는 에러:", error);
               }
             }
+
           } else {
             setMakeMessage("죵료 시간을 입력하려면 시작 시간을 입력해야합니다.")
           }

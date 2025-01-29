@@ -4,28 +4,30 @@ import { AxiosError } from "axios"
 import { getAllFilterContestsAndProblems } from "../api/myData"
 import { mathJaxConfig } from "../constants/mathJaxConfig"
 import { useUser } from "../context/UserContext"
-import { Contest } from "../types/entity/Contest"
 import logo from "../assets/images/logo.png"
 import useNavigation from "../hooks/useNavigation"
 import styles from "../assets/css/Header.module.css"
 import { ProblemListDTO } from "../types/dto/ProblemListDTO"
 import Loading from "./Loading"
 import ErrorPage from "./ErrorPage"
+import { ContestListDTO } from "../types/dto/ContestListDTO"
+import { resultInterval } from "../utils/resultInterval"
+import { ContestsAndProblemsDTO } from "../types/dto/ContestsAndProblemsDTO"
 
 const Header: React.FC = () => {
   const { user, logout } = useUser()
   const { goToContest, goToContestId, goToHome, goToLogin, goToProblem, goToProblemId, goToSetting, goToUserId } = useNavigation()
-  const [contests, setContests] = useState<Contest[]>([])
+  const [contestList, setContestList] = useState<ContestListDTO[]>([])
   const [problemList, setProblemList] = useState<ProblemListDTO[]>([])
   const [error, setError] = useState(false);
   const [load, setLoad] = useState(false);
 
   useEffect(() => {
     async function loadContestsAndProblems() {
+      let requestId = '';
       try {
         const response = await getAllFilterContestsAndProblems();
-        setContests(response.data.contests);
-        setProblemList(response.data.problems);
+        requestId = response.data;
       } catch (error) {
         if (error instanceof AxiosError) {
           if (error.response) console.error(error.response.data.message);
@@ -36,6 +38,11 @@ const Header: React.FC = () => {
         setError(true);
       }
       setLoad(true);
+
+      const response = await resultInterval<ContestsAndProblemsDTO>('data', requestId, 500, setError, setLoad);
+      setContestList(response.contests)
+      setProblemList(response.problems)
+
     }
     loadContestsAndProblems();
   }, []);
@@ -47,7 +54,7 @@ const Header: React.FC = () => {
           <h2>문제</h2>
           <MathJaxContext config={mathJaxConfig}>
             {problemList.slice(-5).map((problem) => (
-              <div key={problem.id} onClick={() => { goToProblemId(problem.problemId!) }}>
+              <div key={problem.id} onClick={() => { goToProblemId(problem.problemId) }}>
                 <MathJax>
                   {String(problem.problemId).padStart(3, '0')}. {problem.problemName}
                 </MathJax>
@@ -57,8 +64,8 @@ const Header: React.FC = () => {
         </div>}
         <div className={styles.selectMenuDescription}>
           <h2>대회</h2>
-          {contests.slice(0, 5).map((contest) => (
-            <div key={contest.id} onClick={() => { goToContestId(contest.id!) }}>{contest.contestName}</div>
+          {contestList.slice(0, 5).map((contest) => (
+            <div key={contest.id} onClick={() => { goToContestId(contest.contestId) }}>{contest.contestName}</div>
           ))}
         </div>
       </>

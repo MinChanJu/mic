@@ -1,51 +1,50 @@
 import axios from './axiosInstance';
 import { ApiResponse } from '../types/dto/ApiResponse';
-import { Problem } from '../types/entity/Problem';
 import { ProblemDTO } from '../types/dto/ProblemDTO';
-import { ProblemScoreDTO } from '../types/dto/ProblemScoreDTO';
-import { ProblemListDTO } from '../types/dto/ProblemListDTO';
 
-export const getProblemListWithUserId = async (userId: string): Promise<ApiResponse<ProblemListDTO[]>> => {
+const url = '/problems'
+
+export const getProblemListWithUserId = async (userId: string): Promise<ApiResponse<string>> => {   // ProblemListDTO[]
   let response;
-  if (userId === '') response = await axios.get(`/problems/all`);
-  else response = await axios.get(`/problems/all/${userId}`);
+  if (userId === '') response = await axios.get(`${url}/all`);
+  else response = await axios.get(`${url}/all/${userId}`);
 
   return response.data;
 };
 
-export const getProblemListByContestIdWithUserId = async (contestId: number, userId: string): Promise<ApiResponse<ProblemListDTO[]>> => {
+export const getProblemListByContestIdWithUserId = async (contestId: number, userId: string): Promise<ApiResponse<string>> => {   // ProblemListDTO[]
   let response;
-  if (userId === '') response = await axios.get(`/problems/contest/${contestId}`);
-  else response = await axios.get(`/problems/contest/${contestId}/${userId}`);
+  if (userId === '') response = await axios.get(`${url}/contest/${contestId}`);
+  else response = await axios.get(`${url}/contest/${contestId}/${userId}`);
   return response.data;
 };
 
-export const getProblemById = async (id: number): Promise<ApiResponse<Problem>> => {
-  const response = await axios.get(`/problems/${id}`);
+export const getProblemById = async (id: number): Promise<ApiResponse<string>> => {   // Problem
+  const response = await axios.get(`${url}/${id}`);
   return response.data;
 };
 
-export const getAllProblemsByUserId = async (userId: string): Promise<ApiResponse<Problem[]>> => {
-  const response = await axios.get(`/problems/user/${userId}`);
+export const getAllProblemsByUserId = async (userId: string): Promise<ApiResponse<string>> => {   // Problem[]
+  const response = await axios.get(`${url}/user/${userId}`);
   return response.data;
 };
 
-export const getAllSolveProblemsByUserId = async (userId: string): Promise<ApiResponse<ProblemScoreDTO[]>> => {
-  const response = await axios.get(`/problems/solve/${userId}`);
+export const getAllSolveProblemsByUserId = async (userId: string): Promise<ApiResponse<string>> => {    // ProblemScoreDTO[]
+  const response = await axios.get(`${url}/solve/${userId}`);
   return response.data;
 };
 
-export const createProblem = async (problemDTO: ProblemDTO): Promise<ApiResponse<Problem>> => {
-  const response = await axios.post('/problems/create', problemDTO);
+export const createProblem = async (problemDTO: ProblemDTO): Promise<ApiResponse<string>> => {    // Problem
+  const response = await axios.post(`${url}/create`, problemDTO);
   return response.data;
 };
 
-export const updateProblem = async (problemDTO: ProblemDTO): Promise<ApiResponse<Problem>> => {
-  const response = await axios.put('/problems/update', problemDTO);
+export const updateProblem = async (problemDTO: ProblemDTO): Promise<ApiResponse<string>> => {    // Problem
+  const response = await axios.put(`${url}/update`, problemDTO);
   return response.data;
 };
 
-export const deleteProblemById = async (id: number): Promise<ApiResponse<void>> => {
-  const response = await axios.delete(`/problems/${id}`);
+export const deleteProblemById = async (id: number): Promise<ApiResponse<string>> => {    // Void
+  const response = await axios.delete(`${url}/${id}`);
   return response.data;
 };

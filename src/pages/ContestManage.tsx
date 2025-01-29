@@ -6,6 +6,7 @@ import { AxiosError } from "axios";
 import Table from "../components/Table";
 import ErrorPage from "../components/ErrorPage";
 import Loading from "../components/Loading";
+import { resultInterval } from "../utils/resultInterval";
 
 const ContestManage = () => {
   const { contestId } = useParams();
@@ -17,10 +18,19 @@ const ContestManage = () => {
 
   useEffect(() => {
     async function fetchData() {
+      let requestId = '';
       try {
         const response = await getAllUsersByContestId(Number(contestId));
-        serPartcipants(response.data);
-        serSize(response.data.length);
+        requestId = response.data;
+      } catch (error) {
+        console.error("에러: ", error);
+        setError(true);
+      }
+
+      try {
+        const response = await resultInterval<User[]>("users", requestId, 500);
+        serPartcipants(response);
+        serSize(response.length);
       } catch (error) {
         if (error instanceof AxiosError) {
           if (error.response) console.error("응답 에러: ", error.response.data.message);
@@ -89,17 +99,12 @@ const ContestManage = () => {
 
       try {
         await register(requestData);
-
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) setMessage("응답 에러: " + error.response.data.message);
-          else console.error("서버 에러: ", error)
-        } else {
-          console.error("알 수 없는 에러:", error);
-        }
+        console.error("에러: ", error);
         console.log(requestData)
       }
     }
+
     setIsLoading(false)
     window.location.reload()
   }
@@ -114,12 +119,7 @@ const ContestManage = () => {
       try {
         await deleteUserById(participants[index].id);
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) console.error("응답 에러: ", error.response.data.message);
-          else console.error("서버 에러: ", error)
-        } else {
-          console.error("알 수 없는 에러:", error);
-        }
+        console.error("에러: ", error);
       }
     }
     serPartcipants((prev) => [...prev.slice(0, index), ...prev.slice(index + 1)]);

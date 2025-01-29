@@ -8,6 +8,7 @@ import { Contest } from "../types/entity/Contest"
 import useNavigation from "../hooks/useNavigation"
 import ErrorPage from "../components/ErrorPage"
 import Loading from "../components/Loading"
+import { resultInterval } from "../utils/resultInterval"
 
 
 const EditContest: React.FC = () => {
@@ -19,13 +20,14 @@ const EditContest: React.FC = () => {
   const [contest, setContest] = useState<Contest>();
   const [checkPassword, setCheckPassword] = useState<string | null>(null);
   const [error, setError] = useState(false);
+  const [load, setLoad] = useState(false);
 
   useEffect(() => {
     async function loadContest() {
+      let requestId = '';
       try {
         const response = await getContestById(Number(contestId));
-        setContest(response.data);
-        setCheckPassword(response.data.contestPw || "")
+        requestId = response.data;
       } catch (error) {
         if (error instanceof AxiosError) {
           if (error.response) console.error("응답 에러: ", error.response.data.message);
@@ -35,12 +37,15 @@ const EditContest: React.FC = () => {
         }
         setError(true)
       }
+
+      resultInterval("contests", requestId, 500, setError, setLoad, setContest);
     }
     loadContest();
   }, []);
 
   if (error) return <ErrorPage />
-  if (!contest) return <Loading width={60} border={6} />
+  if (load) return <Loading width={60} border={6} />
+  if (!contest) return <ErrorPage />
 
   const handleSubmit = async () => {
     setIsLoading(true)
@@ -50,9 +55,8 @@ const EditContest: React.FC = () => {
         if (contest.contestName !== '') {
           if (contest.startTime !== null || contest.endTime === null) {
             try {
-              const response = await updateContest(contest);
-              goToContestId(response.data.id!);
-              window.location.reload()
+              await updateContest(contest);
+              goToContestId(contest.id!);
             } catch (error) {
               if (error instanceof AxiosError) {
                 if (error.response) setEditMessage("응답 에러: " + error.response.data.message);
@@ -61,6 +65,7 @@ const EditContest: React.FC = () => {
                 console.error("알 수 없는 에러:", error);
               }
             }
+            
           } else {
             setEditMessage("죵료 시간을 입력하려면 시작 시간을 입력해야합니다.")
           }

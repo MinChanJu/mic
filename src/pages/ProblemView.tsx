@@ -13,6 +13,8 @@ import useNavigation from "../hooks/useNavigation"
 import styles from "../assets/css/ProblemView.module.css"
 import Loading from "../components/Loading"
 import ErrorPage from "../components/ErrorPage"
+import { resultInterval } from "../utils/resultInterval"
+import { CodeResultDTO } from "../types/dto/CodeResultDTO"
 
 const ProblemView: React.FC = () => {
   const { problemId } = useParams();
@@ -30,19 +32,16 @@ const ProblemView: React.FC = () => {
   useEffect(() => {
     setError(false)
     async function loadProblem() {
+      let requestId = '';
       try {
         const response = await getProblemById(Number(problemId));
-        setProblem(response.data);
+        requestId = response.data;
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) console.error("응답 에러: ", error.response.data.message);
-          else console.error("서버 에러: ", error)
-        } else {
-          console.error("알 수 없는 에러:", error);
-        }
+        console.error("에러: ", error);
         setError(true);
       }
-      setLoad(true);
+
+      resultInterval("problems", requestId, 500, setError, setLoad, setProblem);
     }
     loadProblem();
   }, [problemId]);
@@ -59,7 +58,6 @@ const ProblemView: React.FC = () => {
     try {
       await deleteProblemById(problemId);
       goToHome();
-      window.location.reload();
     } catch (error) {
       if (error instanceof AxiosError) {
         if (error.response) console.error("응답 에러: ", error.response.data.message);
@@ -81,10 +79,19 @@ const ProblemView: React.FC = () => {
         problemId: problem!.id!
       };
 
+      let requestId = '';
       try {
         const response = await runCode(requestData)
-        setMessage(response.data.result);
-        setSolves(response.data.solves);
+        requestId = response.data;
+        
+      } catch (error) {
+        console.error("에러:", error);
+      }
+
+      try {
+        const response = await resultInterval<CodeResultDTO>("data", requestId, 500);
+        setMessage(response.result);
+        setSolves(response.solves);
       } catch (error) {
         if (error instanceof AxiosError) {
           if (error.response) console.error("응답 예러: ", error.response.data.message);
@@ -172,8 +179,8 @@ const ProblemView: React.FC = () => {
           <div className={styles.problemDes}>{problem.problemExampleOutput}</div>
         </div>
       </div>
-      {user.id === -1 && <div className={styles.resultMessage}>코드를 제출하려면 로그인을 해주세요.</div>}
-      {user.id !== -1 && <><div className={styles.resultMessage}>{message}</div>
+      {user.id === null && <div className={styles.resultMessage}>코드를 제출하려면 로그인을 해주세요.</div>}
+      {user.id !== null && <><div className={styles.resultMessage}>{message}</div>
         <div className={styles.doubleDes}>
           <div className={styles.titleDes}>
             <div className="text20">코드</div>

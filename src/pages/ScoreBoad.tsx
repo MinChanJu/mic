@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { MathJax, MathJaxContext } from 'better-react-mathjax'
-import { AxiosError } from 'axios'
 import { getContestById } from '../api/contest'
 import { getProblemListByContestIdWithUserId } from '../api/problem'
 import { getScoreBoardByContestId } from '../api/myData'
@@ -13,6 +12,7 @@ import Table from '../components/Table'
 import { SubmitDTO } from '../types/dto/SubmitDTO'
 import ErrorPage from '../components/ErrorPage'
 import Loading from '../components/Loading'
+import { resultInterval } from '../utils/resultInterval'
 
 
 const ScoreBoard: React.FC = () => {
@@ -25,46 +25,40 @@ const ScoreBoard: React.FC = () => {
 
   useEffect(() => {
     async function loadContest() {
+      let requestId = '';
       try {
         const response = await getContestById(Number(contestId));
-        setContest(response.data);
+        requestId = response.data;
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) console.error("응답 에러: ", error.response.data.message);
-          else console.error("서버 에러: ", error)
-        } else {
-          console.error("알 수 없는 에러:", error);
-        }
+        console.error("에러: ", error);
         setError(true);
       }
+
+      resultInterval("contests", requestId, 500, setError, undefined, setContest);
     }
     async function loadProblems() {
+      let requestId = '';
       try {
         const response = await getProblemListByContestIdWithUserId(Number(contestId), '');
-        setProblemList(response.data);
+        requestId = response.data;
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) console.error("응답 에러: ", error.response.data.message);
-          else console.error("서버 에러: ", error)
-        } else {
-          console.error("알 수 없는 에러:", error);
-        }
+        console.error("에러: ", error);
         setError(true);
       }
+      
+      resultInterval("problems", requestId, 500, setError, undefined, setProblemList);
     }
     async function fetchData() {
+      let requestId = '';
       try {
         const response = await getScoreBoardByContestId(Number(contestId));
-        setContestScores(response.data);
+        requestId = response.data;
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) console.error("응답 에러: ", error.response.data.message);
-          else console.error("서버 에러: ", error)
-        } else {
-          console.error("알 수 없는 에러:", error);
-        }
+        console.error("에러: ", error);
         setError(true);
       }
+
+      resultInterval("data", requestId, 500, setError, undefined, setContestScores);
     }
     loadContest();
     loadProblems();

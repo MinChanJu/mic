@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
-import { AxiosError } from "axios"
 import { getUserByUserId } from "../api/user"
 import { UserDTO } from "../types/dto/UserDTO"
 import ErrorPage from "../components/ErrorPage"
 import Loading from "../components/Loading"
+import { resultInterval } from "../utils/resultInterval"
 
 const UserView: React.FC = () => {
   const { userId } = useParams();
@@ -16,18 +16,16 @@ const UserView: React.FC = () => {
 
   useEffect(() => {
     async function serverObject() {
+      let requestId = '';
       try {
         const response = await getUserByUserId(userId!)
-        setCurUser(response.data);
+        requestId = response.data;
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) console.error("응답 에러: ", error.response.data.message);
-          else console.error("서버 에러: ", error)
-        } else {
-          console.error("알 수 없는 에러:", error);
-        }
+        console.error("에러: ", error);
         setError(true);
       }
+
+      resultInterval("users", requestId, 500, setError, undefined, setCurUser);
     }
     serverObject();
   }, []);
@@ -39,7 +37,7 @@ const UserView: React.FC = () => {
   }, [curUser])
 
   if (error) return <ErrorPage />
-  if (!curUser) return <Loading width={60} border={6} />
+  if (!curUser) return <Loading width={60} border={6} marginTop={250} />
 
   return (
     <div className="list" style={{ maxWidth: "400px" }}>

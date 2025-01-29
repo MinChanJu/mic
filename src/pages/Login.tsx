@@ -7,6 +7,8 @@ import useNavigation from "../hooks/useNavigation"
 import styles from "../assets/css/Login.module.css"
 import { UserLoginDTO } from "../types/dto/UserLoginDTO"
 import Loading from "../components/Loading"
+import { resultInterval } from "../utils/resultInterval"
+import { UserResponseDTO } from "../types/dto/UserResponseDTO"
 
 const Login: React.FC = () => {
   const { setUser } = useUser();
@@ -86,8 +88,18 @@ const Login: React.FC = () => {
 
         console.log(signUp);
 
+        let requestId = '';
+
         try {
-          await register(signUp);
+          const response = await register(signUp);
+          requestId = response.data;
+        } catch (error) {
+          setregisterMessage("알 수 없는 에러")
+          console.error("알 수 없는 에러:", error);
+        }
+
+        try {
+          await resultInterval("users", requestId, 500);
           setregisterMessage("회원가입 성공!")
           handleButtonClick()
         } catch (error) {
@@ -118,12 +130,20 @@ const Login: React.FC = () => {
     setloginMessage('')
     setIsLoading(true)
     if (signIn.userId !== "" && signIn.userPw !== "") {
+      let requestId = '';
       try {
         const response = await login(signIn);
-        setUser(response.data.user)
-        sessionStorage.setItem('token', response.data.token);
+        requestId = response.data;
+      } catch (error) {
+        setloginMessage("알 수 없는 에러")
+        console.error("알 수 없는 에러:", error);
+      }
+
+      try {
+        const response = await resultInterval<UserResponseDTO>("users", requestId, 500);
+        setUser(response.user)
+        sessionStorage.setItem('token', response.token);
         goToHome();
-        window.location.reload()
       } catch (error) {
         if (error instanceof AxiosError) {
           if (error.response) {

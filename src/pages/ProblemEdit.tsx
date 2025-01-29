@@ -10,6 +10,7 @@ import { ProblemDTO } from "../types/dto/ProblemDTO"
 import useNavigation from "../hooks/useNavigation"
 import ErrorPage from "../components/ErrorPage"
 import Loading from "../components/Loading"
+import { resultInterval } from "../utils/resultInterval"
 
 const EditProblem: React.FC = () => {
   const { problemId } = useParams();
@@ -22,33 +23,32 @@ const EditProblem: React.FC = () => {
 
   useEffect(() => {
     async function loadProblem() {
+      let requestId = ''
       try {
         const response = await getProblemById(Number(problemId));
-        setProblem(response.data);
+        requestId = response.data;
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) console.error("응답 에러: ", error.response.data.message);
-          else console.error("서버 에러: ", error)
-        } else {
-          console.error("알 수 없는 에러:", error);
-        }
+        console.error("에러: ", error);
         setError(true)
       }
+
+      const response = await resultInterval<Problem>("problems", requestId, 500, setError);
+      setProblem(response);
     }
     async function loadExamples() {
+      let requestId = ''
       try {
         const response = await getAllExamplesByProblemId(Number(problemId));
-        setExamples(response.data);
+        requestId = response.data;
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) console.error("응답 에러: ", error.response.data.message);
-          else console.error("서버 에러: ", error)
-        } else {
-          console.error("알 수 없는 에러:", error);
-        }
+        console.error("알 수 없는 에러:", error);
         setError(true)
       }
+
+      const response = await resultInterval<Example[]>("problems", requestId, 500, setError);
+      setExamples(response);
     }
+
     loadProblem();
     loadExamples();
   }, []);
@@ -106,12 +106,21 @@ const EditProblem: React.FC = () => {
         examples: exampleData
       };
 
+      let requestId = '';
+
       try {
         const response = await updateProblem(requestData);
-
-        goToProblemId(response.data.id!)
-        window.location.reload()
+        requestId = response.data;
       } catch (error) {
+        setEditMessage("오류");
+        console.error("알 수 없는 에러:", error);
+      }
+
+      try {
+        const response = await resultInterval<Problem>("problems", requestId, 500)
+        goToProblemId(response.id!)
+      } catch (error) {
+        setEditMessage("오류");
         if (error instanceof AxiosError) {
           if (error.response) setEditMessage("응답 에러: " + error.response.data.message);
           else console.error("서버 에러: ", error)

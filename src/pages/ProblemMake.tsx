@@ -8,6 +8,7 @@ import { InitProblem, Problem } from "../types/entity/Problem"
 import { ProblemDTO } from "../types/dto/ProblemDTO"
 import { Example, InitExample } from "../types/entity/Example"
 import useNavigation from "../hooks/useNavigation"
+import { resultInterval } from "../utils/resultInterval"
 
 const ProblemMake: React.FC = () => {
   const { user } = useUser()
@@ -60,16 +61,26 @@ const ProblemMake: React.FC = () => {
         examples: exampleData
       };
 
+      let requestId = '';
+
       try {
-        await createProblem(requestData)
+        const response = await createProblem(requestData)
+        requestId = response.data;
+      } catch (error) {
+        setMakeMessage("오류");
+        console.error("에러: ", error);
+      }
+
+      try {
+        await resultInterval("problems", requestId, 500)
         if (cont === 1) {
           setExamples([])
           setProblem(InitProblem)
         } else {
           goToHome()
-          window.location.reload()
         }
       } catch (error) {
+        setMakeMessage("오류");
         if (error instanceof AxiosError) {
           if (error.response) setMakeMessage("응답 에러: " + error.response.data.message);
           else console.error("서버 에러: ", error)

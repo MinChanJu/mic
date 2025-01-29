@@ -36,7 +36,7 @@ const PageTitle = () => {
       { pattern: "/user/:userId", title: `사용자 ${param}`},
     ];
 
-    let title = titleMap[path] || "MiC";
+    let title = titleMap[path] || "오류";
 
     // 동적 경로 확인
     for (const route of dynamicRoutes) {

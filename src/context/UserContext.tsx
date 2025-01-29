@@ -1,8 +1,8 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { AxiosError } from 'axios';
 import { getAllSolvesByUserId } from '../api/solve';
 import { User, InitUser } from '../types/entity/User';
 import { Solve } from '../types/entity/Solve';
+import { resultInterval } from '../utils/resultInterval';
 
 interface UserContextProps {
   user: User;
@@ -25,17 +25,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     async function loadSolves() {
       if (user.name !== "") {
+        let requestId = ''
         try {
           const response = await getAllSolvesByUserId(user.userId);
-          setSolves(response.data);
+          requestId = response.data;
         } catch (error) {
-          if (error instanceof AxiosError) {
-            if (error.response) console.error(error.response);
-            else console.error("서버 에러: ", error)
-          } else {
-            console.error("알 수 없는 에러:", error);
-          }
+          console.error("에러: ", error);
         }
+        resultInterval("solves", requestId, 500, undefined, undefined, setSolves);
       }
     }
     loadSolves();
@@ -47,7 +44,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     sessionStorage.removeItem('token');
     setUser(InitUser);
     setSolves([])
-    window.location.reload();
+    if (window.location.pathname === "/setting") {
+      window.location.href = "/"; // 홈으로 이동
+    }
   };
 
   return (

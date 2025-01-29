@@ -8,17 +8,18 @@ import { mathJaxConfig } from "../constants/mathJaxConfig"
 import { useUser } from "../context/UserContext"
 import { formatFunctions } from "../utils/formatter"
 import { ProblemListDTO } from "../types/dto/ProblemListDTO"
-import { Contest } from "../types/entity/Contest"
 import useNavigation from "../hooks/useNavigation"
 import Table from "../components/Table"
 import ErrorPage from "../components/ErrorPage"
 import Loading from "../components/Loading"
+import { resultInterval } from "../utils/resultInterval"
+import { ContestListDTO } from "../types/dto/ContestListDTO"
 
 const ContestView: React.FC = () => {
   const { user } = useUser()
   const { goToContestEdit, goToProblemMake, goToProblemId, goToContestScoreBoard, goToContestManage, goToUserId, goToContest } = useNavigation();
   const { contestId } = useParams();
-  const [contest, setContest] = useState<Contest>()
+  const [contest, setContest] = useState<ContestListDTO>()
   const [problemList, setProblemList] = useState<ProblemListDTO[]>([])
   const [error, setError] = useState(false);
   const [load, setLoad] = useState(false);
@@ -26,31 +27,29 @@ const ContestView: React.FC = () => {
   useEffect(() => {
     setError(false)
     async function loadContestAndProblems() {
+      let requestId1 = ''
+      let requestId2 = ''
+
       try {
         const response = await getContestById(Number(contestId));
-        setContest(response.data);
+        requestId1 = response.data;
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) console.error("응답 에러: ", error.response.data.message);
-          else console.error("서버 에러: ", error)
-        } else {
-          console.error("알 수 없는 에러:", error);
-        }
+        console.error("에러: ", error);
         setError(true);
       }
+
       try {
         const response = await getProblemListByContestIdWithUserId(Number(contestId), user.userId);
-        setProblemList(response.data.sort((a, b) => a.id! - b.id!));
+        requestId2 = response.data;
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) console.error("응답 에러: ", error.response.data.message);
-          else console.error("서버 에러: ", error)
-        } else {
-          console.error("알 수 없는 에러:", error);
-        }
+        console.error("에러:", error);
         setError(true);
       }
-      setLoad(true);
+
+      const response1 = await resultInterval<ContestListDTO[]>("contests", requestId1, 500, setError);
+      const response2 = await resultInterval<ProblemListDTO[]>("problems", requestId2, 500, setError, setLoad);
+      setContest(response1.pop())
+      setProblemList(response2)
     }
 
     loadContestAndProblems();
@@ -67,7 +66,6 @@ const ContestView: React.FC = () => {
     try {
       await deleteContestById(contestId);
       goToContest();
-      window.location.reload();
     } catch (error) {
       if (error instanceof AxiosError) {
         if (error.response) console.error("응답 에러: ", error.response.data.message);

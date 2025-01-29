@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { MathJaxContext } from "better-react-mathjax"
 import { AxiosError } from "axios"
 import { getAllProblemsByUserId, getAllSolveProblemsByUserId } from "../api/problem"
-import { getAllContestsByUserId } from "../api/contest"
+import { getContestListByUserId } from "../api/contest"
 import { getAllUsers, updateUser } from "../api/user"
 import { mathJaxConfig } from "../constants/mathJaxConfig"
 import { useUser } from "../context/UserContext"
@@ -14,6 +14,7 @@ import { User } from "../types/entity/User"
 import useNavigation from "../hooks/useNavigation"
 import styles from "../assets/css/SettingView.module.css"
 import Table from "../components/Table"
+import { resultInterval } from "../utils/resultInterval"
 
 
 const SettingView: React.FC = () => {
@@ -160,17 +161,15 @@ const SolvePage: React.FC = () => {
 
   useEffect(() => {
     async function loadProblemScores() {
+      let requestId = ''
       try {
         const response = await getAllSolveProblemsByUserId(user.userId);
-        setProblemScores(response.data);
+        requestId = response.data;
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) console.error("응답 에러: ", error.response.data.message);
-          else console.error("서버 에러: ", error)
-        } else {
-          console.error("알 수 없는 에러:", error);
-        }
+        console.error("에러: ", error);
       }
+
+      resultInterval("problems", requestId, 500, undefined, undefined, setProblemScores);
     }
     loadProblemScores();
   }, []);
@@ -195,17 +194,15 @@ const MakePro: React.FC = () => {
 
   useEffect(() => {
     async function fetchData() {
+      let requestId = ''
       try {
         const response = await getAllProblemsByUserId(user.userId);
-        setProblems(response.data);
+        requestId = response.data;
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) console.error("응답 에러: ", error.response.data.message);
-          else console.error("서버 에러: ", error)
-        } else {
-          console.error("알 수 없는 에러:", error);
-        }
+        console.error("에러: ", error);
       }
+
+      resultInterval("problems", requestId, 500, undefined, undefined, setProblems);
     }
     fetchData()
   }, [])
@@ -231,17 +228,15 @@ const MakeCon: React.FC = () => {
 
   useEffect(() => {
     async function fetchData() {
+      let requestId = ''
       try {
-        const response = await getAllContestsByUserId(user.userId);
-        setContests(response.data);
+        const response = await getContestListByUserId(user.userId);
+        requestId = response.data;
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) console.error("응답 에러: ", error.response.data.message);
-          else console.error("서버 에러: ", error)
-        } else {
-          console.error("알 수 없는 에러:", error);
-        }
+        console.error("에러: ", error);
       }
+
+      resultInterval("contests", requestId, 500, undefined, undefined, setContests);
     }
     fetchData()
   }, [])
@@ -296,12 +291,19 @@ const UserManage: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (user.authority === 5) {
+        let requestId = ''
         try {
           const response = await getAllUsers();
+          requestId = response.data;
+        } catch (error) {
+          console.error("에러: ", error);
+        }
 
-          setUsers(response.data);
-          setAuthoritys(response.data.map((user) => user.authority));
-          setEnters(response.data.map((user) => {
+        try {
+          const response = await resultInterval<User[]>("users", requestId, 500);
+          setUsers(response);
+          setAuthoritys(response.map((user) => user.authority));
+          setEnters(response.map((user) => {
             if (user.contestId) return user.contestId
             return -1;
           }));

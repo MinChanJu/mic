@@ -8,6 +8,7 @@ import useNavigation from '../hooks/useNavigation'
 import Table from '../components/Table'
 import ErrorPage from '../components/ErrorPage'
 import Loading from '../components/Loading'
+import { resultInterval } from '../utils/resultInterval'
 
 const ContestList: React.FC = () => {
   const { user } = useUser();
@@ -18,22 +19,24 @@ const ContestList: React.FC = () => {
 
   useEffect(() => {
     async function loadProblems() {
+      let requestId = '';
       try {
         if (user.contestId === -1) {
           const response = await getContestList();
-          setContestList(response.data);
+          requestId = response.data;
         } else {
           const response = await getContestById(user.contestId);
-          const contest = response.data;
-          const data: ContestListDTO = {
-            id: 1,
-            contestId: contest.id!,
-            contestName: contest.contestName,
-            userId: contest.userId,
-            startTime: contest.startTime,
-            endTime: contest.endTime,
-          }
-          setContestList([data])
+          requestId = response.data;
+          // const contest = response.data;
+          // const data: ContestListDTO = {
+          //   id: 1,
+          //   contestId: contest.id!,
+          //   contestName: contest.contestName,
+          //   userId: contest.userId,
+          //   startTime: contest.startTime,
+          //   endTime: contest.endTime,
+          // }
+          // setContestList([data])
         }
       } catch (error) {
         if (error instanceof AxiosError) {
@@ -44,7 +47,8 @@ const ContestList: React.FC = () => {
         }
         setError(true);
       }
-      setLoad(true)
+
+      resultInterval('contests', requestId, 500, setError, setLoad, setContestList)
     }
     loadProblems();
   }, []);

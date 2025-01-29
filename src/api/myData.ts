@@ -1,21 +1,20 @@
 import axios from './axiosInstance';
 import { ApiResponse } from "../types/dto/ApiResponse";
-import { ContestsAndProblemsDTO } from '../types/dto/ContestsAndProblemsDTO';
-import { ContestScoreDTO } from '../types/dto/ContestScoreDTO';
 import { CodeDTO } from '../types/dto/CodeDTO';
-import { CodeResultDTO } from '../types/dto/CodeResultDTO';
 
-export const getAllFilterContestsAndProblems = async (): Promise<ApiResponse<ContestsAndProblemsDTO>> => {
-  const response = await axios.get('/data/filter');
+const url = '/data'
+
+export const getAllFilterContestsAndProblems = async (): Promise<ApiResponse<string>> => {    // ContestsAndProblemsDTO
+  const response = await axios.get(`${url}/filter`);
   return response.data;
 };
 
-export const getScoreBoardByContestId = async (contestId: number): Promise<ApiResponse<ContestScoreDTO[]>> => {
-  const response = await axios.get(`/data/${contestId}`);
+export const getScoreBoardByContestId = async (contestId: number): Promise<ApiResponse<string>> => {    // ContestScoreDTO[]
+  const response = await axios.get(`${url}/${contestId}`);
   return response.data;
 };
 
-export const runCode = async (codeDTO: CodeDTO): Promise<ApiResponse<CodeResultDTO>> => {
-  const response = await axios.post('/data/code', codeDTO);
+export const runCode = async (codeDTO: CodeDTO): Promise<ApiResponse<string>> => {    // CodeResultDTO
+  const response = await axios.post(`${url}/code`, codeDTO);
   return response.data;
 };

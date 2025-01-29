@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { MathJaxContext } from 'better-react-mathjax'
-import { AxiosError } from 'axios'
 import { getProblemListWithUserId } from '../api/problem'
 import { mathJaxConfig } from '../constants/mathJaxConfig'
 import { useUser } from '../context/UserContext'
@@ -10,6 +9,7 @@ import useNavigation from '../hooks/useNavigation'
 import Table from '../components/Table'
 import Loading from '../components/Loading'
 import ErrorPage from '../components/ErrorPage'
+import { resultInterval } from '../utils/resultInterval'
 
 const ProblemList: React.FC = () => {
   const { user } = useUser()
@@ -20,19 +20,16 @@ const ProblemList: React.FC = () => {
 
   useEffect(() => {
     async function loadProblems() {
+      let requestId = ''
       try {
         const response = await getProblemListWithUserId(user.userId);
-        setProblemList(response.data);
+        requestId = response.data;
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) console.error("응답 에러: ", error.response.data.message);
-          else console.error("서버 에러: ", error)
-        } else {
-          console.error("알 수 없는 에러:", error);
-        }
+        console.error("에러: ", error);
         setError(true);
       }
-      setLoad(true);
+
+      resultInterval<ProblemListDTO[]>("problems", requestId, 500, setError, setLoad, setProblemList)
     }
     loadProblems();
   }, []);

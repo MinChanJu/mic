@@ -1,7 +1,7 @@
-import { Contest } from "../entity/Contest"
+import { ContestListDTO } from "./ContestListDTO"
 import { ProblemListDTO } from "./ProblemListDTO"
 
 export type ContestsAndProblemsDTO = {
-    contests: Contest[]
+    contests: ContestListDTO[]
     problems: ProblemListDTO[]
   }
