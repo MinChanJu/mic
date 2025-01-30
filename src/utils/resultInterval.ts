@@ -4,11 +4,12 @@ import { getResult } from "../api/common";
 export const resultInterval = <T>(
   data: string,
   requestId: string,
-  intervalTime: number,
   setError?: (bool: boolean) => void,
   setLoad?: (bool: boolean) => void,
   setData?: (data: T) => void,
+  intervalTime?: number,
 ): Promise<T> => {
+  if (intervalTime == undefined) intervalTime = 1000;
   return new Promise((resolve, reject) => {
     const interval = setInterval(async () => {
       try {

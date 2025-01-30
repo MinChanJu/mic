@@ -31,18 +31,15 @@ const ContestMake: React.FC = () => {
               const response = await createContest(contest);
               requestId = response.data;
             } catch (error) {
-              if (error instanceof AxiosError) {
-                if (error.response) console.error("응답 에러: " + error.response.data.message);
-                else console.error("서버 에러: ", error)
-              } else {
-                console.error("알 수 없는 에러:", error);
-              }
+              console.error("에러:", error);
+              setMakeMessage("요청 에러");
             }
 
             try {
-              const response = await resultInterval<Contest>("contests", requestId, 500);
+              const response = await resultInterval<Contest>("contests", requestId);
               goToProblemMake(response.id!);
             } catch (error) {
+              setMakeMessage("서버 에러");
               if (error instanceof AxiosError) {
                 if (error.response) setMakeMessage("응답 에러: " + error.response.data.message);
                 else console.error("서버 에러: ", error)

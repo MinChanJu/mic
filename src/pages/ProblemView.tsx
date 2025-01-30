@@ -15,12 +15,14 @@ import Loading from "../components/Loading"
 import ErrorPage from "../components/ErrorPage"
 import { resultInterval } from "../utils/resultInterval"
 import { CodeResultDTO } from "../types/dto/CodeResultDTO"
+import { ProblemScoreDTO } from "../types/dto/ProblemScoreDTO"
 
 const ProblemView: React.FC = () => {
   const { problemId } = useParams();
-  const { user, solves, setSolves } = useUser()
+  const { user } = useUser()
   const { goToProblemEdit, goToHome } = useNavigation()
   const [problem, setProblem] = useState<Problem>()
+  const [score, setScore] = useState<number>(-1)
   const [lang, setLang] = useState<string>('Python');
   const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -30,9 +32,11 @@ const ProblemView: React.FC = () => {
 
 
   useEffect(() => {
+    setLoad(false)
     setError(false)
     async function loadProblem() {
       let requestId = '';
+      
       try {
         const response = await getProblemById(Number(problemId));
         requestId = response.data;
@@ -41,8 +45,13 @@ const ProblemView: React.FC = () => {
         setError(true);
       }
 
-      resultInterval("problems", requestId, 500, setError, setLoad, setProblem);
+      const response = await resultInterval<ProblemScoreDTO>("problems", requestId, setError);
+      setProblem(response.problem);
+      setScore(response.score);
+      
+      setLoad(true);
     }
+
     loadProblem();
   }, [problemId]);
 
@@ -89,9 +98,9 @@ const ProblemView: React.FC = () => {
       }
 
       try {
-        const response = await resultInterval<CodeResultDTO>("data", requestId, 500);
+        const response = await resultInterval<CodeResultDTO>("data", requestId);
         setMessage(response.result);
-        setSolves(response.solves);
+        setScore(response.score);
       } catch (error) {
         if (error instanceof AxiosError) {
           if (error.response) console.error("응답 예러: ", error.response.data.message);
@@ -142,11 +151,11 @@ const ProblemView: React.FC = () => {
         </div>
       }
       {(() => {
-        const filtered = solves.filter((solve) => solve.userId === user.userId && solve.problemId === problem.id);
+        // const filtered = solves.filter((solve) => solve.userId === user.userId && solve.problemId === problem.id);
 
-        if (filtered.length === 0) return <></>;
+        // if (filtered.length === 0) return <></>;
 
-        const score = filtered[0].score;
+        // const score = filtered[0].score;
         let style = { backgroundColor: "rgb(238, 255, 0)" };
         if (score === 1000) style.backgroundColor = "rgb(43, 255, 0)";
         if (score === 0) style.backgroundColor = "rgb(255, 0, 0)";

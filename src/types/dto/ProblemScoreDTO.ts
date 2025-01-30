@@ -1,5 +1,6 @@
+import { Problem } from "../entity/Problem"
+
 export type ProblemScoreDTO = {
-    problemId: number
-    problemName: string
+    problem: Problem
     score: number
 }

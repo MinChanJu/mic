@@ -9,8 +9,8 @@ export const getContestList = async (): Promise<ApiResponse<string>> => {   // C
   return response.data;
 };
 
-export const getContestListByUserId = async (userId: string): Promise<ApiResponse<string>> => {   // ContestListDTO[]
-  const response = await axios.get(`${url}/all/${userId}`);
+export const getContestListForUserId = async (): Promise<ApiResponse<string>> => {   // ContestListDTO[]
+  const response = await axios.get(`${url}/user`);
   return response.data;
 };
 

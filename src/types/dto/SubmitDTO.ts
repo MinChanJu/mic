@@ -1,4 +1,4 @@
 export type SubmitDTO = {
-    problemId: number
-    score: number
-  }
+  problemId: number
+  score: number
+}

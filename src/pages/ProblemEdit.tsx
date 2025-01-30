@@ -20,41 +20,33 @@ const EditProblem: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [examples, setExamples] = useState<Example[]>([]);
   const [error, setError] = useState(false);
+  const [load, setLoad] = useState(false);
 
   useEffect(() => {
     async function loadProblem() {
-      let requestId = ''
+      let requestId1 = ''
+      let requestId2 = ''
+
       try {
-        const response = await getProblemById(Number(problemId));
-        requestId = response.data;
+        const response1 = await getProblemById(Number(problemId));
+        const response2 = await getAllExamplesByProblemId(Number(problemId));
+        requestId1 = response1.data;
+        requestId2 = response2.data;
       } catch (error) {
         console.error("에러: ", error);
         setError(true)
       }
 
-      const response = await resultInterval<Problem>("problems", requestId, 500, setError);
-      setProblem(response);
-    }
-    async function loadExamples() {
-      let requestId = ''
-      try {
-        const response = await getAllExamplesByProblemId(Number(problemId));
-        requestId = response.data;
-      } catch (error) {
-        console.error("알 수 없는 에러:", error);
-        setError(true)
-      }
-
-      const response = await resultInterval<Example[]>("problems", requestId, 500, setError);
-      setExamples(response);
+      await resultInterval<Problem>("problems", requestId1, setError, undefined, setProblem);
+      await resultInterval<Example[]>("problems", requestId2, setError, setLoad, setExamples);
     }
 
     loadProblem();
-    loadExamples();
   }, []);
 
   if (error) return <ErrorPage />
-  if (!problem) return <Loading width={60} border={6} />
+  if (!load) return <Loading width={60} border={6} marginTop={250} />
+  if (!problem) return <ErrorPage />
 
   const addExample = () => {
     setExamples((prev) => [...prev, InitExample]);
@@ -117,7 +109,7 @@ const EditProblem: React.FC = () => {
       }
 
       try {
-        const response = await resultInterval<Problem>("problems", requestId, 500)
+        const response = await resultInterval<Problem>("problems", requestId)
         goToProblemId(response.id!)
       } catch (error) {
         setEditMessage("오류");

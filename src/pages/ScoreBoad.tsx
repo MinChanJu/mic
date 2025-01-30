@@ -1,55 +1,32 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { MathJax, MathJaxContext } from 'better-react-mathjax'
-import { getContestById } from '../api/contest'
-import { getProblemListByContestIdWithUserId } from '../api/problem'
 import { getScoreBoardByContestId } from '../api/myData'
 import { mathJaxConfig } from '../constants/mathJaxConfig'
 import { ContestScoreDTO } from '../types/dto/ContestScoreDTO'
-import { Contest } from '../types/entity/Contest'
 import { ProblemListDTO } from '../types/dto/ProblemListDTO'
 import Table from '../components/Table'
 import { SubmitDTO } from '../types/dto/SubmitDTO'
 import ErrorPage from '../components/ErrorPage'
 import Loading from '../components/Loading'
 import { resultInterval } from '../utils/resultInterval'
+import { ScoreBoardDTO } from '../types/dto/ScoreBoardDTO'
+import { ContestListDTO } from '../types/dto/ContestListDTO'
 
 
 const ScoreBoard: React.FC = () => {
   const { contestId } = useParams();
   const [contestScores, setContestScores] = useState<ContestScoreDTO[]>([]);
 
-  const [contest, setContest] = useState<Contest>();
+  const [contest, setContest] = useState<ContestListDTO>();
   const [problemList, setProblemList] = useState<ProblemListDTO[]>([]);
   const [error, setError] = useState(false);
+  const [load, setLoad] = useState(false);
 
   useEffect(() => {
-    async function loadContest() {
-      let requestId = '';
-      try {
-        const response = await getContestById(Number(contestId));
-        requestId = response.data;
-      } catch (error) {
-        console.error("에러: ", error);
-        setError(true);
-      }
-
-      resultInterval("contests", requestId, 500, setError, undefined, setContest);
-    }
-    async function loadProblems() {
-      let requestId = '';
-      try {
-        const response = await getProblemListByContestIdWithUserId(Number(contestId), '');
-        requestId = response.data;
-      } catch (error) {
-        console.error("에러: ", error);
-        setError(true);
-      }
-      
-      resultInterval("problems", requestId, 500, setError, undefined, setProblemList);
-    }
     async function fetchData() {
       let requestId = '';
+
       try {
         const response = await getScoreBoardByContestId(Number(contestId));
         requestId = response.data;
@@ -58,10 +35,14 @@ const ScoreBoard: React.FC = () => {
         setError(true);
       }
 
-      resultInterval("data", requestId, 500, setError, undefined, setContestScores);
+      const response = await resultInterval<ScoreBoardDTO>("data", requestId, setError);
+      setContest(response.contest);
+      setProblemList(response.problemList);
+      setContestScores(response.contestScores);
+
+      setLoad(true);
     }
-    loadContest();
-    loadProblems();
+
     fetchData();
 
     const interval = setInterval(fetchData, 15_000);
@@ -70,13 +51,10 @@ const ScoreBoard: React.FC = () => {
   }, []);
 
   if (error) return <ErrorPage />
-  if (!contest) return <Loading width={60} border={6} marginTop={250} />
+  if (!load) return <Loading width={60} border={6} marginTop={250} />
+  if (!contest) return <ErrorPage />
 
   const formatScoreBoard = {
-    name: (value: string, row: number, col: number) => {
-      if (col == 0) return <>{row + 1}</>
-      return <>{value}</>
-    },
     solveProblems: (value: SubmitDTO[], _: number, col: number) => {
       if (col >= value.length + 2) {
         let sum = 0;
@@ -105,7 +83,7 @@ const ScoreBoard: React.FC = () => {
             return <MathJax>{value}</MathJax>
           }}
           data={contestScores}
-          dataName={["name", "name", ...problemList.map(() => "solveProblems" as keyof ContestScoreDTO), "solveProblems"]}
+          dataName={["id", "name", ...problemList.map(() => "solveProblems" as keyof ContestScoreDTO), "solveProblems"]}
           dataFunc={formatScoreBoard} />
       </MathJaxContext>
     </div>

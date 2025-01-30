@@ -86,20 +86,18 @@ const Login: React.FC = () => {
         signUp.authority = 1;
         signUp.createdAt = new Date().toISOString();
 
-        console.log(signUp);
-
         let requestId = '';
 
         try {
           const response = await register(signUp);
           requestId = response.data;
         } catch (error) {
-          setregisterMessage("알 수 없는 에러")
+          setregisterMessage("요청 에러")
           console.error("알 수 없는 에러:", error);
         }
 
         try {
-          await resultInterval("users", requestId, 500);
+          await resultInterval("users", requestId);
           setregisterMessage("회원가입 성공!")
           handleButtonClick()
         } catch (error) {
@@ -131,6 +129,7 @@ const Login: React.FC = () => {
     setIsLoading(true)
     if (signIn.userId !== "" && signIn.userPw !== "") {
       let requestId = '';
+      
       try {
         const response = await login(signIn);
         requestId = response.data;
@@ -140,7 +139,7 @@ const Login: React.FC = () => {
       }
 
       try {
-        const response = await resultInterval<UserResponseDTO>("users", requestId, 500);
+        const response = await resultInterval<UserResponseDTO>("users", requestId);
         setUser(response.user)
         sessionStorage.setItem('token', response.token);
         goToHome();

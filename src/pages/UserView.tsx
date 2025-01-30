@@ -13,6 +13,7 @@ const UserView: React.FC = () => {
   const [month, setMonth] = useState<string>();
   const [day, setDay] = useState<string>();
   const [error, setError] = useState(false);
+  const [load, setLoad] = useState(false);
 
   useEffect(() => {
     async function serverObject() {
@@ -25,7 +26,7 @@ const UserView: React.FC = () => {
         setError(true);
       }
 
-      resultInterval("users", requestId, 500, setError, undefined, setCurUser);
+      resultInterval("users", requestId, setError, setLoad, setCurUser);
     }
     serverObject();
   }, []);
@@ -37,7 +38,8 @@ const UserView: React.FC = () => {
   }, [curUser])
 
   if (error) return <ErrorPage />
-  if (!curUser) return <Loading width={60} border={6} marginTop={250} />
+  if (!load) return <Loading width={60} border={6} marginTop={250} />
+  if (!curUser) return <ErrorPage />
 
   return (
     <div className="list" style={{ maxWidth: "400px" }}>

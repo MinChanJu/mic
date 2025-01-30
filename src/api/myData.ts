@@ -9,7 +9,7 @@ export const getAllFilterContestsAndProblems = async (): Promise<ApiResponse<str
   return response.data;
 };
 
-export const getScoreBoardByContestId = async (contestId: number): Promise<ApiResponse<string>> => {    // ContestScoreDTO[]
+export const getScoreBoardByContestId = async (contestId: number): Promise<ApiResponse<string>> => {    // ScoreBoardDTO
   const response = await axios.get(`${url}/${contestId}`);
   return response.data;
 };

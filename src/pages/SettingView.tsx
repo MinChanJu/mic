@@ -2,11 +2,11 @@ import React, { useEffect, useRef, useState } from "react"
 import { MathJaxContext } from "better-react-mathjax"
 import { AxiosError } from "axios"
 import { getAllProblemsByUserId, getAllSolveProblemsByUserId } from "../api/problem"
-import { getContestListByUserId } from "../api/contest"
+import { getContestListForUserId } from "../api/contest"
 import { getAllUsers, updateUser } from "../api/user"
 import { mathJaxConfig } from "../constants/mathJaxConfig"
 import { useUser } from "../context/UserContext"
-import { formatFunctions } from "../utils/formatter"
+import { FormatFunctions, ScoreFormat } from "../utils/formatter"
 import { ProblemScoreDTO } from "../types/dto/ProblemScoreDTO"
 import { Contest } from "../types/entity/Contest"
 import { Problem } from "../types/entity/Problem"
@@ -169,19 +169,27 @@ const SolvePage: React.FC = () => {
         console.error("에러: ", error);
       }
 
-      resultInterval("problems", requestId, 500, undefined, undefined, setProblemScores);
+      resultInterval("problems", requestId, undefined, undefined, setProblemScores);
     }
     loadProblemScores();
   }, []);
+
+  const format = {
+    problem: (value: Problem, row: number, col: number) => {
+      if (col == 0) return <>{row+1}</>
+      return <>{value.problemName}</>
+    },
+    score: (value: number) => ScoreFormat(value),
+  }
   return (
     <MathJaxContext config={mathJaxConfig}>
       <Table
         columnName={["번호", "문제 제목", "해결"]}
         columnClass={["num", "", "solveHead"]}
         data={problemScores}
-        dataName={["problemId", "problemName", "score"]}
-        dataFunc={formatFunctions}
-        onClick={(item) => { goToProblemId(item.problemId) }} />
+        dataName={["problem", "problem", "score"]}
+        dataFunc={format}
+        onClick={(item) => { goToProblemId(item.problem.id!) }} />
     </MathJaxContext>
   )
 }
@@ -202,7 +210,7 @@ const MakePro: React.FC = () => {
         console.error("에러: ", error);
       }
 
-      resultInterval("problems", requestId, 500, undefined, undefined, setProblems);
+      resultInterval("problems", requestId, undefined, undefined, setProblems);
     }
     fetchData()
   }, [])
@@ -214,7 +222,7 @@ const MakePro: React.FC = () => {
         columnClass={["num", ""]}
         data={myProblems}
         dataName={["id", "problemName"]}
-        dataFunc={formatFunctions}
+        dataFunc={FormatFunctions}
         onClick={(item) => { goToProblemId(item.id!) }} />
     </MathJaxContext>
   )
@@ -230,13 +238,13 @@ const MakeCon: React.FC = () => {
     async function fetchData() {
       let requestId = ''
       try {
-        const response = await getContestListByUserId(user.userId);
+        const response = await getContestListForUserId();
         requestId = response.data;
       } catch (error) {
         console.error("에러: ", error);
       }
 
-      resultInterval("contests", requestId, 500, undefined, undefined, setContests);
+      resultInterval("contests", requestId, undefined, undefined, setContests);
     }
     fetchData()
   }, [])
@@ -248,7 +256,7 @@ const MakeCon: React.FC = () => {
         columnClass={["num", ""]}
         data={myContests}
         dataName={["id", "contestName"]}
-        dataFunc={formatFunctions}
+        dataFunc={FormatFunctions}
         onClick={(item) => { goToContestId(item.id!) }} />
     </MathJaxContext>
   )
@@ -300,7 +308,7 @@ const UserManage: React.FC = () => {
         }
 
         try {
-          const response = await resultInterval<User[]>("users", requestId, 500);
+          const response = await resultInterval<User[]>("users", requestId);
           setUsers(response);
           setAuthoritys(response.map((user) => user.authority));
           setEnters(response.map((user) => {

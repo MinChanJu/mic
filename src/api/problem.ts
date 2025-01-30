@@ -4,22 +4,17 @@ import { ProblemDTO } from '../types/dto/ProblemDTO';
 
 const url = '/problems'
 
-export const getProblemListWithUserId = async (userId: string): Promise<ApiResponse<string>> => {   // ProblemListDTO[]
-  let response;
-  if (userId === '') response = await axios.get(`${url}/all`);
-  else response = await axios.get(`${url}/all/${userId}`);
-
+export const getProblemList = async (): Promise<ApiResponse<string>> => {   // ProblemListDTO[]
+  let response = await axios.get(`${url}/all`);
   return response.data;
 };
 
-export const getProblemListByContestIdWithUserId = async (contestId: number, userId: string): Promise<ApiResponse<string>> => {   // ProblemListDTO[]
-  let response;
-  if (userId === '') response = await axios.get(`${url}/contest/${contestId}`);
-  else response = await axios.get(`${url}/contest/${contestId}/${userId}`);
+export const getProblemListByContestId = async (contestId: number): Promise<ApiResponse<string>> => {   // ProblemListDTO[]
+  let response = await axios.get(`${url}/contest/${contestId}`);
   return response.data;
 };
 
-export const getProblemById = async (id: number): Promise<ApiResponse<string>> => {   // Problem
+export const getProblemById = async (id: number): Promise<ApiResponse<string>> => {   // ProblemScoreDTO
   const response = await axios.get(`${url}/${id}`);
   return response.data;
 };

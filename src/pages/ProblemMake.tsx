@@ -72,7 +72,7 @@ const ProblemMake: React.FC = () => {
       }
 
       try {
-        await resultInterval("problems", requestId, 500)
+        await resultInterval("problems", requestId)
         if (cont === 1) {
           setExamples([])
           setProblem(InitProblem)

@@ -19,21 +19,23 @@ export const StringToTime = (formatTime: string): string => {
   return localDate.toISOString().slice(0, 16);
 }
 
-export const formatFunctions = {
+export const FormatFunctions = {
   id: (value: number | null) => <>{String(value).padStart(3, '0')}</>,
   contestId: (value: number | null) => <>{String(value).padStart(3, '0')}</>,
   problemId: (value: number) => <>{String(value).padStart(3, '0')}</>,
   contestName: (value: string) => <>{value}</>,
   problemName: (value: string) => <MathJax>{value}</MathJax>,
-  score: (value: number) => {
-    if (value === -1) return <></>;
-
-    let style: Partial<CSSProperties> = { backgroundColor: "rgb(238, 255, 0)" };
-    if (value === 1000) style.backgroundColor = "rgb(43, 255, 0)";
-    if (value === 0) style.backgroundColor = "rgb(255, 0, 0)";
-
-    return <div className="solve" style={style}>{value / 10}</div>;
-  },
+  score: (value: number) => ScoreFormat(value),
   startTime: (value: string | null) => TimeToString(value),
   endTime: (value: string | null) => TimeToString(value),
 };
+
+export const ScoreFormat = (value: number) => {
+  if (value === -1) return <></>;
+
+  let style: Partial<CSSProperties> = { backgroundColor: "rgb(238, 255, 0)" };
+  if (value === 1000) style.backgroundColor = "rgb(43, 255, 0)";
+  if (value === 0) style.backgroundColor = "rgb(255, 0, 0)";
+
+  return <div className="solve" style={style}>{value / 10}</div>;
+}

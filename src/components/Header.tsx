@@ -37,12 +37,9 @@ const Header: React.FC = () => {
         }
         setError(true);
       }
-      setLoad(true);
-
-      const response = await resultInterval<ContestsAndProblemsDTO>('data', requestId, 500, setError, setLoad);
+      const response = await resultInterval<ContestsAndProblemsDTO>('data', requestId, setError, setLoad);
       setContestList(response.contests)
       setProblemList(response.problems)
-
     }
     loadContestsAndProblems();
   }, []);

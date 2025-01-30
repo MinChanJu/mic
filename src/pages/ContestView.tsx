@@ -3,10 +3,10 @@ import { useParams } from "react-router-dom"
 import { MathJaxContext } from "better-react-mathjax"
 import { AxiosError } from "axios"
 import { deleteContestById, getContestById } from "../api/contest"
-import { getProblemListByContestIdWithUserId } from "../api/problem"
+import { getProblemListByContestId } from "../api/problem"
 import { mathJaxConfig } from "../constants/mathJaxConfig"
 import { useUser } from "../context/UserContext"
-import { formatFunctions } from "../utils/formatter"
+import { FormatFunctions } from "../utils/formatter"
 import { ProblemListDTO } from "../types/dto/ProblemListDTO"
 import useNavigation from "../hooks/useNavigation"
 import Table from "../components/Table"
@@ -25,29 +25,24 @@ const ContestView: React.FC = () => {
   const [load, setLoad] = useState(false);
 
   useEffect(() => {
+    setLoad(false)
     setError(false)
     async function loadContestAndProblems() {
       let requestId1 = ''
       let requestId2 = ''
 
       try {
-        const response = await getContestById(Number(contestId));
-        requestId1 = response.data;
+        const response1 = await getContestById(Number(contestId));
+        const response2 = await getProblemListByContestId(Number(contestId));
+        requestId1 = response1.data;
+        requestId2 = response2.data;
       } catch (error) {
         console.error("에러: ", error);
         setError(true);
       }
 
-      try {
-        const response = await getProblemListByContestIdWithUserId(Number(contestId), user.userId);
-        requestId2 = response.data;
-      } catch (error) {
-        console.error("에러:", error);
-        setError(true);
-      }
-
-      const response1 = await resultInterval<ContestListDTO[]>("contests", requestId1, 500, setError);
-      const response2 = await resultInterval<ProblemListDTO[]>("problems", requestId2, 500, setError, setLoad);
+      const response1 = await resultInterval<ContestListDTO[]>("contests", requestId1, setError);
+      const response2 = await resultInterval<ProblemListDTO[]>("problems", requestId2, setError, setLoad);
       setContest(response1.pop())
       setProblemList(response2)
     }
@@ -58,7 +53,6 @@ const ContestView: React.FC = () => {
   if (error) return <ErrorPage />
   if (!load) return <Loading width={60} border={6} marginTop={250} />
   if (!contest) return <ErrorPage />
-
 
   if (contest.startTime != null && new Date(contest.startTime) >= new Date() && user.authority != 5 && user.userId !== contest.userId) return (<div>아직 아님</div>)
 
@@ -88,7 +82,7 @@ const ContestView: React.FC = () => {
 
     return (
       <div className="flexRow">
-        <span onClick={() => { goToContestScoreBoard(contest.id!) }} className="button" style={{ marginTop: "10px" }}>스코어보드</span>
+        <span onClick={() => { goToContestScoreBoard(contest.contestId) }} className="button" style={{ marginTop: "10px" }}>스코어보드</span>
       </div>
     )
   }
@@ -112,7 +106,7 @@ const ContestView: React.FC = () => {
           columnClass={["num", "", "solveHead"]}
           data={problemList}
           dataName={["id", "problemName", "score"]}
-          dataFunc={formatFunctions}
+          dataFunc={FormatFunctions}
           onClick={(item) => goToProblemId(item.problemId)} />
       </MathJaxContext>
       {(user.authority === 5 || user.userId === contest?.userId) &&

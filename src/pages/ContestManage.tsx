@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import { InitUser, User } from "../types/entity/User";
 import { deleteUserById, getAllUsersByContestId, register } from "../api/user";
 import { useParams } from "react-router-dom";
-import { AxiosError } from "axios";
 import Table from "../components/Table";
 import ErrorPage from "../components/ErrorPage";
 import Loading from "../components/Loading";
@@ -10,11 +9,12 @@ import { resultInterval } from "../utils/resultInterval";
 
 const ContestManage = () => {
   const { contestId } = useParams();
-  const [participants, serPartcipants] = useState<User[]>([]);
-  const [size, serSize] = useState<number>(0);
+  const [participants, setPartcipants] = useState<User[]>([]);
+  const [size, setSize] = useState<number>(0);
   const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState(false);
+  const [load, setLoad] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -27,24 +27,17 @@ const ContestManage = () => {
         setError(true);
       }
 
-      try {
-        const response = await resultInterval<User[]>("users", requestId, 500);
-        serPartcipants(response);
-        serSize(response.length);
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) console.error("응답 에러: ", error.response.data.message);
-          else console.error("서버 에러: ", error)
-        } else {
-          console.error("알 수 없는 에러:", error);
-        }
-        setError(true);
-      }
+      resultInterval("users", requestId, setError, setLoad, setPartcipants);
     }
     fetchData();
   }, [])
 
+  useEffect(() => {
+    setSize(participants.length);
+  }, [participants])
+
   if (error) return <ErrorPage />
+  if (!load) return <Loading width={60} border={6} marginTop={250} />
   if(!participants) return <Loading width={60} border={6} />
 
   const generateUserId = (idx: number) => {
@@ -110,23 +103,23 @@ const ContestManage = () => {
   }
 
   const addParticipant = () => {
-    serPartcipants((prev) => [...prev, InitUser]);
+    setPartcipants((prev) => [...prev, InitUser]);
   }
 
   const deleteExample = async (index: number) => {
     if (participants[index].id != null) {
-      serSize((prev) => prev-1)
+      setSize((prev) => prev-1)
       try {
         await deleteUserById(participants[index].id);
       } catch (error) {
         console.error("에러: ", error);
       }
     }
-    serPartcipants((prev) => [...prev.slice(0, index), ...prev.slice(index + 1)]);
+    setPartcipants((prev) => [...prev.slice(0, index), ...prev.slice(index + 1)]);
   };
 
   const handleExampleChange = (index: number, field: "name" | "phone" | "email", value: string) => {
-    serPartcipants((prev) =>
+    setPartcipants((prev) =>
       prev.map((participant, idx) =>
         idx === index ? { ...participant, [field]: value } : participant
       )

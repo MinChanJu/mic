@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { AxiosError } from 'axios'
 import { getContestById, getContestList } from '../api/contest'
 import { useUser } from '../context/UserContext'
-import { formatFunctions } from '../utils/formatter'
+import { FormatFunctions } from '../utils/formatter'
 import { ContestListDTO } from '../types/dto/ContestListDTO'
 import useNavigation from '../hooks/useNavigation'
 import Table from '../components/Table'
@@ -20,6 +19,7 @@ const ContestList: React.FC = () => {
   useEffect(() => {
     async function loadProblems() {
       let requestId = '';
+
       try {
         if (user.contestId === -1) {
           const response = await getContestList();
@@ -27,28 +27,13 @@ const ContestList: React.FC = () => {
         } else {
           const response = await getContestById(user.contestId);
           requestId = response.data;
-          // const contest = response.data;
-          // const data: ContestListDTO = {
-          //   id: 1,
-          //   contestId: contest.id!,
-          //   contestName: contest.contestName,
-          //   userId: contest.userId,
-          //   startTime: contest.startTime,
-          //   endTime: contest.endTime,
-          // }
-          // setContestList([data])
         }
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) console.error("응답 에러: ", error.response.data.message);
-          else console.error("서버 에러: ", error)
-        } else {
-          console.error("알 수 없는 에러:", error);
-        }
+        console.error("에러: ", error);
         setError(true);
       }
 
-      resultInterval('contests', requestId, 500, setError, setLoad, setContestList)
+      resultInterval('contests', requestId, setError, setLoad, setContestList)
     }
     loadProblems();
   }, []);
@@ -103,7 +88,7 @@ const ContestList: React.FC = () => {
         columnClass={["num", "", "", "time", "time"]}
         data={contestList}
         dataName={["id", "contestName", "userId", "startTime", "endTime"]}
-        dataFunc={formatFunctions}
+        dataFunc={FormatFunctions}
         onClick={(item) => { check(item, true); }}
         rowClass={(item) => { return check(item, false); }} />
       {contestList.length === 0 && <div>대회가 존재하지 않습니다.</div>}

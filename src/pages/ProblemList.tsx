@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { MathJaxContext } from 'better-react-mathjax'
-import { getProblemListWithUserId } from '../api/problem'
+import { getProblemList } from '../api/problem'
 import { mathJaxConfig } from '../constants/mathJaxConfig'
 import { useUser } from '../context/UserContext'
-import { formatFunctions } from '../utils/formatter'
+import { FormatFunctions } from '../utils/formatter'
 import { ProblemListDTO } from '../types/dto/ProblemListDTO'
 import useNavigation from '../hooks/useNavigation'
 import Table from '../components/Table'
@@ -21,15 +21,16 @@ const ProblemList: React.FC = () => {
   useEffect(() => {
     async function loadProblems() {
       let requestId = ''
+      
       try {
-        const response = await getProblemListWithUserId(user.userId);
+        const response = await getProblemList();
         requestId = response.data;
       } catch (error) {
         console.error("에러: ", error);
         setError(true);
       }
 
-      resultInterval<ProblemListDTO[]>("problems", requestId, 500, setError, setLoad, setProblemList)
+      resultInterval<ProblemListDTO[]>("problems", requestId, setError, setLoad, setProblemList)
     }
     loadProblems();
   }, []);
@@ -47,7 +48,7 @@ const ProblemList: React.FC = () => {
           columnClass={["num", "", "", "solveHead"]}
           data={problemList}
           dataName={["problemId", "problemName", "contestName", "score"]}
-          dataFunc={formatFunctions}
+          dataFunc={FormatFunctions}
           onClick={(item) => goToProblemId(item.problemId)} />
       </MathJaxContext>
       {problemList.length === 0 && <div>문제가 존재하지 않습니다.</div>}

@@ -1,14 +1,9 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { getAllSolvesByUserId } from '../api/solve';
+import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { User, InitUser } from '../types/entity/User';
-import { Solve } from '../types/entity/Solve';
-import { resultInterval } from '../utils/resultInterval';
 
 interface UserContextProps {
   user: User;
-  solves: Solve[]
   setUser: React.Dispatch<React.SetStateAction<User>>;
-  setSolves: React.Dispatch<React.SetStateAction<Solve[]>>;
   logout: () => void;
 }
 
@@ -20,37 +15,19 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return storedUser ? JSON.parse(storedUser) : InitUser;
   });
 
-  const [solves, setSolves] = useState<Solve[]>([]);
-
-  useEffect(() => {
-    async function loadSolves() {
-      if (user.name !== "") {
-        let requestId = ''
-        try {
-          const response = await getAllSolvesByUserId(user.userId);
-          requestId = response.data;
-        } catch (error) {
-          console.error("에러: ", error);
-        }
-        resultInterval("solves", requestId, 500, undefined, undefined, setSolves);
-      }
-    }
-    loadSolves();
-    sessionStorage.setItem('user', JSON.stringify(user));
-  }, [user]);
-
   const logout = () => {
     sessionStorage.removeItem('user');
     sessionStorage.removeItem('token');
     setUser(InitUser);
-    setSolves([])
     if (window.location.pathname === "/setting") {
       window.location.href = "/"; // 홈으로 이동
+    } else {
+      window.location.reload();
     }
   };
 
   return (
-    <UserContext.Provider value={{ user, solves, setUser, setSolves, logout }}>
+    <UserContext.Provider value={{ user, setUser, logout }}>
       {children}
     </UserContext.Provider>
   );
