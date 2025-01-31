@@ -1,71 +1,71 @@
 .makeContainer {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    justify-content: center;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .makeBox {
-    width: 600px;
-    height: auto;
-    padding: 20px;
-    margin-top: 50px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 600px;
+  height: auto;
+  padding: 20px;
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .makeGroup {
-    width: 100%;
-    margin-top: 20px;
+  width: 100%;
+  margin-top: 20px;
 }
 
 .doubleMakeGroup {
-    width: 100%;
-    display: flex;
-    gap: 10px;
+  width: 100%;
+  display: flex;
+  gap: 10px;
 }
 
 .makeTitle {
-    font-size: 15px;
-    margin-bottom: 10px;
+  font-size: 15px;
+  margin-bottom: 10px;
 }
 
 .makeField {
-    width: 100%;
-    font-size: 15px;
-    padding: 8px;
-    border: 1px solid #1976d2;
-    border-radius: 5px;
-    box-sizing: border-box;
+  width: 100%;
+  font-size: 15px;
+  padding: 8px;
+  border: 1px solid #1976d2;
+  border-radius: 5px;
+  box-sizing: border-box;
 }
 
 .makeField:focus {
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.8);
-    border-color: #007BFF;
-    outline: none;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.8);
+  border-color: #007BFF;
+  outline: none;
 }
 
 .makeButton {
-    background-color: #1976d2;
-    color: #fff;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-    margin: 20px auto;
-    text-align: center;
+  background-color: #1976d2;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  margin: 20px auto;
+  text-align: center;
 }
 
 .addExample {
-    padding: 6px 12px;
-    border-radius: 10px;
-    background-color: #1976d2;
-    color: #fff;
-    margin-top: 20px;
-    cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background-color: #1976d2;
+  color: #fff;
+  margin-top: 20px;
+  cursor: pointer;
 }

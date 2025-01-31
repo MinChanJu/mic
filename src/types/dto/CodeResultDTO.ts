@@ -1,4 +1,4 @@
 export type CodeResultDTO = {
-    result: string
-    score: number
+  result: string
+  score: number
 }

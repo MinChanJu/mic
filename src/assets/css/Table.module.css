@@ -1,70 +1,71 @@
 .tableContainer {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
 }
 
-.tableHead, .tableCell {
-    border: 1px solid #898888;
-    padding: 8px;
-    word-break: break-all;
+.tableHead,
+.tableCell {
+  border: 1px solid #898888;
+  padding: 8px;
+  word-break: break-all;
 }
 
 .tableHead {
-    background-color: rgb(218, 216, 216);
+  background-color: rgb(218, 216, 216);
 }
 
 .cursor {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .num {
-    width: 40px;
-    text-align: center;
-    font-size: 15px;
+  width: 40px;
+  text-align: center;
+  font-size: 15px;
 }
 
 .time {
-    width: 160px;
-    font-size: 15px;
-    text-align: center;
+  width: 160px;
+  font-size: 15px;
+  text-align: center;
 }
 
 .solveHead {
-    width: 60px;
-    font-size: 15px;
-    text-align: center;
-    justify-items: center;
+  width: 60px;
+  font-size: 15px;
+  text-align: center;
+  justify-items: center;
 }
 
 .numIn {
-    width: 50px;
-    font-size: 15px;
-    text-align: center;
+  width: 50px;
+  font-size: 15px;
+  text-align: center;
 }
 
 .edit {
-    width: 40px;
-    font-size: 15px;
-    text-align: center;
+  width: 40px;
+  font-size: 15px;
+  text-align: center;
 }
 
 .after {
-    background-color: rgb(255, 255, 255);
+  background-color: rgb(255, 255, 255);
 }
 
 .ongoingImp {
-    background-color: rgb(255, 100, 100);
+  background-color: rgb(255, 100, 100);
 }
 
 .ongoingPos {
-    background-color: rgb(0, 255, 0);
+  background-color: rgb(0, 255, 0);
 }
 
 .before {
-    background-color: rgb(192, 192, 192);
+  background-color: rgb(192, 192, 192);
 }
 
 .center {
-    text-align: center;
+  text-align: center;
 }

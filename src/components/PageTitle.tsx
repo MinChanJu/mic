@@ -1,6 +1,5 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { matchPath } from "react-router-dom";
+import { useLocation, matchPath } from "react-router-dom";
 
 const PageTitle = () => {
   const location = useLocation();
@@ -22,6 +21,8 @@ const PageTitle = () => {
       "/contest/make": "대회 생성",
       "/problem": "문제 목록",
       "/setting": "설정",
+      "/report": "제보",
+      "/notice": "게시판",
     };
 
     // 동적 경로를 위한 패턴 매칭
@@ -34,6 +35,7 @@ const PageTitle = () => {
       { pattern: "/problem/:problemId", title: "문제 상세" },
       { pattern: "/score/:contestId", title: "스코어보드" },
       { pattern: "/user/:userId", title: `사용자 ${param}`},
+      { pattern: "/notice/:noticeId", title: `글 상세`},
     ];
 
     let title = titleMap[path] || "오류";

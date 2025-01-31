@@ -3,14 +3,14 @@ import { useParams } from "react-router-dom"
 import { AxiosError } from "axios"
 import { getProblemById, updateProblem } from "../api/problem"
 import { deleteExampleById, getAllExamplesByProblemId } from "../api/example"
-import { autoResize } from "../utils/resize"
+import { ProblemDTO } from "../types/dto/ProblemDTO"
 import { Problem } from "../types/entity/Problem"
 import { Example, InitExample } from "../types/entity/Example"
-import { ProblemDTO } from "../types/dto/ProblemDTO"
+import { resultInterval } from "../utils/resultInterval"
+import { autoResize } from "../utils/resize"
 import useNavigation from "../hooks/useNavigation"
 import ErrorPage from "../components/ErrorPage"
 import Loading from "../components/Loading"
-import { resultInterval } from "../utils/resultInterval"
 
 const EditProblem: React.FC = () => {
   const { problemId } = useParams();

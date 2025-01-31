@@ -28,6 +28,7 @@ export const FormatFunctions = {
   score: (value: number) => ScoreFormat(value),
   startTime: (value: string | null) => TimeToString(value),
   endTime: (value: string | null) => TimeToString(value),
+  createdAt: (value: string | null) => TimeToString(value),
 };
 
 export const ScoreFormat = (value: number) => {

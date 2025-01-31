@@ -1,6 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
-import Home from './pages/Home';
-import Login from './pages/Login';
+import ContestManage from './pages/ContestManage';
 import ContestList from './pages/ContestList';
 import EditContest from './pages/ContestEdit';
 import ContestMake from './pages/ContestMake';
@@ -9,12 +8,16 @@ import ProblemList from './pages/ProblemList';
 import EditProblem from './pages/ProblemEdit';
 import ProblemMake from './pages/ProblemMake';
 import ProblemView from './pages/ProblemView';
-import UserView from './pages/UserView';
 import SettingView from './pages/SettingView';
+import NoticeBoard from './pages/NoticeBoard';
+import NoticeView from './pages/NoticeView';
+import ReportView from './pages/ReportView';
 import ScoreBoard from './pages/ScoreBoad';
 import PageTitle from './components/PageTitle';
-import ContestManage from './pages/ContestManage';
 import ErrorPage from './components/ErrorPage';
+import UserView from './pages/UserView';
+import Login from './pages/Login';
+import Home from './pages/Home';
 
 const AppRoutes = () => (
   <>
@@ -34,6 +37,9 @@ const AppRoutes = () => (
       <Route path="/problem/:problemId" element={<ProblemView />} />
       <Route path="/user/:userId" element={<UserView />} />
       <Route path="/setting" element={<SettingView />} />
+      <Route path="/report" element={<ReportView />} />
+      <Route path="/notice" element={<NoticeBoard />} />
+      <Route path="/notice/:noticeId" element={<NoticeView />} />
       <Route path='*' element={<ErrorPage />} />
     </Routes>
   </>

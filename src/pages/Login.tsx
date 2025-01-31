@@ -2,13 +2,13 @@ import React, { useEffect, useRef, useState } from "react"
 import { AxiosError } from "axios"
 import { login, register } from "../api/user"
 import { useUser } from "../context/UserContext"
-import { InitUser, User } from "../types/entity/User"
-import useNavigation from "../hooks/useNavigation"
-import styles from "../assets/css/Login.module.css"
 import { UserLoginDTO } from "../types/dto/UserLoginDTO"
-import Loading from "../components/Loading"
-import { resultInterval } from "../utils/resultInterval"
 import { UserResponseDTO } from "../types/dto/UserResponseDTO"
+import { InitUser, User } from "../types/entity/User"
+import { resultInterval } from "../utils/resultInterval"
+import styles from "../assets/css/Login.module.css"
+import useNavigation from "../hooks/useNavigation"
+import Loading from "../components/Loading"
 
 const Login: React.FC = () => {
   const { setUser } = useUser();

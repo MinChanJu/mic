@@ -11,4 +11,15 @@ export type Problem = {
   createdAt: string
 }
 
-export const InitProblem: Problem = { id: null, contestId: -1, userId: '', problemName: '', problemDescription: '', problemInputDescription: '', problemOutputDescription: '', problemExampleInput: '', problemExampleOutput: '', createdAt: '' };
+export const InitProblem: Problem = {
+  id: null,
+  contestId: -1,
+  userId: '',
+  problemName: '',
+  problemDescription: '',
+  problemInputDescription: '',
+  problemOutputDescription: '',
+  problemExampleInput: '',
+  problemExampleOutput: '',
+  createdAt: ''
+};

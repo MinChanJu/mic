@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react"
-import { InitUser, User } from "../types/entity/User";
-import { deleteUserById, getAllUsersByContestId, register } from "../api/user";
 import { useParams } from "react-router-dom";
+import { deleteUserById, getAllUsersByContestId, register } from "../api/user";
+import { InitUser, User } from "../types/entity/User";
+import { resultInterval } from "../utils/resultInterval";
 import Table from "../components/Table";
 import ErrorPage from "../components/ErrorPage";
 import Loading from "../components/Loading";
-import { resultInterval } from "../utils/resultInterval";
 
-const ContestManage = () => {
+const ContestManage: React.FC = () => {
   const { contestId } = useParams();
   const [participants, setPartcipants] = useState<User[]>([]);
   const [size, setSize] = useState<number>(0);

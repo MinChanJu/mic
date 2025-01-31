@@ -1,7 +1,7 @@
 import axios from './axiosInstance';
 import { ApiResponse } from '../types/dto/ApiResponse';
-import { User } from '../types/entity/User';
 import { UserLoginDTO } from '../types/dto/UserLoginDTO';
+import { User } from '../types/entity/User';
 
 const url = '/users'
 

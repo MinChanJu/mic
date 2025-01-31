@@ -10,6 +10,9 @@ const useNavigation = () => {
 		goToLogin: () => navigate(ROUTES.LOGIN),
 		goToUserId: (userId: string) => navigate(ROUTES.USER(userId)),
 		goToSetting: () => navigate(ROUTES.SETTING),
+		goToReport: () => navigate(ROUTES.REPORT),
+		goToNotice: () => navigate(ROUTES.NOTICE),
+		goToNoticeId: (noticeId: number) => navigate(ROUTES.NOTICE_ID(noticeId)),
 		goBack: () => navigate(-1),
 
 		// 대회 이동

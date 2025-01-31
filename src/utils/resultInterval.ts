@@ -1,4 +1,3 @@
-import { AxiosError } from "axios";
 import { getResult } from "../api/common";
 
 export const resultInterval = <T>(
@@ -9,6 +8,7 @@ export const resultInterval = <T>(
   setData?: (data: T) => void,
   intervalTime?: number,
 ): Promise<T> => {
+  if (requestId == '') if (setError) setError(true)
   if (intervalTime == undefined) intervalTime = 1000;
   return new Promise((resolve, reject) => {
     const interval = setInterval(async () => {
@@ -24,12 +24,6 @@ export const resultInterval = <T>(
           resolve(resultResponse.data); // 최종 데이터 반환
         }
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response) console.error("응답 에러: ", error.response.data.message);
-          else console.error("서버 에러: ", error);
-        } else {
-          console.error("알 수 없는 에러:", error);
-        }
         if (setError) setError(true);
         clearInterval(interval); // 에러 발생 시 인터벌 중지
         reject(error); // 에러 발생 시 reject

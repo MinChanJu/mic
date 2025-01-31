@@ -3,10 +3,10 @@ import { AxiosError } from "axios"
 import { createContest } from "../api/contest"
 import { useUser } from "../context/UserContext"
 import { Contest, InitContest } from "../types/entity/Contest"
-import useNavigation from "../hooks/useNavigation"
-import Loading from "../components/Loading"
 import { StringToTime } from "../utils/formatter"
 import { resultInterval } from "../utils/resultInterval"
+import useNavigation from "../hooks/useNavigation"
+import Loading from "../components/Loading"
 
 const ContestMake: React.FC = () => {
   const { user } = useUser()

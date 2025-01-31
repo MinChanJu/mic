@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { getUserByUserId } from "../api/user"
 import { UserDTO } from "../types/dto/UserDTO"
+import { resultInterval } from "../utils/resultInterval"
 import ErrorPage from "../components/ErrorPage"
 import Loading from "../components/Loading"
-import { resultInterval } from "../utils/resultInterval"
 
 const UserView: React.FC = () => {
   const { userId } = useParams();

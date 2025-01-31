@@ -6,15 +6,15 @@ import { getContestListForUserId } from "../api/contest"
 import { getAllUsers, updateUser } from "../api/user"
 import { mathJaxConfig } from "../constants/mathJaxConfig"
 import { useUser } from "../context/UserContext"
-import { FormatFunctions, ScoreFormat } from "../utils/formatter"
 import { ProblemScoreDTO } from "../types/dto/ProblemScoreDTO"
 import { Contest } from "../types/entity/Contest"
 import { Problem } from "../types/entity/Problem"
 import { User } from "../types/entity/User"
-import useNavigation from "../hooks/useNavigation"
+import { FormatFunctions, ScoreFormat } from "../utils/formatter"
+import { resultInterval } from "../utils/resultInterval"
 import styles from "../assets/css/SettingView.module.css"
 import Table from "../components/Table"
-import { resultInterval } from "../utils/resultInterval"
+import useNavigation from "../hooks/useNavigation"
 
 
 const SettingView: React.FC = () => {

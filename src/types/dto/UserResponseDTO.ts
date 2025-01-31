@@ -1,6 +1,6 @@
 import { User } from "../entity/User"
 
 export type UserResponseDTO = {
-    user: User
-    token: string
+  user: User
+  token: string
 }

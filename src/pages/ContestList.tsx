@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { getContestById, getContestList } from '../api/contest'
 import { useUser } from '../context/UserContext'
-import { FormatFunctions } from '../utils/formatter'
 import { ContestListDTO } from '../types/dto/ContestListDTO'
+import { FormatFunctions } from '../utils/formatter'
+import { resultInterval } from '../utils/resultInterval'
 import useNavigation from '../hooks/useNavigation'
 import Table from '../components/Table'
 import ErrorPage from '../components/ErrorPage'
 import Loading from '../components/Loading'
-import { resultInterval } from '../utils/resultInterval'
 
 const ContestList: React.FC = () => {
   const { user } = useUser();

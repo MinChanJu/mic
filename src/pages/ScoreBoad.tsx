@@ -5,13 +5,13 @@ import { getScoreBoardByContestId } from '../api/myData'
 import { mathJaxConfig } from '../constants/mathJaxConfig'
 import { ContestScoreDTO } from '../types/dto/ContestScoreDTO'
 import { ProblemListDTO } from '../types/dto/ProblemListDTO'
-import Table from '../components/Table'
+import { ContestListDTO } from '../types/dto/ContestListDTO'
+import { ScoreBoardDTO } from '../types/dto/ScoreBoardDTO'
 import { SubmitDTO } from '../types/dto/SubmitDTO'
+import { resultInterval } from '../utils/resultInterval'
+import Table from '../components/Table'
 import ErrorPage from '../components/ErrorPage'
 import Loading from '../components/Loading'
-import { resultInterval } from '../utils/resultInterval'
-import { ScoreBoardDTO } from '../types/dto/ScoreBoardDTO'
-import { ContestListDTO } from '../types/dto/ContestListDTO'
 
 
 const ScoreBoard: React.FC = () => {

@@ -3,13 +3,13 @@ import { MathJaxContext } from 'better-react-mathjax'
 import { getProblemList } from '../api/problem'
 import { mathJaxConfig } from '../constants/mathJaxConfig'
 import { useUser } from '../context/UserContext'
-import { FormatFunctions } from '../utils/formatter'
 import { ProblemListDTO } from '../types/dto/ProblemListDTO'
+import { FormatFunctions } from '../utils/formatter'
+import { resultInterval } from '../utils/resultInterval'
 import useNavigation from '../hooks/useNavigation'
 import Table from '../components/Table'
 import Loading from '../components/Loading'
 import ErrorPage from '../components/ErrorPage'
-import { resultInterval } from '../utils/resultInterval'
 
 const ProblemList: React.FC = () => {
   const { user } = useUser()

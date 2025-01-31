@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
-import { AxiosError } from "axios"
 import { getContestById, updateContest } from "../api/contest"
 import { useUser } from "../context/UserContext"
-import { StringToTime } from "../utils/formatter"
 import { Contest } from "../types/entity/Contest"
+import { StringToTime } from "../utils/formatter"
+import { resultInterval } from "../utils/resultInterval"
 import useNavigation from "../hooks/useNavigation"
 import ErrorPage from "../components/ErrorPage"
 import Loading from "../components/Loading"
-import { resultInterval } from "../utils/resultInterval"
 
 
 const EditContest: React.FC = () => {
@@ -54,12 +53,7 @@ const EditContest: React.FC = () => {
               await updateContest(contest);
               goToContestId(contest.id!);
             } catch (error) {
-              if (error instanceof AxiosError) {
-                if (error.response) setEditMessage("응답 에러: " + error.response.data.message);
-                else console.error("서버 에러: ", error)
-              } else {
-                console.error("알 수 없는 에러:", error);
-              }
+              console.error("알 수 없는 에러:", error);
             }
 
           } else {

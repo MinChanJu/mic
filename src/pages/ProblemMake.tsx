@@ -3,12 +3,12 @@ import { useParams } from "react-router-dom"
 import { AxiosError } from "axios"
 import { createProblem } from "../api/problem"
 import { useUser } from "../context/UserContext"
-import { autoResize } from "../utils/resize"
-import { InitProblem, Problem } from "../types/entity/Problem"
 import { ProblemDTO } from "../types/dto/ProblemDTO"
+import { InitProblem, Problem } from "../types/entity/Problem"
 import { Example, InitExample } from "../types/entity/Example"
-import useNavigation from "../hooks/useNavigation"
 import { resultInterval } from "../utils/resultInterval"
+import { autoResize } from "../utils/resize"
+import useNavigation from "../hooks/useNavigation"
 
 const ProblemMake: React.FC = () => {
   const { user } = useUser()

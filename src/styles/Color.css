@@ -1,31 +1,31 @@
 .backRed {
-    background-color: red;
+  background-color: red;
 }
 
 .backBlue {
-    background-color: rgb(0, 200, 255);
+  background-color: rgb(0, 200, 255);
 }
 
 .backWhite {
-    background-color: white;
+  background-color: white;
 }
 
 .backBlack {
-    background-color: black;
+  background-color: black;
 }
 
 .red {
-    color: red;
+  color: red;
 }
 
 .blue {
-    color: rgb(0, 200, 255);
+  color: rgb(0, 200, 255);
 }
 
 .white {
-    color: white;
+  color: white;
 }
 
 .black {
-    color: black;
+  color: black;
 }
