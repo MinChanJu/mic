@@ -1,4 +1,4 @@
-import { HashRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { UserProvider } from './context/UserContext';
 import Header from './components/Header';
 import AppRoutes from './AppRoutes';
@@ -11,10 +11,10 @@ import './styles/Color.css'
 function App() {
   return (
     <UserProvider>
-      <HashRouter basename='/mic'>
+      <BrowserRouter basename='/mic'>
         <Header />
         <AppRoutes />
-      </HashRouter>
+      </BrowserRouter>
     </UserProvider>
   )
 }
