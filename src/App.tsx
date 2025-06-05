@@ -11,7 +11,7 @@ import './styles/Color.css'
 function App() {
   return (
     <UserProvider>
-      <BrowserRouter basename='/mic'>
+      <BrowserRouter basename='/MiC'>
         <Header />
         <AppRoutes />
       </BrowserRouter>
