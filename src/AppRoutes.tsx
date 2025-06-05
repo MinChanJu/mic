@@ -12,7 +12,7 @@ import SettingView from './pages/SettingView';
 import NoticeBoard from './pages/NoticeBoard';
 import NoticeView from './pages/NoticeView';
 import ReportView from './pages/ReportView';
-import ScoreBoard from './pages/ScoreBoad';
+import ScoreBoard from './pages/ScoreBoard';
 import PageTitle from './components/PageTitle';
 import ErrorPage from './components/ErrorPage';
 import UserView from './pages/UserView';
